@@ -58,7 +58,7 @@ def call_claude(full_prompt: str) -> str:
         "content-type": "application/json",
     }
     body = {
-    "model": "claude-haiku-4-5-20251001",
+    "model": "claude-3-5-haiku-20241022",
     "max_tokens": 512,
     "messages": [
         {
@@ -85,14 +85,9 @@ def call_ollama(full_prompt: str) -> str:
 
 
 def get_ai_response(full_prompt: str) -> str:
-    """Use Claude if API key is set, otherwise fall back to Ollama."""
     if ANTHROPIC_API_KEY:
-        try:
-            return call_claude(full_prompt)
-        except Exception as e:
-            print(f"Claude API error: {e} — falling back to Ollama")
-    return call_ollama(full_prompt)
-
+        return call_claude(full_prompt)
+    return "No API key configured."
 
 # ── Main endpoint ─────────────────────────────────────────────────────────────
 @app.post("/generate/")
