@@ -58,7 +58,7 @@ def call_claude(full_prompt: str) -> str:
         "content-type": "application/json",
     }
     body = {
-    "model": "claude-3-haiku-20240307",
+    "model": "claude-3-5-haiku-20241022",
     "max_tokens": 512,
     "messages": [
         {
