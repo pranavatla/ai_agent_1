@@ -55,11 +55,15 @@ def call_claude(full_prompt: str) -> str:
         "content-type": "application/json",
     }
     body = {
-        "model": "claude-haiku-4-5-20251001",
-        "max_tokens": 512,
-        "system": SYSTEM_PROMPT,
-        "messages": [{"role": "user", "content": full_prompt}],
-    }
+    "model": "claude-haiku-4-5-20251001",
+    "max_tokens": 512,
+    "messages": [
+        {
+            "role": "user", 
+            "content": f"{SYSTEM_PROMPT}\n\n{full_prompt}"
+        }
+    ],
+}
     r = requests.post("https://api.anthropic.com/v1/messages", json=body, headers=headers, timeout=30)
     r.raise_for_status()
     return r.json()["content"][0]["text"]
