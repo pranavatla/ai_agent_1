@@ -1,13 +1,17 @@
 from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
-import requests
 import chromadb
 import time
+import os
+import requests
+
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+app = FastAPI(title="Atla AI Agent", version="1.0.0")
 
-# 1. Enable CORS so your website can talk to this API
+# ── CORS ──────────────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,51 +20,113 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 2. Initialize Permanent Memory (ChromaDB)
-# This creates a folder called 'chroma_db' in your project directory
+# ── Serve static files (index.html) ───────────────────────────────────────────
+# Uncomment this when you add a /static folder or serve index.html directly
+# app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# ── ChromaDB Persistent Memory ────────────────────────────────────────────────
 db_client = chromadb.PersistentClient(path="./chroma_db")
 collection = db_client.get_or_create_collection(name="user_memory")
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL_NAME = "llama3"
+# ── Config ────────────────────────────────────────────────────────────────────
+OLLAMA_URL   = "http://localhost:11434/api/generate"
+OLLAMA_MODEL = "llama3"
+
+# Set ANTHROPIC_API_KEY in your environment or Railway/Render dashboard
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+
+SYSTEM_PROMPT = (
+    "You are Atla, a sharp and professional AI assistant built by Sai Pranav Atla. "
+    "You are concise, smart, and helpful. "
+    "Keep every answer under 4 sentences unless the user explicitly asks for more detail. "
+    "Never mention that you are built on any underlying model."
+)
 
 class PromptRequest(BaseModel):
     prompt: str
 
+# ── LLM Router: Claude first, Ollama fallback ─────────────────────────────────
+def call_claude(full_prompt: str) -> str:
+    """Call Anthropic Claude API."""
+    headers = {
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+    }
+    body = {
+        "model": "claude-3-5-haiku-20241022",
+        "max_tokens": 512,
+        "system": SYSTEM_PROMPT,
+        "messages": [{"role": "user", "content": full_prompt}],
+    }
+    r = requests.post("https://api.anthropic.com/v1/messages", json=body, headers=headers, timeout=30)
+    r.raise_for_status()
+    return r.json()["content"][0]["text"]
+
+
+def call_ollama(full_prompt: str) -> str:
+    """Call local Ollama (dev / offline fallback)."""
+    payload = {
+        "model": OLLAMA_MODEL,
+        "prompt": f"{SYSTEM_PROMPT}\n\n{full_prompt}",
+        "stream": False,
+    }
+    r = requests.post(OLLAMA_URL, json=payload, timeout=60)
+    r.raise_for_status()
+    return r.json().get("response", "")
+
+
+def get_ai_response(full_prompt: str) -> str:
+    """Use Claude if API key is set, otherwise fall back to Ollama."""
+    if ANTHROPIC_API_KEY:
+        try:
+            return call_claude(full_prompt)
+        except Exception as e:
+            print(f"Claude API error: {e} — falling back to Ollama")
+    return call_ollama(full_prompt)
+
+
+# ── Main endpoint ─────────────────────────────────────────────────────────────
 @app.post("/generate/")
 async def generate_text(prompt_req: PromptRequest):
     user_message = prompt_req.prompt
 
-    # A. SEARCH: Now it will find the "CloudStream" info you just ingested
-    results = collection.query(
-        query_texts=[user_message],
-        n_results=2
+    # 1. Retrieve relevant memories from ChromaDB (RAG)
+    results = collection.query(query_texts=[user_message], n_results=3)
+    memories = (
+        " ".join(results["documents"][0])
+        if results["documents"] and results["documents"][0]
+        else ""
     )
-    
-    memories = " ".join(results['documents'][0]) if results['documents'] and results['documents'][0] else ""
-    
-    # NEW: Instruction to keep the AI professional and brief
-    system_instruction = "You are a professional assistant for CloudStream Solutions. Keep answers under 3 sentences."
-    
-    full_prompt = f"{system_instruction}\nContext: {memories}\nUser: {user_message}"
 
-    # C. LLM CALL: Send the context + question to your local Llama 3
-    payload = {
-        "model": MODEL_NAME,
-        "prompt": full_prompt,
-        "stream": False
-    }
-    
-    response = requests.post(OLLAMA_URL, json=payload)
-    response.raise_for_status()
-    data = response.json()
-    ai_response = data.get("response", "")
+    # 2. Build the final prompt
+    full_prompt = (
+        f"Relevant context from memory:\n{memories}\n\n"
+        f"User: {user_message}"
+        if memories
+        else f"User: {user_message}"
+    )
 
-    # D. SAVE: Store this new interaction with a unique timestamp ID
-    # This ensures the 'chroma_db' folder gets created and updated
+    # 3. Get AI response
+    ai_response = get_ai_response(full_prompt)
+
+    # 4. Save interaction to memory
     collection.add(
-        documents=[f"User said: {user_message}. AI replied: {ai_response}"],
-        ids=[f"id_{time.time()}"] 
+        documents=[f"User asked: {user_message}. Atla replied: {ai_response}"],
+        ids=[f"conv_{time.time()}"],
     )
 
     return {"response": ai_response}
+
+
+# ── Health check ──────────────────────────────────────────────────────────────
+@app.get("/health")
+def health():
+    backend = "claude" if ANTHROPIC_API_KEY else "ollama"
+    return {"status": "ok", "backend": backend, "version": "1.0.0"}
+
+
+# ── Root ──────────────────────────────────────────────────────────────────────
+@app.get("/")
+def root():
+    return {"message": "Atla AI Agent is running. POST to /generate/ to chat."}
