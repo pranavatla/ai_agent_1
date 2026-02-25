@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 🚀 Atla AI Agent
 
 Serverless + Containerized AI Backend | RAG | Persistent Memory | Multi-Cloud Deployment
@@ -78,11 +79,64 @@ Serverless	Vercel
 Container Runtime	Railway
 💻 Quick Start (Local)
 1️⃣ Clone & Setup
+=======
+# 🚀 Atla AI Agent
+
+Production-grade conversational AI system with persistent memory, Retrieval-Augmented Generation (RAG), and dual-cloud deployment.
+
+Live: https://atla.in
+
+
+## Overview
+
+Atla AI Agent is a FastAPI-based AI backend with persistent vector memory using ChromaDB.  
+It supports Claude (production) and Ollama (local development), and is deployed across:
+
+- Vercel (serverless runtime)
+- Railway (container runtime)
+
+Single repository. Multi-platform deployment. Automated CI/CD.
+
+
+## Architecture
+
+AI_Agent_1/
+│
+├── api/index.py        # Primary FastAPI app (Vercel runtime)
+├── app1.py             # Railway entrypoint (imports api.index)
+├── ingest.py           # Single file ingestion
+├── ingest_all.py       # Bulk ingestion
+├── memory_test.py      # Chroma smoke test
+├── knowledge_base/     # Drop .txt files here
+├── chroma_db/          # Persistent vector store (gitignored)
+├── index.html          # Frontend UI
+├── requirements.txt
+├── vercel.json
+└── README.md
+
+
+## Core Features
+
+- Retrieval-Augmented Generation (RAG)
+- Persistent ChromaDB memory
+- Claude API integration
+- Ollama + Llama 3 local mode
+- Conversation compression
+- Multi-cloud deployment
+- Git-based CI/CD
+
+
+## Local Development
+
+Clone and setup:
+
+>>>>>>> 9777fa6 (Rewrite README cleanly)
 git clone https://github.com/saipranavAtla/atla-agent.git
 cd atla-agent
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+<<<<<<< HEAD
 2️⃣ Optional: Run with Ollama (Local Dev)
 
 In a separate terminal:
@@ -247,3 +301,77 @@ Clean Git-based CI/CD
 Multi-cloud architecture from one codebase
 
 This repository is both a functional AI system and an infrastructure learning project.
+=======
+
+
+Run with Claude:
+
+export ANTHROPIC_API_KEY=sk-ant-...
+
+
+Optional: Run Ollama locally
+
+ollama serve
+ollama pull llama3
+
+
+Ingest knowledge:
+
+python ingest_all.py
+
+
+Start server:
+
+uvicorn app1:app --reload --port 8000
+
+
+Serve frontend:
+
+python -m http.server 3000
+
+Open:
+http://localhost:3000
+
+
+## API Endpoints
+
+POST  /generate/   → Chat with AI  
+GET   /health      → Backend status  
+GET   /            → Root info  
+
+
+Example:
+
+curl -X POST http://localhost:8000/generate/ \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"What services do you offer?"}'
+
+
+## Deployment
+
+Railway:
+- Deploy from GitHub
+- Set ANTHROPIC_API_KEY
+- Start command:
+  uvicorn app1:app --host 0.0.0.0 --port $PORT
+
+Vercel:
+- Connect GitHub
+- Ensure vercel.json exists
+- Set environment variables
+- Push to main → auto deploy
+
+
+## Environment Variables
+
+ANTHROPIC_API_KEY  (Production LLM)
+OPENAI_API_KEY     (Optional)
+OLLAMA_BASE_URL    (Local dev)
+
+
+## Built By
+
+Sai Pranav Atla
+AI Engineer — Bengaluru
+https://atla.in
+>>>>>>> 9777fa6 (Rewrite README cleanly)
