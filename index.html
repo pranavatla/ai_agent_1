@@ -221,12 +221,14 @@
   const typingEl = document.getElementById("typing");
   const errorEl = document.getElementById("error");
 
-  // 🔥 Conversation Memory
+  // ===== SETTINGS =====
+  const MAX_MESSAGES = 10;   // Hard cap
+  const SYSTEM_PROMPT = "You are Atla, a helpful and intelligent AI assistant.";
+
+  // ===== Conversation Memory =====
   let conversation = [
-    {
-      role: "assistant",
-      content: "Hello. I'm Atla — your intelligent assistant. Ask me anything."
-    }
+    { role: "system", content: SYSTEM_PROMPT },
+    { role: "assistant", content: "Hello. I'm Atla — your intelligent assistant. Ask me anything." }
   ];
 
   function scrollBottom() {
@@ -253,6 +255,16 @@
     scrollBottom();
   }
 
+  function trimConversation() {
+    // Always keep system prompt
+    const system = conversation[0];
+
+    // Keep last MAX_MESSAGES messages
+    const recent = conversation.slice(-MAX_MESSAGES);
+
+    conversation = [system, ...recent.filter(m => m.role !== "system")];
+  }
+
   async function sendMessage() {
     const text = inputEl.value.trim();
     if (!text) return;
@@ -263,6 +275,8 @@
       role: "user",
       content: text
     });
+
+    trimConversation(); // 🔥 Cost control here
 
     inputEl.value = "";
     typingEl.classList.add("visible");
@@ -285,6 +299,8 @@
         role: "assistant",
         content: data.response
       });
+
+      trimConversation(); // Trim again after response
 
     } catch (err) {
       errorEl.textContent = "Connection failed.";
