@@ -17,6 +17,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://reliable-choux-3bbc18.netlify.app",
+        "https://genuine-churros-be1013.netlify.app",
         "https://atla.in"
     ],
     allow_credentials=True,
