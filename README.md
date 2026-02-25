@@ -1,145 +1,249 @@
-# Atla AI Agent — atla.in
+🚀 Atla AI Agent
 
-A production-grade conversational AI agent with persistent memory, RAG, and a clean glassmorphism UI.
+Serverless + Containerized AI Backend | RAG | Persistent Memory | Multi-Cloud Deployment
 
-**Live demo:** [atla.in](https://atla.in)
+Atla AI Agent — atla.in
 
----
+A production-grade conversational AI agent with persistent memory, Retrieval-Augmented Generation (RAG), and a modern glassmorphism UI.
 
-## What it does
+Live demo: https://atla.in
 
-- Answers questions using a local knowledge base (RAG via ChromaDB)
-- Remembers conversations permanently across server restarts
-- Routes to **Claude API** in production or **Ollama (Llama 3)** locally
-- Clean, animated dark UI with real-time "Thinking…" state
+This project demonstrates:
 
----
+FastAPI-based AI backend
 
-## Tech Stack
+Persistent vector memory (ChromaDB)
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | FastAPI + Uvicorn |
-| Vector DB | ChromaDB (persistent) |
-| LLM (prod) | Claude API (claude-3-5-haiku) |
-| LLM (dev) | Ollama + Llama 3 (local) |
-| Frontend | Vanilla HTML/CSS/JS |
-| Deploy | Railway / Render |
+Claude API (production) + Ollama (local dev)
 
----
+Dual deployment: Vercel (serverless) + Railway (container runtime)
 
-## Project Structure
+Git-based CI/CD automation
 
-```
+✨ What It Does
+
+Answers questions using a local knowledge base (RAG via ChromaDB)
+
+Remembers conversations across server restarts
+
+Routes to Claude API in production
+
+Supports Ollama + Llama 3 locally
+
+Clean animated dark UI with real-time “Thinking…” state
+
+Deployable across multiple cloud runtimes from a single repo
+
+🏗 Architecture Overview
 AI_Agent_1/
-├── app1.py           # FastAPI backend — main entry point
-├── ingest.py         # Ingest a single .txt file into memory
-├── ingest_all.py     # Bulk ingest all files in /knowledge_base
-├── memory_test.py    # Quick ChromaDB smoke test
-├── knowledge_base/   # Drop .txt files here to expand AI knowledge
-│   └── company_info.txt
-├── chroma_db/        # Auto-created vector store (gitignored)
-├── index.html        # Frontend UI
-├── requirements.txt  # Python dependencies
+│
+├── api/
+│   └── index.py          # Primary FastAPI application (Vercel runtime)
+│
+├── app1.py               # Railway entrypoint (imports api.index)
+├── ingest.py             # Ingest single file into vector store
+├── ingest_all.py         # Bulk ingest knowledge base
+├── memory_test.py        # ChromaDB smoke test
+│
+├── knowledge_base/       # Drop .txt files here
+├── chroma_db/            # Persistent vector database (gitignored)
+│
+├── index.html            # Frontend UI
+├── requirements.txt
+├── vercel.json           # Vercel routing config
 └── README.md
-```
+☁️ Deployment Model
+Platform	Role
+Vercel	Static frontend + serverless backend
+Railway	Persistent container backend
+Netlify (optional)	Static frontend pointing to Railway
+How It Works
 
----
+api/index.py → primary FastAPI app
 
-## Quick Start (Local)
+app1.py → thin wrapper for Railway (from api.index import app)
 
-### 1. Clone and set up environment
+Same backend logic deployed to two environments
 
-```bash
+Push to Git → auto redeploy on both platforms
+
+🧠 Tech Stack
+Layer	Technology
+Backend	FastAPI + Uvicorn
+Vector DB	ChromaDB (persistent)
+LLM (prod)	Claude API (claude-3-5-haiku)
+LLM (dev)	Ollama + Llama 3
+Frontend	Vanilla HTML / CSS / JS
+Serverless	Vercel
+Container Runtime	Railway
+💻 Quick Start (Local)
+1️⃣ Clone & Setup
 git clone https://github.com/saipranavAtla/atla-agent.git
 cd atla-agent
-python3.13 -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-```
+2️⃣ Optional: Run with Ollama (Local Dev)
 
-### 2. (Optional) Run with Ollama locally
+In a separate terminal:
 
-```bash
-# In a separate terminal
 ollama serve
 ollama pull llama3
-```
-
-### 3. (Optional) Use Claude API
-
-```bash
+3️⃣ Optional: Use Claude API
 export ANTHROPIC_API_KEY=sk-ant-...
-```
-
-### 4. Ingest your knowledge base
-
-```bash
+4️⃣ Ingest Knowledge Base
 python ingest_all.py
-```
 
-### 5. Start the server
+This creates the persistent chroma_db/ directory.
 
-```bash
+5️⃣ Start Backend
 uvicorn app1:app --reload --port 8000
-```
+6️⃣ Open UI
 
-### 6. Open the UI
+Either open index.html directly
+or serve it:
 
-Open `index.html` directly in your browser, or serve it:
-
-```bash
 python -m http.server 3000
-```
-Then visit: [http://localhost:3000](http://localhost:3000)
 
----
+Visit:
 
-## Deploy to Railway (10 minutes)
-
-1. Push this repo to GitHub
-2. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub
-3. Set environment variable: `ANTHROPIC_API_KEY = sk-ant-...`
-4. Railway auto-detects FastAPI and deploys
-5. Get your URL (e.g. `https://atla-agent.up.railway.app`)
-6. Update `API_BASE` in `index.html` with this URL
-7. Point `atla.in` DNS to Railway
-
----
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/generate/` | Chat with the AI agent |
-| `GET`  | `/health`    | Backend health + active LLM backend |
-| `GET`  | `/`          | Root info |
-
-**Example request:**
-```bash
+http://localhost:3000
+📡 API Endpoints
+Method	Endpoint	Description
+POST	/generate/	Chat with the AI agent
+GET	/health	Backend health check
+GET	/	Root info
+Example Request
 curl -X POST http://localhost:8000/generate/ \
   -H "Content-Type: application/json" \
   -d '{"prompt": "What services do you offer?"}'
-```
+📚 Adding Knowledge
 
----
+Drop any .txt file into:
 
-## Adding Knowledge
+knowledge_base/
 
-Drop any `.txt` file into the `knowledge_base/` folder and run:
+Then run:
 
-```bash
 python ingest_all.py
-```
 
-The AI will now use this content when answering relevant questions.
+The AI will incorporate the new content into retrieval responses.
 
----
+🚂 Deploy to Railway
 
-## Built by
+Push repo to GitHub
 
-**Sai Pranav Atla** — AI Engineer, Bengaluru
+Go to railway.app → New Project → Deploy from GitHub
 
-- [LinkedIn](https://linkedin.com/in/saipranavAtla)
-- [GitHub](https://github.com/saipranavAtla)
-- [atla.in](https://atla.in)
+Set environment variable:
+
+ANTHROPIC_API_KEY = sk-ant-...
+
+Start command:
+
+uvicorn app1:app --host 0.0.0.0 --port $PORT
+
+Railway auto deploys
+
+Update frontend API_BASE if using Railway URL
+
+Point DNS (atla.in) to Railway
+
+🚀 Deploy to Vercel
+
+Connect GitHub repo to Vercel
+
+Ensure vercel.json exists
+
+Set required environment variables
+
+Push to main
+
+Auto deployment triggers
+
+Vercel handles:
+
+Static frontend hosting
+
+Serverless FastAPI backend via /api/index.py
+
+🔐 Environment Variables
+Variable	Required	Description
+ANTHROPIC_API_KEY	Yes (Claude mode)	Production LLM
+OPENAI_API_KEY	Optional	If using OpenAI mode
+OLLAMA_BASE_URL	Optional	Local dev mode
+
+Must be configured separately per platform.
+
+⚙️ CI/CD Workflow
+
+Every git push:
+
+Vercel rebuilds frontend + serverless backend
+
+Railway redeploys backend
+
+No manual build steps required
+
+⚠ Limitations
+
+Current architecture is suitable for:
+
+Personal AI agents
+
+Small-scale SaaS
+
+Portfolio projects
+
+Experimental deployments
+
+For enterprise scale:
+
+Replace in-memory rate limiting with Redis
+
+Add distributed caching
+
+Add structured logging
+
+Add observability (Prometheus / OpenTelemetry)
+
+Add horizontal scaling strategy
+
+🛠 Future Roadmap
+
+Streaming responses
+
+Advanced memory layering
+
+Redis-backed distributed rate limiting
+
+Vector DB cloud migration
+
+Custom domain API subdomain (api.atla.in)
+
+Structured logging & monitoring
+
+👤 Built By
+
+Sai Pranav Atla
+AI Engineer — Bengaluru
+
+LinkedIn
+
+GitHub
+
+https://atla.in
+
+🔥 What This Project Demonstrates
+
+Retrieval-Augmented Generation (RAG)
+
+Persistent vector memory
+
+Dual runtime deployment (serverless + container)
+
+Clean Git-based CI/CD
+
+Multi-cloud architecture from one codebase
+
+This repository is both a functional AI system and an infrastructure learning project.
