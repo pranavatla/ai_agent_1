@@ -5,8 +5,9 @@ from openai import OpenAI, RateLimitError, APIError, AuthenticationError
 import time
 import os
 from collections import defaultdict
+from typing import List
 
-app = FastAPI(title="Atla AI Agent", version="3.1.0")
+app = FastAPI(title="Atla AI Agent", version="3.2.0")
 
 # ── CORS ─────────────────────────────────────────────
 app.add_middleware(
@@ -38,23 +39,36 @@ SYSTEM_PROMPT = (
     "Never mention that you are built on any underlying model."
 )
 
-class PromptRequest(BaseModel):
-    prompt: str
+# ── Models ───────────────────────────────────────────
+class Message(BaseModel):
+    role: str
+    content: str
 
-def get_ai_response(user_prompt: str) -> str:
+class ConversationRequest(BaseModel):
+    messages: List[Message]
+
+# ── AI Response Function ─────────────────────────────
+def get_ai_response(messages: List[Message]) -> str:
     if not OPENAI_API_KEY:
         return "AI service configuration issue."
 
     try:
+        openai_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+
+        for msg in messages:
+            if msg.role in ["user", "assistant"]:
+                openai_messages.append({
+                    "role": msg.role,
+                    "content": msg.content
+                })
+
         response = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_prompt},
-            ],
+            messages=openai_messages,
             temperature=0.7,
             max_tokens=400,
         )
+
         return response.choices[0].message.content
 
     except RateLimitError:
@@ -67,8 +81,9 @@ def get_ai_response(user_prompt: str) -> str:
         print("Unexpected error:", str(e))
         return "Unexpected AI service error."
 
+# ── Endpoint ─────────────────────────────────────────
 @app.post("/generate/")
-async def generate_text(request: Request, prompt_req: PromptRequest):
+async def generate_text(request: Request, convo: ConversationRequest):
     client_ip = request.client.host
     current_time = time.time()
 
@@ -82,7 +97,7 @@ async def generate_text(request: Request, prompt_req: PromptRequest):
 
     request_log[client_ip].append(current_time)
 
-    ai_response = get_ai_response(prompt_req.prompt)
+    ai_response = get_ai_response(convo.messages)
     return {"response": ai_response}
 
 @app.get("/health")
@@ -91,7 +106,7 @@ def health():
         "status": "ok",
         "backend": "openai" if OPENAI_API_KEY else "none",
         "rate_limit": f"{RATE_LIMIT} req/{WINDOW}s",
-        "version": "3.1.0",
+        "version": "3.2.0",
     }
 
 @app.get("/")
