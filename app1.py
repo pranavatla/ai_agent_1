@@ -1,16 +1,17 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
 import chromadb
 import time
 import os
+from collections import defaultdict
 
-from openai import OpenAI
+from openai import OpenAI, RateLimitError, APIError, AuthenticationError
 
 
 # ── App Init ────────────────────────────────────────────────────────────────
-app = FastAPI(title="Atla AI Agent", version="2.0.0")
+app = FastAPI(title="Atla AI Agent", version="3.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,6 +35,12 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 
+# ── Rate Limiting Setup ─────────────────────────────────────────────────────
+request_log = defaultdict(list)
+RATE_LIMIT = 10   # max requests
+WINDOW = 60       # per 60 seconds
+
+
 SYSTEM_PROMPT = (
     "You are Atla, a sharp and professional AI assistant built by Sai Pranav Atla. "
     "You are concise, smart, and helpful. "
@@ -46,12 +53,13 @@ class PromptRequest(BaseModel):
     prompt: str
 
 
-# ── LLM Call ─────────────────────────────────────────────────────────────────
+# ── LLM Call With Fallback + Clean Errors ───────────────────────────────────
 def get_ai_response(full_prompt: str) -> str:
     if not OPENAI_API_KEY:
-        return "OpenAI API key not configured."
+        return "AI service configuration issue."
 
     try:
+        # Primary model
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -61,20 +69,59 @@ def get_ai_response(full_prompt: str) -> str:
             temperature=0.7,
             max_tokens=500,
         )
-
         return response.choices[0].message.content
 
+    except RateLimitError:
+        # Fallback to cheaper model
+        try:
+            fallback = client.chat.completions.create(
+                model="gpt-4.1-mini",
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": full_prompt},
+                ],
+                temperature=0.7,
+                max_tokens=500,
+            )
+            return fallback.choices[0].message.content
+        except Exception:
+            return "Service temporarily busy. Please try again shortly."
+
+    except AuthenticationError:
+        return "AI service authentication failed."
+
+    except APIError:
+        return "AI service currently unavailable."
+
     except Exception as e:
-        # Prevent server crash — return readable error
-        return f"LLM Error: {str(e)}"
+        print("Unexpected LLM error:", str(e))
+        return "Unexpected AI service error."
 
 
 # ── Main Endpoint ───────────────────────────────────────────────────────────
 @app.post("/generate/")
-async def generate_text(prompt_req: PromptRequest):
+async def generate_text(request: Request, prompt_req: PromptRequest):
+
+    # ── Rate Limiting ──
+    client_ip = request.client.host
+    current_time = time.time()
+
+    request_log[client_ip] = [
+        t for t in request_log[client_ip]
+        if current_time - t < WINDOW
+    ]
+
+    if len(request_log[client_ip]) >= RATE_LIMIT:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many requests. Please slow down."
+        )
+
+    request_log[client_ip].append(current_time)
+
     user_message = prompt_req.prompt
 
-    # 1. Retrieve memory (RAG)
+    # ── Retrieve Memory (RAG) ──
     results = collection.query(query_texts=[user_message], n_results=3)
 
     memories = (
@@ -83,17 +130,16 @@ async def generate_text(prompt_req: PromptRequest):
         else ""
     )
 
-    # 2. Build final prompt
     full_prompt = (
         f"Relevant context from memory:\n{memories}\n\nUser: {user_message}"
         if memories
         else f"User: {user_message}"
     )
 
-    # 3. Generate response
+    # ── Generate Response ──
     ai_response = get_ai_response(full_prompt)
 
-    # 4. Store interaction
+    # ── Store Interaction ──
     collection.add(
         documents=[f"User asked: {user_message}. Atla replied: {ai_response}"],
         ids=[f"conv_{time.time()}"],
@@ -108,7 +154,8 @@ def health():
     return {
         "status": "ok",
         "backend": "openai" if OPENAI_API_KEY else "none",
-        "version": "2.0.0",
+        "rate_limit": f"{RATE_LIMIT} req/{WINDOW}s",
+        "version": "3.0.0",
     }
 
 
