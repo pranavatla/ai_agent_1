@@ -13,12 +13,14 @@ from openai import OpenAI, RateLimitError, APIError, AuthenticationError
 # ── App Init ────────────────────────────────────────────────────────────────
 app = FastAPI(title="Atla AI Agent", version="3.0.0")
 
+# ── CORS Configuration ──────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://reliable-choux-3bbc18.netlify.app",
         "https://genuine-churros-be1013.netlify.app",
-        "https://atla.in"
+        "https://atla.in",
+        "http://localhost:8000"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -38,8 +40,8 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 # ── Rate Limiting Setup ─────────────────────────────────────────────────────
 request_log = defaultdict(list)
-RATE_LIMIT = 10   # max requests
-WINDOW = 60       # per 60 seconds
+RATE_LIMIT = 10
+WINDOW = 60  # seconds
 
 
 SYSTEM_PROMPT = (
@@ -54,13 +56,12 @@ class PromptRequest(BaseModel):
     prompt: str
 
 
-# ── LLM Call With Fallback + Clean Errors ───────────────────────────────────
+# ── LLM Call With Fallback ──────────────────────────────────────────────────
 def get_ai_response(full_prompt: str) -> str:
     if not OPENAI_API_KEY:
         return "AI service configuration issue."
 
     try:
-        # Primary model
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -73,7 +74,7 @@ def get_ai_response(full_prompt: str) -> str:
         return response.choices[0].message.content
 
     except RateLimitError:
-        # Fallback to cheaper model
+        # Fallback model
         try:
             fallback = client.chat.completions.create(
                 model="gpt-4.1-mini",
@@ -149,7 +150,7 @@ async def generate_text(request: Request, prompt_req: PromptRequest):
     return {"response": ai_response}
 
 
-# ── Health ───────────────────────────────────────────────────────────────────
+# ── Health Endpoint ─────────────────────────────────────────────────────────
 @app.get("/health")
 def health():
     return {
@@ -160,7 +161,7 @@ def health():
     }
 
 
-# ── Root ─────────────────────────────────────────────────────────────────────
+# ── Root Endpoint ───────────────────────────────────────────────────────────
 @app.get("/")
 def root():
     return {"message": "Atla AI Agent is running. POST to /generate/ to chat."}
