@@ -258,7 +258,11 @@
       const res = await fetch(`${API_BASE}/generate/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: text })
+        body: JSON.stringify({
+          messages: [
+            { role: "user", content: text }
+          ]
+        })
       });
 
       if (!res.ok) throw new Error("Backend error " + res.status);
