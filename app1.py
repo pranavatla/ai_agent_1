@@ -29,7 +29,7 @@ app.add_middleware(
 
 
 # ── ChromaDB Persistent Memory ──────────────────────────────────────────────
-db_client = chromadb.PersistentClient(path="./chroma_db")
+db_client = chromadb.Client()
 collection = db_client.get_or_create_collection(name="user_memory")
 
 
