@@ -161,8 +161,3 @@ def health():
         "compression": "enabled",
         "version": "4.0.0",
     }
-
-
-@app.get("/")
-def root():
-    return {"message": "Atla AI Agent running."}
