@@ -139,6 +139,14 @@
       display:block;
     }
 
+    #error{
+      display:none;
+      background:#2a0f18;
+      color:#ff5c7a;
+      padding:8px 16px;
+      font-size:12px;
+    }
+
     #input-area{
       display:flex;
       gap:10px;
@@ -170,14 +178,6 @@
       cursor:pointer;
       color:#fff;
       font-weight:700;
-    }
-
-    #error{
-      display:none;
-      background:#2a0f18;
-      color:#ff5c7a;
-      padding:8px 16px;
-      font-size:12px;
     }
   </style>
 </head>
@@ -221,6 +221,14 @@
   const typingEl = document.getElementById("typing");
   const errorEl = document.getElementById("error");
 
+  // 🔥 Conversation Memory
+  let conversation = [
+    {
+      role: "assistant",
+      content: "Hello. I'm Atla — your intelligent assistant. Ask me anything."
+    }
+  ];
+
   function scrollBottom() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -229,7 +237,7 @@
     const row = document.createElement("div");
     row.className = `msg-row ${role}`;
 
-    if (role === "ai") {
+    if (role === "assistant") {
       const avatar = document.createElement("div");
       avatar.className = "avatar";
       avatar.textContent = "A";
@@ -250,6 +258,12 @@
     if (!text) return;
 
     addMessage(text, "user");
+
+    conversation.push({
+      role: "user",
+      content: text
+    });
+
     inputEl.value = "";
     typingEl.classList.add("visible");
     errorEl.style.display = "none";
@@ -258,17 +272,19 @@
       const res = await fetch(`${API_BASE}/generate/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [
-            { role: "user", content: text }
-          ]
-        })
+        body: JSON.stringify({ messages: conversation })
       });
 
       if (!res.ok) throw new Error("Backend error " + res.status);
 
       const data = await res.json();
-      addMessage(data.response || "No response received.", "ai");
+
+      addMessage(data.response, "assistant");
+
+      conversation.push({
+        role: "assistant",
+        content: data.response
+      });
 
     } catch (err) {
       errorEl.textContent = "Connection failed.";
