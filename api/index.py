@@ -1,7 +1,9 @@
 import os
+from pathlib import Path
 import tiktoken
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from openai import OpenAI
 
@@ -76,12 +78,21 @@ def summarize_messages(messages):
     ]
 
 # =====================================
-# Health Route
+# Root + Health Routes
 # =====================================
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+INDEX_HTML = PROJECT_ROOT / "index.html"
+
 @app.get("/")
-def health():
+def root():
+    if INDEX_HTML.exists():
+        return FileResponse(INDEX_HTML)
     return {"message": "Atla AI Agent running."}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 # =====================================
 # Generate Route
