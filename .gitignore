@@ -8,6 +8,7 @@ env/
 
 # ChromaDB — vector store data (large, regenerable)
 chroma_db/
+chroma_db_legacy_*/
 
 # Environment variables
 .env

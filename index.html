@@ -2,163 +2,832 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Atla — AI Agent</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Atla — Conversational AI Agent built by Sai Pranav Atla" />
-  <meta name="color-scheme" content="dark" />
-  <!-- Keep your entire existing CSS exactly as-is -->
-</head>
-<body>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AtlaOps | AI-Powered Cloud Operations Dashboard</title>
+  <meta name="description" content="AtlaOps is an AI cloud operations dashboard with incident simulation and RAG-powered assistant." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  <!-- NAV -->
-  <nav class="nav">
-    <div class="nav-logo">atla<span>.in</span></div>
-    <div class="nav-links">
-      <a href="https://github.com/saipranavAtla" target="_blank">GitHub</a>
-      <a href="https://linkedin.com/in/saipranavAtla" target="_blank">LinkedIn</a>
-      <span class="nav-badge">v1.0 live</span>
-    </div>
-  </nav>
+    :root {
+      --bg: #06121c;
+      --bg-2: #0d1d2b;
+      --panel: rgba(15, 30, 46, 0.9);
+      --panel-2: rgba(11, 24, 38, 0.95);
+      --border: rgba(151, 180, 207, 0.2);
+      --text: #e9f2fb;
+      --muted: #9ab3c9;
+      --good: #2fd08f;
+      --warn: #ffc046;
+      --bad: #ff6b6b;
+      --accent: #3ba9ff;
+      --radius: 16px;
+    }
 
-  <div class="app-shell">
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "IBM Plex Sans", sans-serif;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(45, 166, 255, 0.2), transparent 42%),
+        radial-gradient(circle at 90% 20%, rgba(22, 196, 127, 0.15), transparent 36%),
+        linear-gradient(170deg, #071018, #071a2a 45%, #071623);
+    }
 
-    <main class="chat-card">
-      <header class="chat-header">
-        <div class="title-group">
-          <span class="badge">
-            <span class="badge-dot"></span>
-            Atla AI
-          </span>
-          <div class="app-title">
-            Conversational Agent
-            <span>RAG · Memory · FastAPI</span>
-          </div>
-        </div>
-        <div class="header-actions">
-          <button class="ghost-button" onclick="clearChat()">Clear</button>
-          <span class="pill" id="backend-pill">Checking...</span>
-        </div>
-      </header>
+    .layout {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr) 360px;
+      gap: 16px;
+      min-height: 100vh;
+      padding: 16px;
+    }
 
-      <div id="chat-box" class="chat-box">
-        <div class="placeholder-copy">
-          Ask me anything. Persistent memory enabled.
-        </div>
-      </div>
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+    }
 
-      <div class="input-row">
-        <input
-          type="text"
-          id="user-input"
-          placeholder="Ask me anything…"
-          autocomplete="off"
-          onkeydown="if(event.key === 'Enter') sendMessage()"
-        />
-        <button class="send-button" id="send-button" onclick="sendMessage()">
-          ➤ Send
-        </button>
-      </div>
+    .sidebar {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
 
-      <div id="error-banner" class="error-banner"></div>
-    </main>
+    .brand h1 {
+      font-size: 22px;
+      letter-spacing: 0.04em;
+    }
 
-  </div>
+    .brand p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
 
-  <footer class="footer">
-    atla.in · Built by <a href="https://linkedin.com/in/saipranavAtla">Sai Pranav Atla</a> · 2026
-  </footer>
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+    }
 
-  <script>
-    const API_BASE =
-      window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1"
-        ? "http://127.0.0.1:8000"
-        : "https://atla-main.up.railway.app";
+    .nav-link {
+      color: #b8d0e5;
+      text-decoration: none;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 10px 12px;
+      transition: 0.2s;
+      background: rgba(255, 255, 255, 0.02);
+    }
 
-    async function checkHealth() {
-      try {
-        const r = await fetch(`${API_BASE}/health`);
-        const d = await r.json();
-        document.getElementById("backend-pill").textContent =
-          d.backend || "online";
-      } catch {
-        document.getElementById("backend-pill").textContent = "offline";
+    .nav-link:hover {
+      border-color: var(--border);
+      color: var(--text);
+      transform: translateX(2px);
+    }
+
+    .status-pill {
+      margin-top: auto;
+      padding: 8px 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #d8ecff;
+      background: rgba(22, 196, 127, 0.13);
+      border: 1px solid rgba(22, 196, 127, 0.35);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--good);
+    }
+
+    .main {
+      display: grid;
+      grid-template-rows: auto auto auto 1fr;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .hero {
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      background: linear-gradient(125deg, rgba(43, 128, 196, 0.28), rgba(19, 97, 84, 0.25));
+    }
+
+    .hero h2 {
+      font-size: 24px;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      color: #b8cde0;
+      max-width: 700px;
+      font-size: 14px;
+    }
+
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      font-family: "Space Mono", monospace;
+      font-size: 11px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: #cfe3f6;
+      background: rgba(6, 14, 22, 0.4);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      padding: 14px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .metric-title {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .metric-meta {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #9eb8cc;
+    }
+
+    .analytics {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .chart-wrap {
+      padding: 14px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      min-width: 0;
+    }
+
+    .section-title {
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #cce3f7;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    canvas {
+      width: 100%;
+      height: 190px;
+      border-radius: 10px;
+      border: 1px solid rgba(151, 180, 207, 0.12);
+      background: rgba(4, 12, 20, 0.75);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 8px 6px;
+      border-bottom: 1px solid rgba(151, 180, 207, 0.12);
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .status {
+      font-size: 12px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      display: inline-block;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+
+    .healthy { background: rgba(47, 208, 143, 0.15); color: #89f4c7; }
+    .degraded { background: rgba(255, 192, 70, 0.16); color: #ffd78e; }
+
+    .ops-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .logs, .timeline, .architecture {
+      padding: 14px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      min-height: 230px;
+    }
+
+    .mono {
+      font-family: "Space Mono", monospace;
+      font-size: 12px;
+      color: #c8dcf0;
+      background: rgba(4, 10, 16, 0.7);
+      border: 1px solid rgba(151, 180, 207, 0.13);
+      border-radius: 10px;
+      padding: 8px;
+      max-height: 210px;
+      overflow: auto;
+      white-space: pre-wrap;
+      line-height: 1.45;
+    }
+
+    .timeline-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 210px;
+      overflow: auto;
+      font-size: 13px;
+      color: #d2e6f8;
+    }
+
+    .timeline-list li {
+      border-left: 2px solid rgba(59, 169, 255, 0.4);
+      padding-left: 10px;
+    }
+
+    .time {
+      color: #8fb0cb;
+      font-size: 11px;
+      margin-bottom: 2px;
+      font-family: "Space Mono", monospace;
+    }
+
+    .incident-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #d7e9fb;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.04);
+      transition: 0.2s;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .btn-warn { border-color: rgba(255, 192, 70, 0.4); }
+    .btn-bad { border-color: rgba(255, 107, 107, 0.5); }
+    .btn-good { border-color: rgba(47, 208, 143, 0.5); }
+
+    .assistant {
+      padding: 14px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .assistant-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .assistant-title h3 {
+      font-size: 17px;
+    }
+
+    .assistant-title p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    #chat-box {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(7, 14, 20, 0.8);
+      padding: 10px;
+      overflow: auto;
+      min-height: 320px;
+      max-height: calc(100vh - 220px);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .msg {
+      font-size: 13px;
+      line-height: 1.45;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(151, 180, 207, 0.12);
+      max-width: 95%;
+    }
+
+    .msg.user {
+      margin-left: auto;
+      background: rgba(59, 169, 255, 0.2);
+      border-color: rgba(59, 169, 255, 0.35);
+    }
+
+    .msg.ai {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .chat-input {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    #prompt {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(7, 14, 20, 0.85);
+      color: var(--text);
+      padding: 10px;
+      font-size: 13px;
+      font-family: inherit;
+      resize: none;
+      min-height: 42px;
+      max-height: 120px;
+    }
+
+    .cta {
+      background: linear-gradient(140deg, #1d95f7, #1fbf9a);
+      border: none;
+      color: white;
+      padding: 0 13px;
+    }
+
+    @media (max-width: 1250px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .assistant {
+        min-height: 420px;
+      }
+
+      #chat-box {
+        max-height: 300px;
       }
     }
 
-    checkHealth();
+    @media (max-width: 840px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .analytics, .ops-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .layout {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar panel">
+      <div class="brand">
+        <h1>AtlaOps</h1>
+        <p>AI-Powered Cloud Infrastructure Dashboard</p>
+      </div>
+      <nav class="nav-links">
+        <a class="nav-link" href="#overview">Overview</a>
+        <a class="nav-link" href="#services">Services</a>
+        <a class="nav-link" href="#incidents">Incidents</a>
+        <a class="nav-link" href="#architecture">Architecture</a>
+        <a class="nav-link" href="#assistant">Ops Guru</a>
+      </nav>
+      <div class="status-pill"><span class="dot"></span><span id="health-pill">Checking backend...</span></div>
+    </aside>
+
+    <main class="main">
+      <section id="overview" class="hero panel">
+        <div>
+          <h2>Explore Cloud Operations in Real Time</h2>
+          <p>AtlaOps simulates live infrastructure telemetry, service health, and incident response. Ask Ops Guru how the system scales, fails, and recovers.</p>
+        </div>
+        <div class="chip-row">
+          <span class="chip">AWS-style Metrics</span>
+          <span class="chip">Incident Simulation</span>
+          <span class="chip">RAG Assistant</span>
+          <span class="chip">DevOps Storytelling</span>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <div class="metric-title">CPU Usage</div>
+          <div class="metric-value" id="cpu">--</div>
+          <div class="metric-meta">Cluster utilization</div>
+        </article>
+        <article class="card">
+          <div class="metric-title">Memory Usage</div>
+          <div class="metric-value" id="memory">--</div>
+          <div class="metric-meta">Container memory pressure</div>
+        </article>
+        <article class="card">
+          <div class="metric-title">P95 Latency</div>
+          <div class="metric-value" id="latency">--</div>
+          <div class="metric-meta">API gateway edge latency</div>
+        </article>
+        <article class="card">
+          <div class="metric-title">Error Rate</div>
+          <div class="metric-value" id="errors">--</div>
+          <div class="metric-meta">Application-level failures</div>
+        </article>
+        <article class="card">
+          <div class="metric-title">Pod Count</div>
+          <div class="metric-value" id="pods">--</div>
+          <div class="metric-meta">Autoscaling snapshot</div>
+        </article>
+        <article class="card">
+          <div class="metric-title">Requests / min</div>
+          <div class="metric-value" id="rpm">--</div>
+          <div class="metric-meta">Traffic intensity</div>
+        </article>
+      </section>
+
+      <section id="services" class="analytics">
+        <article class="chart-wrap">
+          <div class="section-title">
+            <span>Latency Trend (p95)</span>
+            <span id="incident-badge" class="chip">Incident: normal</span>
+          </div>
+          <canvas id="latency-chart" width="700" height="220"></canvas>
+        </article>
+
+        <article class="chart-wrap">
+          <div class="section-title"><span>Service Health</span></div>
+          <table>
+            <thead>
+              <tr><th>Service</th><th>Status</th><th>Latency</th></tr>
+            </thead>
+            <tbody id="service-body"></tbody>
+          </table>
+        </article>
+      </section>
+
+      <section class="ops-grid">
+        <article id="incidents" class="timeline">
+          <div class="section-title"><span>Incident Simulator</span></div>
+          <div class="incident-controls">
+            <button class="btn-warn" onclick="triggerIncident('traffic_spike')">Traffic Spike</button>
+            <button class="btn-bad" onclick="triggerIncident('db_errors')">DB Error Burst</button>
+            <button class="btn-good" onclick="triggerIncident('recovery')">Recovery</button>
+            <button onclick="triggerIncident('normal')">Reset</button>
+          </div>
+          <ul class="timeline-list" id="timeline-list"></ul>
+        </article>
+
+        <article class="logs">
+          <div class="section-title"><span>Live Logs</span></div>
+          <div id="log-output" class="mono">Loading logs...</div>
+        </article>
+      </section>
+
+      <section id="architecture" class="architecture">
+        <div class="section-title"><span>Architecture Map</span></div>
+        <div id="arch-output" class="mono">Loading architecture...</div>
+      </section>
+    </main>
+
+    <aside id="assistant" class="assistant panel">
+      <div class="assistant-head">
+        <div class="assistant-title">
+          <h3>Ops Guru</h3>
+          <p>RAG-enabled cloud operations assistant</p>
+        </div>
+        <button onclick="clearChat()">Clear</button>
+      </div>
+
+      <div id="chat-box">
+        <div class="msg ai">Ask about scaling strategy, incident root cause, architecture, or remediation playbooks.</div>
+      </div>
+
+      <div class="chat-input">
+        <textarea id="prompt" placeholder="Example: What caused the current incident, and how would you mitigate it?"></textarea>
+        <button class="cta" id="send-btn" onclick="sendMessage()">Ask</button>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const API_BASE =
+      window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        ? "http://127.0.0.1:8000"
+        : window.location.origin;
+
+    const latencyHistory = [];
+    const maxPoints = 28;
+
+    const metricEls = {
+      cpu: document.getElementById("cpu"),
+      memory: document.getElementById("memory"),
+      latency: document.getElementById("latency"),
+      errors: document.getElementById("errors"),
+      pods: document.getElementById("pods"),
+      rpm: document.getElementById("rpm"),
+    };
+
+    function formatTime(iso) {
+      try {
+        return new Date(iso).toLocaleTimeString();
+      } catch {
+        return iso;
+      }
+    }
+
+    function drawLatencyChart() {
+      const canvas = document.getElementById("latency-chart");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#04101a";
+      ctx.fillRect(0, 0, w, h);
+
+      if (latencyHistory.length < 2) return;
+
+      const max = Math.max(...latencyHistory) + 10;
+      const min = Math.max(0, Math.min(...latencyHistory) - 10);
+
+      ctx.strokeStyle = "rgba(151, 180, 207, 0.2)";
+      ctx.lineWidth = 1;
+      for (let i = 1; i <= 4; i++) {
+        const y = (h / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = "#3ba9ff";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      latencyHistory.forEach((v, i) => {
+        const x = (i / (maxPoints - 1)) * (w - 20) + 10;
+        const y = h - ((v - min) / (max - min)) * (h - 24) - 12;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      const last = latencyHistory[latencyHistory.length - 1];
+      ctx.fillStyle = "#9fd2ff";
+      ctx.font = "12px Space Mono";
+      ctx.fillText(`Latest: ${last.toFixed(1)}ms`, 10, 18);
+    }
+
+    function renderServices(services) {
+      const body = document.getElementById("service-body");
+      body.innerHTML = "";
+      services.forEach((s) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${s.name}</td>
+          <td><span class="status ${s.status}">${s.status}</span></td>
+          <td>${s.latency_ms} ms</td>
+        `;
+        body.appendChild(row);
+      });
+    }
+
+    function renderTimeline(items) {
+      const list = document.getElementById("timeline-list");
+      list.innerHTML = "";
+      items.slice(0, 12).forEach((item) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<div class="time">${formatTime(item.time)}</div><div>${item.event}</div>`;
+        list.appendChild(li);
+      });
+    }
+
+    async function refreshMetrics() {
+      try {
+        const res = await fetch(`${API_BASE}/ops/metrics`);
+        const data = await res.json();
+        const m = data.metrics;
+
+        metricEls.cpu.textContent = `${m.cpu_percent}%`;
+        metricEls.memory.textContent = `${m.memory_percent}%`;
+        metricEls.latency.textContent = `${m.latency_p95_ms}ms`;
+        metricEls.errors.textContent = `${m.error_rate_percent}%`;
+        metricEls.pods.textContent = m.pod_count;
+        metricEls.rpm.textContent = m.requests_per_min;
+
+        document.getElementById("incident-badge").textContent = `Incident: ${data.incident}`;
+
+        latencyHistory.push(m.latency_p95_ms);
+        while (latencyHistory.length > maxPoints) latencyHistory.shift();
+        drawLatencyChart();
+
+        renderServices(data.services || []);
+      } catch {
+        document.getElementById("health-pill").textContent = "backend offline";
+      }
+    }
+
+    async function refreshLogs() {
+      try {
+        const res = await fetch(`${API_BASE}/ops/logs?limit=18`);
+        const data = await res.json();
+        const lines = (data.logs || []).map((l) => `[${formatTime(l.time)}] ${l.line}`);
+        document.getElementById("log-output").textContent = lines.join("\n");
+      } catch {
+        document.getElementById("log-output").textContent = "Unable to fetch logs.";
+      }
+    }
+
+    async function refreshIncidents() {
+      try {
+        const res = await fetch(`${API_BASE}/ops/incidents`);
+        const data = await res.json();
+        renderTimeline(data.timeline || []);
+      } catch {
+        document.getElementById("timeline-list").innerHTML = "<li>Unable to load incident timeline.</li>";
+      }
+    }
+
+    async function refreshArchitecture() {
+      try {
+        const res = await fetch(`${API_BASE}/ops/architecture`);
+        const data = await res.json();
+        const lines = [];
+        lines.push("Nodes:");
+        (data.nodes || []).forEach((n) => lines.push(`- ${n}`));
+        lines.push("\nFlows:");
+        (data.edges || []).forEach((e) => lines.push(`- ${e[0]} -> ${e[1]}`));
+        document.getElementById("arch-output").textContent = lines.join("\n");
+      } catch {
+        document.getElementById("arch-output").textContent = "Unable to load architecture map.";
+      }
+    }
+
+    async function checkHealth() {
+      try {
+        const res = await fetch(`${API_BASE}/health`);
+        const data = await res.json();
+        document.getElementById("health-pill").textContent = `backend ${data.status} (${data.backend})`;
+      } catch {
+        document.getElementById("health-pill").textContent = "backend offline";
+      }
+    }
+
+    async function triggerIncident(type) {
+      try {
+        await fetch(`${API_BASE}/ops/incidents/trigger`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ incident_type: type }),
+        });
+        await Promise.all([refreshMetrics(), refreshLogs(), refreshIncidents()]);
+      } catch {
+        alert("Failed to trigger incident.");
+      }
+    }
+
+    function addChat(role, text) {
+      const box = document.getElementById("chat-box");
+      const msg = document.createElement("div");
+      msg.className = `msg ${role}`;
+      msg.textContent = text;
+      box.appendChild(msg);
+      box.scrollTop = box.scrollHeight;
+      return msg;
+    }
 
     function clearChat() {
       const box = document.getElementById("chat-box");
-      box.innerHTML = `
-        <div class="placeholder-copy">
-          Ask me anything. Persistent memory enabled.
-        </div>`;
-    }
-
-    function appendMessage(role, text, loading = false) {
-      const box = document.getElementById("chat-box");
-
-      box.querySelector(".placeholder-copy")?.remove();
-
-      const msg = document.createElement("div");
-      msg.className = `message ${role}`;
-
-      const avatar = document.createElement("div");
-      avatar.className = "avatar";
-      avatar.textContent = role === "user" ? "You" : "AI";
-
-      const bubble = document.createElement("div");
-      bubble.className = "bubble";
-      if (loading) bubble.classList.add("loading");
-      bubble.textContent = text;
-
-      msg.appendChild(avatar);
-      msg.appendChild(bubble);
-      box.appendChild(msg);
-
-      box.scrollTop = box.scrollHeight;
-      return bubble;
+      box.innerHTML = '<div class="msg ai">Ask about scaling strategy, incident root cause, architecture, or remediation playbooks.</div>';
     }
 
     async function sendMessage() {
-      const input = document.getElementById("user-input");
-      const errorEl = document.getElementById("error-banner");
-      const sendBtn = document.getElementById("send-button");
-      const userText = input.value.trim();
+      const promptEl = document.getElementById("prompt");
+      const btn = document.getElementById("send-btn");
+      const text = promptEl.value.trim();
+      if (!text) return;
 
-      if (!userText) return;
-
-      errorEl.style.display = "none";
-      appendMessage("user", userText);
-      input.value = "";
-      sendBtn.disabled = true;
-
-      const aiBubble = appendMessage("ai", "Thinking…", true);
+      addChat("user", text);
+      promptEl.value = "";
+      btn.disabled = true;
+      const ai = addChat("ai", "Analyzing current system state...");
 
       try {
         const res = await fetch(`${API_BASE}/generate/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: userText }),
+          body: JSON.stringify({ prompt: text }),
         });
-
-        if (!res.ok) throw new Error(`Server returned ${res.status}`);
-
+        if (!res.ok) throw new Error("AI request failed");
         const data = await res.json();
-        aiBubble.classList.remove("loading");
-        aiBubble.textContent = data.response ?? "(no response)";
-      } catch (err) {
-        aiBubble.classList.remove("loading");
-        aiBubble.textContent = "Backend unreachable.";
-        errorEl.textContent = err.message;
-        errorEl.style.display = "block";
+        ai.textContent = data.response || "No response received.";
+      } catch {
+        ai.textContent = "Ops Guru is unreachable right now.";
       } finally {
-        sendBtn.disabled = false;
-        input.focus();
+        btn.disabled = false;
+        promptEl.focus();
       }
     }
-  </script>
 
+    document.getElementById("prompt").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    async function boot() {
+      await Promise.all([
+        checkHealth(),
+        refreshMetrics(),
+        refreshLogs(),
+        refreshIncidents(),
+        refreshArchitecture(),
+      ]);
+      setInterval(refreshMetrics, 3500);
+      setInterval(refreshLogs, 4500);
+      setInterval(refreshIncidents, 7000);
+      setInterval(checkHealth, 15000);
+    }
+
+    boot();
+  </script>
 </body>
 </html>
