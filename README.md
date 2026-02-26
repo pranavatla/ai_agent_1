@@ -95,7 +95,7 @@ This repo is already configured for Railway Docker deployments via `railway.toml
 
 Railway will:
 - Build with `Dockerfile`
-- Start from Docker `CMD` (`uvicorn app1:app --host 0.0.0.0 --port ${PORT:-8000}`)
+- Start with `python run.py` (reads `PORT` safely in Python)
 - Run health checks on `/health`
 
 Result: one Railway URL serves both UI (`/`) and API (`/generate/`).
