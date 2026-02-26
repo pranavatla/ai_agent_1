@@ -2,7 +2,10 @@
 
 Production-ready AI chat webapp built with FastAPI, OpenAI, and a lightweight frontend.
 
-Live demo: [https://ai-agent-1-six.vercel.app/](https://ai-agent-1-six.vercel.app/)
+## Live Deployments
+
+- Vercel (serverless): [https://ai-agent-1-six.vercel.app/](https://ai-agent-1-six.vercel.app/)
+- Railway (Docker single URL): [https://web-production-7495f.up.railway.app/](https://web-production-7495f.up.railway.app/)
 
 ## Why this project
 
