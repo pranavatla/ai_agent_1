@@ -7,6 +7,7 @@ import shutil
 import time
 
 import chromadb
+from chromadb.utils import embedding_functions
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -14,7 +15,7 @@ from openai import APIError, AuthenticationError, OpenAI, RateLimitError
 from pydantic import BaseModel
 
 
-app = FastAPI(title="AtlaOps AI Agent", version="4.0.0")
+app = FastAPI(title="AtlaOps AI Agent", version="4.1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,52 +25,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-CHROMA_PATH = Path("./chroma_db")
-
-
-def init_collection():
-    try:
-        client_local = chromadb.PersistentClient(path=str(CHROMA_PATH))
-        return client_local.get_or_create_collection(name="user_memory")
-    except Exception as exc:
-        backup_dir = Path(f"./chroma_db_legacy_{int(time.time())}")
-        if CHROMA_PATH.exists():
-            shutil.move(str(CHROMA_PATH), str(backup_dir))
-        client_local = chromadb.PersistentClient(path=str(CHROMA_PATH))
-        coll = client_local.get_or_create_collection(name="user_memory")
-        print(f"ChromaDB reset after init failure: {exc}. Backup: {backup_dir}")
-        return coll
-
-
-collection = init_collection()
-
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 client = OpenAI(api_key=OPENAI_API_KEY)
+
+CHROMA_PATH = Path("./chroma_db")
+PROJECT_ROOT = Path(__file__).resolve().parent
+INDEX_HTML = PROJECT_ROOT / "index.html"
 
 request_log = defaultdict(list)
 RATE_LIMIT = 20
 WINDOW = 60
 
+ALLOWED_INCIDENTS = {"normal", "traffic_spike", "db_errors", "recovery"}
+
 SYSTEM_PROMPT = (
     "You are AtlaOps Guru, an AI cloud operations assistant built by Sai Pranav Atla. "
-    "Answer with operational clarity, reference architecture tradeoffs, and keep replies concise "
-    "unless the user asks for a deep dive."
+    "Give concise, technically precise answers. "
+    "When knowledge-base context is provided, ground your answer in it and reference evidence briefly."
 )
-
-
-class PromptRequest(BaseModel):
-    prompt: str
-
-
-class IncidentRequest(BaseModel):
-    incident_type: str
-
-
-PROJECT_ROOT = Path(__file__).resolve().parent
-INDEX_HTML = PROJECT_ROOT / "index.html"
-
-ALLOWED_INCIDENTS = {"normal", "traffic_spike", "db_errors", "recovery"}
 
 ops_state = {
     "incident": "normal",
@@ -85,6 +58,56 @@ ops_state = {
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def get_embedding_function():
+    if not OPENAI_API_KEY:
+        return None
+    return embedding_functions.OpenAIEmbeddingFunction(
+        api_key=OPENAI_API_KEY,
+        model_name="text-embedding-3-small",
+    )
+
+
+def init_collections():
+    embedding_fn = get_embedding_function()
+    try:
+        chroma_client = chromadb.PersistentClient(path=str(CHROMA_PATH))
+        user_memory = chroma_client.get_or_create_collection(
+            name="user_memory",
+            embedding_function=embedding_fn,
+        )
+        kb_docs = chroma_client.get_or_create_collection(
+            name="atlaops_kb",
+            embedding_function=embedding_fn,
+        )
+        return user_memory, kb_docs
+    except Exception as exc:
+        backup_dir = Path(f"./chroma_db_legacy_{int(time.time())}")
+        if CHROMA_PATH.exists():
+            shutil.move(str(CHROMA_PATH), str(backup_dir))
+        chroma_client = chromadb.PersistentClient(path=str(CHROMA_PATH))
+        user_memory = chroma_client.get_or_create_collection(
+            name="user_memory",
+            embedding_function=embedding_fn,
+        )
+        kb_docs = chroma_client.get_or_create_collection(
+            name="atlaops_kb",
+            embedding_function=embedding_fn,
+        )
+        print(f"ChromaDB reset after init failure: {exc}. Backup: {backup_dir}")
+        return user_memory, kb_docs
+
+
+user_collection, kb_collection = init_collections()
+
+
+class PromptRequest(BaseModel):
+    prompt: str
+
+
+class IncidentRequest(BaseModel):
+    incident_type: str
 
 
 def push_timeline(event: str) -> None:
@@ -104,8 +127,8 @@ def get_ai_response(full_prompt: str) -> str:
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": full_prompt},
             ],
-            temperature=0.5,
-            max_tokens=450,
+            temperature=0.4,
+            max_tokens=500,
         )
         return response.choices[0].message.content
     except RateLimitError:
@@ -212,10 +235,7 @@ def generate_logs(limit: int) -> list[dict]:
     logs = []
     for i in range(limit):
         entry = base[i % len(base)]
-        logs.append({
-            "time": utc_now(),
-            "line": entry,
-        })
+        logs.append({"time": utc_now(), "line": entry})
     return logs
 
 
@@ -238,6 +258,47 @@ def build_ops_context() -> str:
     )
 
 
+def retrieve_kb_context(query: str, top_k: int = 4):
+    if kb_collection.count() == 0:
+        return "", []
+
+    results = kb_collection.query(query_texts=[query], n_results=top_k)
+    documents = results.get("documents", [[]])[0]
+    metadatas = results.get("metadatas", [[]])[0]
+
+    contexts = []
+    sources = []
+
+    for idx, doc in enumerate(documents):
+        meta = metadatas[idx] if idx < len(metadatas) and metadatas[idx] else {}
+        source = meta.get("source", "unknown")
+        chunk_index = meta.get("chunk_index", "?")
+        contexts.append(f"[{source}#chunk-{chunk_index}] {doc}")
+        sources.append({"source": source, "chunk": chunk_index})
+
+    context_block = "\n\n".join(contexts)
+    dedup = []
+    seen = set()
+    for source in sources:
+        key = (source["source"], str(source["chunk"]))
+        if key in seen:
+            continue
+        seen.add(key)
+        dedup.append(source)
+
+    return context_block, dedup
+
+
+def retrieve_memory_context(query: str, top_k: int = 2) -> str:
+    if user_collection.count() == 0:
+        return ""
+    results = user_collection.query(query_texts=[query], n_results=top_k)
+    documents = results.get("documents", [[]])[0]
+    if not documents:
+        return ""
+    return "\n".join(documents)
+
+
 @app.get("/")
 def root():
     if INDEX_HTML.exists():
@@ -251,8 +312,9 @@ def health():
         "status": "ok",
         "backend": "openai" if OPENAI_API_KEY else "none",
         "rate_limit": f"{RATE_LIMIT} req/{WINDOW}s",
-        "version": "4.0.0",
+        "version": "4.1.0",
         "incident": ops_state["incident"],
+        "kb_chunks": kb_collection.count(),
     }
 
 
@@ -263,10 +325,7 @@ def ops_metrics():
 
 @app.get("/ops/logs")
 def ops_logs(limit: int = Query(default=20, ge=5, le=100)):
-    return {
-        "incident": ops_state["incident"],
-        "logs": generate_logs(limit),
-    }
+    return {"incident": ops_state["incident"], "logs": generate_logs(limit)}
 
 
 @app.get("/ops/incidents")
@@ -294,11 +353,7 @@ def trigger_incident(payload: IncidentRequest):
     else:
         push_timeline("System returned to normal baseline.")
 
-    return {
-        "ok": True,
-        "incident": ops_state["incident"],
-        "updated_at": ops_state["updated_at"],
-    }
+    return {"ok": True, "incident": ops_state["incident"], "updated_at": ops_state["updated_at"]}
 
 
 @app.get("/ops/architecture")
@@ -326,42 +381,51 @@ def ops_architecture():
     }
 
 
+@app.get("/ops/kb/status")
+def kb_status():
+    return {
+        "kb_chunks": kb_collection.count(),
+        "memory_chunks": user_collection.count(),
+    }
+
+
 @app.post("/generate/")
 async def generate_text(request: Request, prompt_req: PromptRequest):
     client_ip = request.client.host if request.client else "unknown"
     current_time = time.time()
 
-    request_log[client_ip] = [
-        t for t in request_log[client_ip]
-        if current_time - t < WINDOW
-    ]
-
+    request_log[client_ip] = [t for t in request_log[client_ip] if current_time - t < WINDOW]
     if len(request_log[client_ip]) >= RATE_LIMIT:
         raise HTTPException(status_code=429, detail="Too many requests. Please slow down.")
-
     request_log[client_ip].append(current_time)
 
-    user_message = prompt_req.prompt
-    results = collection.query(query_texts=[user_message], n_results=3)
+    user_message = prompt_req.prompt.strip()
+    if not user_message:
+        raise HTTPException(status_code=400, detail="Prompt is required.")
 
-    memories = (
-        " ".join(results["documents"][0])
-        if results.get("documents") and results["documents"][0]
-        else ""
-    )
+    ops_context = build_ops_context()
+    kb_context, sources = retrieve_kb_context(user_message, top_k=4)
+    memory_context = retrieve_memory_context(user_message, top_k=2)
 
-    incident_context = build_ops_context()
     full_prompt = (
-        f"{incident_context}\nRelevant context from memory:\n{memories}\n\nUser: {user_message}"
-        if memories
-        else f"{incident_context}\nUser: {user_message}"
+        f"Current ops state:\n{ops_context}\n\n"
+        f"Knowledge base context:\n{kb_context or 'No KB chunks found.'}\n\n"
+        f"Conversation memory:\n{memory_context or 'No prior memory found.'}\n\n"
+        f"User question: {user_message}\n\n"
+        "Instructions: use the context above when relevant, be explicit about incident signals, "
+        "and avoid claims not supported by the provided context."
     )
 
     ai_response = get_ai_response(full_prompt)
 
-    collection.add(
+    user_collection.add(
         documents=[f"User asked: {user_message}. AtlaOps Guru replied: {ai_response}"],
+        metadatas=[{"source": "conversation", "time": utc_now()}],
         ids=[f"conv_{time.time()}"],
     )
 
-    return {"response": ai_response}
+    return {
+        "response": ai_response,
+        "sources": sources,
+        "incident": ops_state["incident"],
+    }

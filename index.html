@@ -388,6 +388,14 @@
       background: rgba(255, 255, 255, 0.05);
     }
 
+    .sources {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #9dbad2;
+      font-family: "Space Mono", monospace;
+      line-height: 1.4;
+    }
+
     .chat-input {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -763,11 +771,19 @@
       }
     }
 
-    function addChat(role, text) {
+    function addChat(role, text, sources = []) {
       const box = document.getElementById("chat-box");
       const msg = document.createElement("div");
       msg.className = `msg ${role}`;
       msg.textContent = text;
+
+      if (role === "ai" && sources.length > 0) {
+        const ref = document.createElement("div");
+        ref.className = "sources";
+        ref.textContent = `Sources: ${sources.map((s) => `${s.source}#${s.chunk}`).join(", ")}`;
+        msg.appendChild(ref);
+      }
+
       box.appendChild(msg);
       box.scrollTop = box.scrollHeight;
       return msg;
@@ -798,6 +814,12 @@
         if (!res.ok) throw new Error("AI request failed");
         const data = await res.json();
         ai.textContent = data.response || "No response received.";
+        if (Array.isArray(data.sources) && data.sources.length > 0) {
+          const ref = document.createElement("div");
+          ref.className = "sources";
+          ref.textContent = `Sources: ${data.sources.map((s) => `${s.source}#${s.chunk}`).join(", ")}`;
+          ai.appendChild(ref);
+        }
       } catch {
         ai.textContent = "Ops Guru is unreachable right now.";
       } finally {

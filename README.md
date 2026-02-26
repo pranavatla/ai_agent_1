@@ -4,12 +4,12 @@ AtlaOps is an interactive CloudOps portfolio product: a live operations-style da
 
 ## Current Status (develop branch)
 
-Phase 1 MVP is implemented:
+Phase 1 + Phase 2 foundation is implemented:
 - Live synthetic cloud metrics dashboard
 - Service health table and latency trend chart
 - Incident simulation controls (traffic spike, DB errors, recovery)
 - Incident timeline and synthetic log stream
-- Embedded AI assistant (`/generate/`) with memory retrieval context
+- Embedded AI assistant (`/generate/`) with KB retrieval + source citations
 
 ## Tech Stack
 
@@ -29,6 +29,7 @@ Phase 1 MVP is implemented:
 - `GET /ops/incidents` -> current incident + timeline
 - `POST /ops/incidents/trigger` -> trigger `traffic_spike`, `db_errors`, `recovery`, `normal`
 - `GET /ops/architecture` -> architecture node/flow data
+- `GET /ops/kb/status` -> KB and memory collection counts
 
 ## Local Run
 
@@ -55,6 +56,18 @@ python run.py
 4. Open:
 
 `http://localhost:8000`
+
+## Ingest AtlaOps Knowledge Base (RAG)
+
+Run ingestion before demoing chat grounding:
+
+```bash
+python ingest_atlaops_kb.py --reset
+```
+
+Then verify:
+- `GET /ops/kb/status` should show `kb_chunks > 0`
+- Ops Guru responses should include `Sources: ...`
 
 ## RAG Knowledge Base Seed
 
