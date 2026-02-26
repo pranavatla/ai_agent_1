@@ -1,35 +1,54 @@
 # Atla AI Agent
 
-Production-grade conversational AI webapp with a FastAPI backend and a minimal chat UI.
+Production-ready AI chat webapp built with FastAPI, OpenAI, and a lightweight frontend.
 
-## Overview
+Live demo: [https://ai-agent-1-six.vercel.app/](https://ai-agent-1-six.vercel.app/)
 
-This repo serves a static frontend (`index.html`) and a serverless FastAPI backend (`api/index.py`).
-It is designed to deploy cleanly on Vercel.
+## Why this project
+
+This project demonstrates:
+- API-first backend engineering with FastAPI
+- Token-aware conversation management (trim + summarize)
+- Dual deployment strategy from one repo
+- Serverless deployment (Vercel) and container deployment (Railway/Docker)
+
+## Stack
+
+- Backend: FastAPI, Pydantic, Uvicorn
+- LLM: OpenAI Chat Completions (`gpt-4o-mini`)
+- Token accounting: `tiktoken`
+- Frontend: Vanilla HTML/CSS/JS
+- Deploy: Vercel (serverless) + Railway (Docker)
 
 ## Architecture
 
-AI_Agent_1/
-├── api/index.py        # FastAPI app (Vercel serverless runtime)
-├── index.html          # Frontend UI
-├── requirements.txt
-├── vercel.json
-├── ingest.py
-├── ingest_all.py
-├── memory_test.py
-├── knowledge_base/
-├── chroma_db/          # gitignored
-└── README.md
+- `api/index.py`: Main FastAPI app
+- `app1.py`: Runtime entrypoint (`from api.index import app`)
+- `index.html`: Chat UI
+- `vercel.json`: Vercel routing/build config
+- `Dockerfile`: Container build
+- `railway.toml`: Railway Docker deploy config
 
-## Core Features
+## API Endpoints
 
-- FastAPI + OpenAI SDK
-- Conversation trimming and summarization for cost control
-- Single-repo deployment (static frontend + serverless backend)
+- `GET /`: Serves `index.html` when available
+- `GET /health`: Health check
+- `POST /generate/`: Chat completion endpoint
+
+Request body for `POST /generate/`:
+
+```json
+{
+  "messages": [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Hello"}
+  ]
+}
+```
 
 ## Local Development
 
-1. Setup
+1. Create environment and install dependencies:
 
 ```bash
 python3 -m venv venv
@@ -37,66 +56,66 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-2. Set env var
+2. Set environment variable:
 
 ```bash
 export OPENAI_API_KEY=sk-...
 ```
 
-3. Run backend
+3. Run the app:
 
 ```bash
 uvicorn app1:app --reload --port 8000
 ```
 
-4. Serve frontend
+4. Open:
 
-```bash
-python -m http.server 3000
-```
+`http://localhost:8000`
 
-Open:
-`http://localhost:3000`
+## Deploy on Vercel (Current live setup)
 
-## API Endpoints
-
-- `POST /generate/`  → Chat with the assistant
-- `GET /health`      → Backend health check
-- `GET /`            → Root info
-
-## Vercel Deployment
-
-1. Connect this repo to Vercel
-2. Set environment variables:
-
+1. Connect repository in Vercel.
+2. Set environment variable:
 - `OPENAI_API_KEY`
+3. Deploy.
 
-3. Deploy
+Routing behavior comes from `vercel.json`:
+- `/` -> `index.html`
+- `/health` -> `api/index.py`
+- `/generate/` -> `api/index.py`
 
-Vercel serves:
-- `index.html` as the frontend
-- `api/index.py` as serverless backend (see `vercel.json` routes)
+## Deploy on Railway (Docker, single URL)
 
-## Docker (Single URL)
+This repo is already configured for Railway Docker deployments via `railway.toml`.
 
-The container serves the UI at `/` and the API at `/generate/` and `/health`.
+1. Create a new Railway project from this repo.
+2. Add environment variable:
+- `OPENAI_API_KEY`
+3. Deploy.
 
-Build:
+Railway will:
+- Build with `Dockerfile`
+- Start with `uvicorn app1:app --host 0.0.0.0 --port $PORT`
+- Run health checks on `/health`
+
+Result: one Railway URL serves both UI (`/`) and API (`/generate/`).
+
+## Run with Docker locally
 
 ```bash
 docker build -t atla-agent .
-```
-
-Run:
-
-```bash
 docker run -p 8000:8000 -e OPENAI_API_KEY=sk-... atla-agent
 ```
 
 Open:
 `http://localhost:8000`
 
+## Environment Variables
+
+- `OPENAI_API_KEY` (required)
+
 ## Notes
 
-- `index.html` uses same-origin API calls in production, so no extra CORS setup is needed.
-- The backend supports long conversations by summarizing when token usage is high.
+- The frontend uses same-origin calls in production.
+- CORS is enabled in backend for compatibility across environments.
+- Long conversations are protected with token limits and summarization.
