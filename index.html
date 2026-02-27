@@ -49,6 +49,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       backdrop-filter: blur(12px);
+      transition: border-color 0.2s ease, transform 0.2s ease;
     }
 
     .sidebar {
@@ -126,6 +127,7 @@
       align-items: flex-start;
       gap: 16px;
       background: linear-gradient(125deg, rgba(43, 128, 196, 0.28), rgba(19, 97, 84, 0.25));
+      box-shadow: inset 0 0 0 1px rgba(151, 180, 207, 0.08);
     }
 
     .hero h2 {
@@ -156,6 +158,56 @@
       background: rgba(6, 14, 22, 0.4);
     }
 
+    .hero-meta {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .hero-meta-item {
+      font-size: 11px;
+      color: #cbe2f6;
+      border: 1px solid rgba(151, 180, 207, 0.2);
+      background: rgba(5, 12, 18, 0.35);
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-family: "Space Mono", monospace;
+    }
+
+    .insight-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .insight-card {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(151, 180, 207, 0.2);
+      background: rgba(6, 14, 22, 0.62);
+    }
+
+    .insight-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .insight-value {
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .insight-meta {
+      color: #a7c0d4;
+      font-size: 12px;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -167,6 +219,12 @@
       background: var(--panel-2);
       border: 1px solid var(--border);
       border-radius: 14px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-1px);
+      border-color: rgba(151, 180, 207, 0.35);
     }
 
     .metric-title {
@@ -504,6 +562,10 @@
         grid-template-columns: 1fr;
       }
 
+      .insight-strip {
+        grid-template-columns: 1fr;
+      }
+
       .hero {
         flex-direction: column;
       }
@@ -542,6 +604,11 @@
         <div>
           <h2>Explore Cloud Operations in Real Time</h2>
           <p>AtlaOps simulates live infrastructure telemetry, service health, and incident response. Ask Ops Guru how the system scales, fails, and recovers.</p>
+          <div class="hero-meta">
+            <span class="hero-meta-item" id="meta-incident">INCIDENT: NORMAL</span>
+            <span class="hero-meta-item" id="meta-time">UTC: --:--:--</span>
+            <span class="hero-meta-item" id="meta-kb">KB CHUNKS: --</span>
+          </div>
         </div>
         <div class="chip-row">
           <span class="chip">AWS-style Metrics</span>
@@ -549,6 +616,24 @@
           <span class="chip">RAG Assistant</span>
           <span class="chip">DevOps Storytelling</span>
         </div>
+      </section>
+
+      <section class="insight-strip">
+        <article class="insight-card">
+          <div class="insight-label">SLO Compliance</div>
+          <div class="insight-value" id="slo-value">--</div>
+          <div class="insight-meta" id="slo-meta">Waiting for telemetry...</div>
+        </article>
+        <article class="insight-card">
+          <div class="insight-label">Active Alarms</div>
+          <div class="insight-value" id="alarm-value">--</div>
+          <div class="insight-meta" id="alarm-meta">Waiting for telemetry...</div>
+        </article>
+        <article class="insight-card">
+          <div class="insight-label">Last Deploy</div>
+          <div class="insight-value" id="deploy-value">--</div>
+          <div class="insight-meta">GitOps preview environment</div>
+        </article>
       </section>
 
       <section class="grid">
@@ -682,6 +767,28 @@
       pods: document.getElementById("pods"),
       rpm: document.getElementById("rpm"),
     };
+
+    function updateMetaClock() {
+      const now = new Date();
+      document.getElementById("meta-time").textContent = `UTC: ${now.toUTCString().split(" ")[4]}`;
+    }
+
+    function updateInsights(metrics, incident) {
+      const sloOk = metrics.latency_p95_ms < 180 && metrics.error_rate_percent < 1.2;
+      document.getElementById("slo-value").textContent = sloOk ? "99.95%" : "99.10%";
+      document.getElementById("slo-meta").textContent = sloOk
+        ? "Latency and errors are within target"
+        : "SLO burn observed. Investigate incident signals.";
+
+      const alarmCount = incident === "normal" ? 0 : incident === "recovery" ? 1 : 3;
+      document.getElementById("alarm-value").textContent = String(alarmCount);
+      document.getElementById("alarm-meta").textContent = alarmCount === 0
+        ? "No active CloudWatch alarms"
+        : `${alarmCount} alert pipeline(s) currently active`;
+
+      document.getElementById("deploy-value").textContent = `${Math.max(3, Math.floor(metrics.requests_per_min / 20))}m ago`;
+      document.getElementById("meta-incident").textContent = `INCIDENT: ${incident.toUpperCase().replace("_", " ")}`;
+    }
 
     function formatTime(iso) {
       try {
@@ -935,6 +1042,7 @@
         metricEls.rpm.textContent = m.requests_per_min;
 
         document.getElementById("incident-badge").textContent = `Incident: ${data.incident}`;
+        updateInsights(m, data.incident);
 
         latencyHistory.push(m.latency_p95_ms);
         while (latencyHistory.length > maxPoints) latencyHistory.shift();
@@ -1024,6 +1132,9 @@
         const res = await fetch(`${API_BASE}/health`);
         const data = await res.json();
         document.getElementById("health-pill").textContent = `backend ${data.status} (${data.backend})`;
+        if (typeof data.kb_chunks === "number") {
+          document.getElementById("meta-kb").textContent = `KB CHUNKS: ${data.kb_chunks}`;
+        }
       } catch {
         document.getElementById("health-pill").textContent = "backend offline";
       }
@@ -1135,6 +1246,7 @@
     });
 
     async function boot() {
+      updateMetaClock();
       await Promise.all([
         checkHealth(),
         refreshMetrics(),
@@ -1147,6 +1259,7 @@
       setInterval(refreshLogs, 4500);
       setInterval(refreshIncidents, 7000);
       setInterval(checkHealth, 15000);
+      setInterval(updateMetaClock, 1000);
     }
 
     boot();
