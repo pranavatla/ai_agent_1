@@ -276,6 +276,32 @@
       min-height: 230px;
     }
 
+    .arch-layout {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 10px;
+    }
+
+    #arch-canvas {
+      width: 100%;
+      height: 260px;
+      border-radius: 10px;
+      border: 1px solid rgba(151, 180, 207, 0.12);
+      background: rgba(4, 10, 16, 0.72);
+      cursor: pointer;
+    }
+
+    .arch-details {
+      border: 1px solid rgba(151, 180, 207, 0.13);
+      border-radius: 10px;
+      background: rgba(4, 10, 16, 0.62);
+      padding: 10px;
+      font-size: 12px;
+      color: #cde1f4;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
     .rca-panel {
       padding: 14px;
       background: var(--panel-2);
@@ -474,6 +500,10 @@
         grid-template-columns: 1fr;
       }
 
+      .arch-layout {
+        grid-template-columns: 1fr;
+      }
+
       .hero {
         flex-direction: column;
       }
@@ -594,7 +624,10 @@
 
       <section id="architecture" class="architecture">
         <div class="section-title"><span>Architecture Map</span></div>
-        <div id="arch-output" class="mono">Loading architecture...</div>
+        <div class="arch-layout">
+          <canvas id="arch-canvas" width="900" height="360"></canvas>
+          <div id="arch-details" class="arch-details">Hover or click a node to inspect architecture components.</div>
+        </div>
       </section>
 
       <section class="ops-grid-3">
@@ -636,6 +669,10 @@
 
     const latencyHistory = [];
     const maxPoints = 28;
+    let archData = { nodes: [], edges: [] };
+    let archNodePositions = [];
+    let selectedArchNode = null;
+    let hoveredArchNode = null;
 
     const metricEls = {
       cpu: document.getElementById("cpu"),
@@ -652,6 +689,169 @@
       } catch {
         return iso;
       }
+    }
+
+    function getNodeDescription(name) {
+      const map = {
+        "Route53": "Public DNS routing layer. Directs user traffic to CloudFront.",
+        "CloudFront": "Global edge CDN + TLS termination. Low-latency delivery and caching.",
+        "S3 Frontend": "Hosts static dashboard assets for AtlaOps UI.",
+        "API Gateway": "Public API ingress for chat and ops endpoints.",
+        "Lambda AtlaOps API": "Stateless orchestration for telemetry, RCA simulation, and AI requests.",
+        "OpenAI LLM": "Managed inference endpoint for Ops Guru reasoning and response generation.",
+        "Vector Store": "Retrieval context store for architecture docs, playbooks, and project notes.",
+        "CloudWatch": "Metrics, alarms, and incident signal pipeline.",
+      };
+      return map[name] || "Infrastructure component in the AtlaOps reference topology.";
+    }
+
+    function getArchitectureNodePositions(nodes, width, height) {
+      const presets = {
+        "Route53": [0.08, 0.5],
+        "CloudFront": [0.24, 0.5],
+        "S3 Frontend": [0.42, 0.28],
+        "API Gateway": [0.42, 0.72],
+        "Lambda AtlaOps API": [0.61, 0.5],
+        "OpenAI LLM": [0.82, 0.26],
+        "Vector Store": [0.82, 0.5],
+        "CloudWatch": [0.82, 0.74],
+      };
+
+      return nodes.map((name, idx) => {
+        const p = presets[name];
+        if (p) {
+          return { name, x: p[0] * width, y: p[1] * height, r: 16, idx };
+        }
+        const angle = (Math.PI * 2 * idx) / Math.max(nodes.length, 1);
+        return {
+          name,
+          x: width * 0.5 + Math.cos(angle) * width * 0.25,
+          y: height * 0.5 + Math.sin(angle) * height * 0.25,
+          r: 16,
+          idx,
+        };
+      });
+    }
+
+    function edgeTouchesNode(edge, nodeName) {
+      return edge[0] === nodeName || edge[1] === nodeName;
+    }
+
+    function renderArchitectureDetails(nodeName) {
+      const el = document.getElementById("arch-details");
+      if (!nodeName) {
+        el.textContent = "Hover or click a node to inspect architecture components.";
+        return;
+      }
+
+      const connected = archData.edges
+        .filter((e) => edgeTouchesNode(e, nodeName))
+        .map((e) => `${e[0]} -> ${e[1]}`);
+
+      const lines = [];
+      lines.push(`Component: ${nodeName}`);
+      lines.push("");
+      lines.push(getNodeDescription(nodeName));
+      if (connected.length) {
+        lines.push("");
+        lines.push("Connected flows:");
+        connected.forEach((c) => lines.push(`- ${c}`));
+      }
+      el.textContent = lines.join("\n");
+    }
+
+    function drawArchitectureGraph() {
+      const canvas = document.getElementById("arch-canvas");
+      if (!canvas || !archData.nodes.length) return;
+      const ctx = canvas.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      const cssW = canvas.clientWidth || 900;
+      const cssH = canvas.clientHeight || 260;
+      canvas.width = Math.floor(cssW * dpr);
+      canvas.height = Math.floor(cssH * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, cssW, cssH);
+
+      archNodePositions = getArchitectureNodePositions(archData.nodes, cssW, cssH);
+
+      const nodeMap = new Map(archNodePositions.map((n) => [n.name, n]));
+
+      archData.edges.forEach((edge) => {
+        const from = nodeMap.get(edge[0]);
+        const to = nodeMap.get(edge[1]);
+        if (!from || !to) return;
+
+        let emphasis = false;
+        if (selectedArchNode) emphasis = edgeTouchesNode(edge, selectedArchNode);
+        if (hoveredArchNode) emphasis = emphasis || edgeTouchesNode(edge, hoveredArchNode);
+
+        ctx.beginPath();
+        ctx.moveTo(from.x, from.y);
+        ctx.lineTo(to.x, to.y);
+        ctx.strokeStyle = emphasis ? "rgba(59, 169, 255, 0.95)" : "rgba(151, 180, 207, 0.35)";
+        ctx.lineWidth = emphasis ? 2.4 : 1.4;
+        ctx.stroke();
+      });
+
+      archNodePositions.forEach((node) => {
+        const isSelected = selectedArchNode === node.name;
+        const isHover = hoveredArchNode === node.name;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
+        ctx.fillStyle = isSelected
+          ? "rgba(31, 191, 154, 0.95)"
+          : isHover
+          ? "rgba(59, 169, 255, 0.95)"
+          : "rgba(18, 48, 74, 0.95)";
+        ctx.fill();
+        ctx.lineWidth = isSelected || isHover ? 2.5 : 1.4;
+        ctx.strokeStyle = isSelected || isHover ? "rgba(200, 238, 255, 0.95)" : "rgba(151, 180, 207, 0.45)";
+        ctx.stroke();
+
+        ctx.fillStyle = "#e2f0fd";
+        ctx.font = "12px IBM Plex Sans";
+        ctx.textAlign = "center";
+        ctx.fillText(node.name, node.x, node.y - 22);
+      });
+    }
+
+    function setupArchitectureInteractions() {
+      const canvas = document.getElementById("arch-canvas");
+      if (!canvas || canvas.dataset.bound === "1") return;
+      canvas.dataset.bound = "1";
+
+      canvas.addEventListener("mousemove", (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        hoveredArchNode = null;
+        for (const node of archNodePositions) {
+          const dx = x - node.x;
+          const dy = y - node.y;
+          if (Math.sqrt(dx * dx + dy * dy) <= node.r + 4) {
+            hoveredArchNode = node.name;
+            break;
+          }
+        }
+        const focus = hoveredArchNode || selectedArchNode;
+        renderArchitectureDetails(focus);
+        drawArchitectureGraph();
+      });
+
+      canvas.addEventListener("mouseleave", () => {
+        hoveredArchNode = null;
+        renderArchitectureDetails(selectedArchNode);
+        drawArchitectureGraph();
+      });
+
+      canvas.addEventListener("click", () => {
+        if (!hoveredArchNode) return;
+        selectedArchNode = hoveredArchNode;
+        renderArchitectureDetails(selectedArchNode);
+        drawArchitectureGraph();
+      });
+
+      window.addEventListener("resize", () => drawArchitectureGraph());
     }
 
     function drawLatencyChart() {
@@ -771,14 +971,18 @@
       try {
         const res = await fetch(`${API_BASE}/ops/architecture`);
         const data = await res.json();
-        const lines = [];
-        lines.push("Nodes:");
-        (data.nodes || []).forEach((n) => lines.push(`- ${n}`));
-        lines.push("\nFlows:");
-        (data.edges || []).forEach((e) => lines.push(`- ${e[0]} -> ${e[1]}`));
-        document.getElementById("arch-output").textContent = lines.join("\n");
+        archData = {
+          nodes: data.nodes || [],
+          edges: data.edges || [],
+        };
+        if (!selectedArchNode && archData.nodes.length) {
+          selectedArchNode = archData.nodes[0];
+        }
+        setupArchitectureInteractions();
+        renderArchitectureDetails(selectedArchNode);
+        drawArchitectureGraph();
       } catch {
-        document.getElementById("arch-output").textContent = "Unable to load architecture map.";
+        document.getElementById("arch-details").textContent = "Unable to load architecture map.";
       }
     }
 
