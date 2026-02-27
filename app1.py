@@ -10,6 +10,7 @@ import chromadb
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from mangum import Mangum
 from openai import APIError, AuthenticationError, OpenAI, RateLimitError
 from pydantic import BaseModel
 
@@ -530,3 +531,6 @@ async def generate_text(request: Request, prompt_req: PromptRequest):
             "sources": [],
             "incident": ops_state["incident"],
         }
+
+
+handler = Mangum(app)
