@@ -1,14 +1,16 @@
 import argparse
+import os
 from pathlib import Path
 import uuid
 
 import chromadb
-from chromadb.utils import embedding_functions
+from openai import OpenAI
 
 
 KB_DIR = Path("docs/atlaops-kb")
 CHROMA_PATH = Path("chroma_db")
 COLLECTION_NAME = "atlaops_kb"
+EMBEDDING_MODEL = "text-embedding-3-small"
 
 
 def chunk_text(text: str, chunk_size: int = 900, overlap: int = 120) -> list[str]:
@@ -37,11 +39,9 @@ def list_kb_files() -> list[Path]:
     return sorted(files)
 
 
-def get_embedding_fn(api_key: str):
-    return embedding_functions.OpenAIEmbeddingFunction(
-        api_key=api_key,
-        model_name="text-embedding-3-small",
-    )
+def embed_texts(client: OpenAI, texts: list[str]) -> list[list[float]]:
+    response = client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
+    return [item.embedding for item in response.data]
 
 
 def ingest(reset: bool, api_key: str):
@@ -50,19 +50,16 @@ def ingest(reset: bool, api_key: str):
         raise RuntimeError(f"No .md/.txt files found under {KB_DIR}")
 
     client = chromadb.PersistentClient(path=str(CHROMA_PATH))
-    embedding_fn = get_embedding_fn(api_key)
+    openai_client = OpenAI(api_key=api_key)
 
-    collection = client.get_or_create_collection(
-        name=COLLECTION_NAME,
-        embedding_function=embedding_fn,
-    )
+    collection = client.get_or_create_collection(name=COLLECTION_NAME)
 
     if reset:
-        client.delete_collection(COLLECTION_NAME)
-        collection = client.get_or_create_collection(
-            name=COLLECTION_NAME,
-            embedding_function=embedding_fn,
-        )
+        try:
+            client.delete_collection(COLLECTION_NAME)
+        except Exception:
+            pass
+        collection = client.get_or_create_collection(name=COLLECTION_NAME)
 
     all_docs = []
     all_ids = []
@@ -82,8 +79,10 @@ def ingest(reset: bool, api_key: str):
 
     batch_size = 100
     for i in range(0, len(all_docs), batch_size):
+        docs_batch = all_docs[i:i + batch_size]
         collection.add(
-            documents=all_docs[i:i + batch_size],
+            documents=docs_batch,
+            embeddings=embed_texts(openai_client, docs_batch),
             ids=all_ids[i:i + batch_size],
             metadatas=all_meta[i:i + batch_size],
         )
@@ -97,7 +96,7 @@ if __name__ == "__main__":
     parser.add_argument("--api-key", default=None, help="OpenAI API key (fallback: OPENAI_API_KEY env)")
     args = parser.parse_args()
 
-    api_key = args.api_key or __import__("os").environ.get("OPENAI_API_KEY")
+    api_key = args.api_key or os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY is required for embeddings")
 

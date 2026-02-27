@@ -7,7 +7,6 @@ import shutil
 import time
 
 import chromadb
-from chromadb.utils import embedding_functions
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -27,6 +26,7 @@ app.add_middleware(
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 client = OpenAI(api_key=OPENAI_API_KEY)
+EMBEDDING_MODEL = "text-embedding-3-small"
 
 CHROMA_PATH = Path("./chroma_db")
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -60,46 +60,44 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def get_embedding_function():
+def embed_texts(texts: list[str]) -> list[list[float]]:
     if not OPENAI_API_KEY:
-        return None
-    return embedding_functions.OpenAIEmbeddingFunction(
-        api_key=OPENAI_API_KEY,
-        model_name="text-embedding-3-small",
-    )
+        return []
+    try:
+        response = client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
+        return [item.embedding for item in response.data]
+    except Exception:
+        return []
 
 
 def init_collections():
-    embedding_fn = get_embedding_function()
     try:
         chroma_client = chromadb.PersistentClient(path=str(CHROMA_PATH))
-        user_memory = chroma_client.get_or_create_collection(
-            name="user_memory",
-            embedding_function=embedding_fn,
-        )
-        kb_docs = chroma_client.get_or_create_collection(
-            name="atlaops_kb",
-            embedding_function=embedding_fn,
-        )
+        user_memory = chroma_client.get_or_create_collection(name="user_memory")
+        kb_docs = chroma_client.get_or_create_collection(name="atlaops_kb")
         return user_memory, kb_docs
     except Exception as exc:
         backup_dir = Path(f"./chroma_db_legacy_{int(time.time())}")
         if CHROMA_PATH.exists():
             shutil.move(str(CHROMA_PATH), str(backup_dir))
         chroma_client = chromadb.PersistentClient(path=str(CHROMA_PATH))
-        user_memory = chroma_client.get_or_create_collection(
-            name="user_memory",
-            embedding_function=embedding_fn,
-        )
-        kb_docs = chroma_client.get_or_create_collection(
-            name="atlaops_kb",
-            embedding_function=embedding_fn,
-        )
+        user_memory = chroma_client.get_or_create_collection(name="user_memory")
+        kb_docs = chroma_client.get_or_create_collection(name="atlaops_kb")
         print(f"ChromaDB reset after init failure: {exc}. Backup: {backup_dir}")
         return user_memory, kb_docs
 
 
 user_collection, kb_collection = init_collections()
+
+
+def reset_user_collection():
+    global user_collection
+    client_local = chromadb.PersistentClient(path=str(CHROMA_PATH))
+    try:
+        client_local.delete_collection("user_memory")
+    except Exception:
+        pass
+    user_collection = client_local.get_or_create_collection(name="user_memory")
 
 
 class PromptRequest(BaseModel):
@@ -262,7 +260,13 @@ def retrieve_kb_context(query: str, top_k: int = 4):
     if kb_collection.count() == 0:
         return "", []
 
-    results = kb_collection.query(query_texts=[query], n_results=top_k)
+    try:
+        query_embedding = embed_texts([query])
+        if not query_embedding:
+            return "", []
+        results = kb_collection.query(query_embeddings=query_embedding, n_results=top_k)
+    except Exception:
+        return "", []
     documents = results.get("documents", [[]])[0]
     metadatas = results.get("metadatas", [[]])[0]
 
@@ -292,7 +296,13 @@ def retrieve_kb_context(query: str, top_k: int = 4):
 def retrieve_memory_context(query: str, top_k: int = 2) -> str:
     if user_collection.count() == 0:
         return ""
-    results = user_collection.query(query_texts=[query], n_results=top_k)
+    try:
+        query_embedding = embed_texts([query])
+        if not query_embedding:
+            return ""
+        results = user_collection.query(query_embeddings=query_embedding, n_results=top_k)
+    except Exception:
+        return ""
     documents = results.get("documents", [[]])[0]
     if not documents:
         return ""
@@ -389,43 +399,134 @@ def kb_status():
     }
 
 
-@app.post("/generate/")
-async def generate_text(request: Request, prompt_req: PromptRequest):
-    client_ip = request.client.host if request.client else "unknown"
-    current_time = time.time()
+@app.get("/ops/incidents/rca")
+def incident_rca():
+    incident = ops_state["incident"]
+    metrics = generate_metrics()["metrics"]
+    recent_logs = [entry["line"] for entry in generate_logs(8)]
+    recent_events = [entry["event"] for entry in ops_state["timeline"][:4]]
 
-    request_log[client_ip] = [t for t in request_log[client_ip] if current_time - t < WINDOW]
-    if len(request_log[client_ip]) >= RATE_LIMIT:
-        raise HTTPException(status_code=429, detail="Too many requests. Please slow down.")
-    request_log[client_ip].append(current_time)
-
-    user_message = prompt_req.prompt.strip()
-    if not user_message:
-        raise HTTPException(status_code=400, detail="Prompt is required.")
-
-    ops_context = build_ops_context()
-    kb_context, sources = retrieve_kb_context(user_message, top_k=4)
-    memory_context = retrieve_memory_context(user_message, top_k=2)
-
-    full_prompt = (
-        f"Current ops state:\n{ops_context}\n\n"
-        f"Knowledge base context:\n{kb_context or 'No KB chunks found.'}\n\n"
-        f"Conversation memory:\n{memory_context or 'No prior memory found.'}\n\n"
-        f"User question: {user_message}\n\n"
-        "Instructions: use the context above when relevant, be explicit about incident signals, "
-        "and avoid claims not supported by the provided context."
-    )
-
-    ai_response = get_ai_response(full_prompt)
-
-    user_collection.add(
-        documents=[f"User asked: {user_message}. AtlaOps Guru replied: {ai_response}"],
-        metadatas=[{"source": "conversation", "time": utc_now()}],
-        ids=[f"conv_{time.time()}"],
-    )
+    if incident == "traffic_spike":
+        summary = "Traffic surge caused latency amplification and autoscaling pressure."
+        likely_root_cause = "Request rate exceeded baseline, saturating API gateway and service pods."
+        mitigation = [
+            "Scale out stateless services and verify autoscaler thresholds.",
+            "Apply temporary rate limiting for abusive clients.",
+            "Tune cache and edge TTL for high-read paths.",
+        ]
+    elif incident == "db_errors":
+        summary = "Checkout path degradation driven by database timeouts."
+        likely_root_cause = "Orders database query latency and retries increased error propagation."
+        mitigation = [
+            "Investigate slow queries and connection pool saturation.",
+            "Enable circuit-breaker behavior for failing DB dependencies.",
+            "Shift read-heavy paths to cache and validate retry/backoff config.",
+        ]
+    elif incident == "recovery":
+        summary = "System is in recovery mode after mitigation workflow."
+        likely_root_cause = "Prior incident signals are stabilizing after remediation actions."
+        mitigation = [
+            "Keep elevated monitoring until latency and error trends fully normalize.",
+            "Run post-incident validation checks on dependent services.",
+            "Document timeline and finalize postmortem actions.",
+        ]
+    else:
+        summary = "No active incident detected; platform is operating at baseline."
+        likely_root_cause = "N/A"
+        mitigation = [
+            "Maintain baseline observability and alert hygiene.",
+            "Run periodic failure drills to validate runbooks.",
+            "Review capacity thresholds before peak traffic windows.",
+        ]
 
     return {
-        "response": ai_response,
-        "sources": sources,
-        "incident": ops_state["incident"],
+        "incident": incident,
+        "generated_at": utc_now(),
+        "summary": summary,
+        "likely_root_cause": likely_root_cause,
+        "signals": {
+            "cpu_percent": metrics["cpu_percent"],
+            "memory_percent": metrics["memory_percent"],
+            "latency_p95_ms": metrics["latency_p95_ms"],
+            "error_rate_percent": metrics["error_rate_percent"],
+            "pod_count": metrics["pod_count"],
+            "requests_per_min": metrics["requests_per_min"],
+        },
+        "recent_events": recent_events,
+        "recent_logs": recent_logs,
+        "mitigation_plan": mitigation,
     }
+
+
+@app.post("/generate/")
+async def generate_text(request: Request, prompt_req: PromptRequest):
+    try:
+        if not OPENAI_API_KEY:
+            return {
+                "response": "OPENAI_API_KEY is not configured in this running server process.",
+                "sources": [],
+                "incident": ops_state["incident"],
+            }
+
+        client_ip = request.client.host if request.client else "unknown"
+        current_time = time.time()
+
+        request_log[client_ip] = [t for t in request_log[client_ip] if current_time - t < WINDOW]
+        if len(request_log[client_ip]) >= RATE_LIMIT:
+            raise HTTPException(status_code=429, detail="Too many requests. Please slow down.")
+        request_log[client_ip].append(current_time)
+
+        user_message = prompt_req.prompt.strip()
+        if not user_message:
+            raise HTTPException(status_code=400, detail="Prompt is required.")
+
+        ops_context = build_ops_context()
+        kb_context, sources = retrieve_kb_context(user_message, top_k=4)
+        memory_context = retrieve_memory_context(user_message, top_k=2)
+
+        full_prompt = (
+            f"Current ops state:\n{ops_context}\n\n"
+            f"Knowledge base context:\n{kb_context or 'No KB chunks found.'}\n\n"
+            f"Conversation memory:\n{memory_context or 'No prior memory found.'}\n\n"
+            f"User question: {user_message}\n\n"
+            "Instructions: use the context above when relevant, be explicit about incident signals, "
+            "and avoid claims not supported by the provided context."
+        )
+
+        ai_response = get_ai_response(full_prompt)
+
+        memory_doc = f"User asked: {user_message}. AtlaOps Guru replied: {ai_response}"
+        memory_embeddings = embed_texts([memory_doc])
+        if memory_embeddings:
+            try:
+                user_collection.add(
+                    documents=[memory_doc],
+                    embeddings=memory_embeddings,
+                    metadatas=[{"source": "conversation", "time": utc_now()}],
+                    ids=[f"conv_{time.time()}"],
+                )
+            except Exception as exc:
+                if "dimensionality" in str(exc).lower():
+                    reset_user_collection()
+                    user_collection.add(
+                        documents=[memory_doc],
+                        embeddings=memory_embeddings,
+                        metadatas=[{"source": "conversation", "time": utc_now()}],
+                        ids=[f"conv_{time.time()}"],
+                    )
+                else:
+                    raise
+
+        return {
+            "response": ai_response,
+            "sources": sources,
+            "incident": ops_state["incident"],
+        }
+    except HTTPException:
+        raise
+    except Exception as exc:
+        return {
+            "response": f"Ops Guru backend error: {type(exc).__name__}: {exc}",
+            "sources": [],
+            "incident": ops_state["incident"],
+        }

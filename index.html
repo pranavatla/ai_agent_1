@@ -261,7 +261,22 @@
       min-height: 0;
     }
 
+    .ops-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      min-height: 0;
+    }
+
     .logs, .timeline, .architecture {
+      padding: 14px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      min-height: 230px;
+    }
+
+    .rca-panel {
       padding: 14px;
       background: var(--panel-2);
       border: 1px solid var(--border);
@@ -297,6 +312,13 @@
     .timeline-list li {
       border-left: 2px solid rgba(59, 169, 255, 0.4);
       padding-left: 10px;
+    }
+
+    .rca-block {
+      font-size: 13px;
+      line-height: 1.45;
+      color: #d5e8f9;
+      white-space: pre-wrap;
     }
 
     .time {
@@ -376,6 +398,8 @@
       border-radius: 10px;
       border: 1px solid rgba(151, 180, 207, 0.12);
       max-width: 95%;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
 
     .msg.user {
@@ -572,6 +596,16 @@
         <div class="section-title"><span>Architecture Map</span></div>
         <div id="arch-output" class="mono">Loading architecture...</div>
       </section>
+
+      <section class="ops-grid-3">
+        <article class="rca-panel">
+          <div class="section-title">
+            <span>Incident RCA</span>
+            <button onclick="generateRca()">Generate RCA</button>
+          </div>
+          <div id="rca-output" class="rca-block">Click \"Generate RCA\" to produce a root-cause summary and mitigation plan.</div>
+        </article>
+      </section>
     </main>
 
     <aside id="assistant" class="assistant panel">
@@ -748,6 +782,39 @@
       }
     }
 
+    function renderRca(data) {
+      const lines = [];
+      lines.push(`Incident: ${data.incident}`);
+      lines.push(`Generated: ${formatTime(data.generated_at)}`);
+      lines.push("");
+      lines.push(`Summary: ${data.summary}`);
+      lines.push(`Likely Root Cause: ${data.likely_root_cause}`);
+      lines.push("");
+      lines.push("Signals:");
+      lines.push(`- CPU: ${data.signals.cpu_percent}%`);
+      lines.push(`- Memory: ${data.signals.memory_percent}%`);
+      lines.push(`- P95 Latency: ${data.signals.latency_p95_ms} ms`);
+      lines.push(`- Error Rate: ${data.signals.error_rate_percent}%`);
+      lines.push(`- Pods: ${data.signals.pod_count}`);
+      lines.push(`- RPM: ${data.signals.requests_per_min}`);
+      lines.push("");
+      lines.push("Mitigation Plan:");
+      (data.mitigation_plan || []).forEach((step, idx) => lines.push(`${idx + 1}. ${step}`));
+      document.getElementById("rca-output").textContent = lines.join("\n");
+    }
+
+    async function generateRca() {
+      const el = document.getElementById("rca-output");
+      el.textContent = "Generating incident analysis...";
+      try {
+        const res = await fetch(`${API_BASE}/ops/incidents/rca`);
+        const data = await res.json();
+        renderRca(data);
+      } catch {
+        el.textContent = "Unable to generate RCA.";
+      }
+    }
+
     async function checkHealth() {
       try {
         const res = await fetch(`${API_BASE}/health`);
@@ -765,17 +832,38 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ incident_type: type }),
         });
-        await Promise.all([refreshMetrics(), refreshLogs(), refreshIncidents()]);
+        await Promise.all([refreshMetrics(), refreshLogs(), refreshIncidents(), generateRca()]);
       } catch {
         alert("Failed to trigger incident.");
       }
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function formatAiText(text) {
+      let html = escapeHtml(text || "");
+      html = html.replace(/\\*\\*(.*?)\\*\\*/g, "<strong>$1</strong>");
+      html = html.replace(/(?:^|\\n)-\\s+/g, "<br>- ");
+      html = html.replace(/\\n/g, "<br>");
+      return html;
     }
 
     function addChat(role, text, sources = []) {
       const box = document.getElementById("chat-box");
       const msg = document.createElement("div");
       msg.className = `msg ${role}`;
-      msg.textContent = text;
+      if (role === "ai") {
+        msg.innerHTML = formatAiText(text);
+      } else {
+        msg.textContent = text;
+      }
 
       if (role === "ai" && sources.length > 0) {
         const ref = document.createElement("div");
@@ -811,17 +899,24 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt: text }),
         });
-        if (!res.ok) throw new Error("AI request failed");
+        if (!res.ok) {
+          let detail = "AI request failed";
+          try {
+            const err = await res.json();
+            detail = err.detail || err.response || detail;
+          } catch {}
+          throw new Error(`${detail} (status ${res.status})`);
+        }
         const data = await res.json();
-        ai.textContent = data.response || "No response received.";
+        ai.innerHTML = formatAiText(data.response || "No response received.");
         if (Array.isArray(data.sources) && data.sources.length > 0) {
           const ref = document.createElement("div");
           ref.className = "sources";
           ref.textContent = `Sources: ${data.sources.map((s) => `${s.source}#${s.chunk}`).join(", ")}`;
           ai.appendChild(ref);
         }
-      } catch {
-        ai.textContent = "Ops Guru is unreachable right now.";
+      } catch (err) {
+        ai.innerHTML = formatAiText(err.message || "Ops Guru is unreachable right now.");
       } finally {
         btn.disabled = false;
         promptEl.focus();
@@ -842,6 +937,7 @@
         refreshLogs(),
         refreshIncidents(),
         refreshArchitecture(),
+        generateRca(),
       ]);
       setInterval(refreshMetrics, 3500);
       setInterval(refreshLogs, 4500);
