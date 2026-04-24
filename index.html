@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AtlaOps | AI-Powered Cloud Operations Dashboard</title>
-  <meta name="description" content="AtlaOps is an AI cloud operations dashboard with incident simulation and RAG-powered assistant." />
+  <title>obs.atla.in | Advanced Cloud Operations Platform</title>
+  <meta name="description" content="Advanced cloud operations and incident management platform with real-time monitoring, AI-powered RCA, and sophisticated incident simulation." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     * {
       box-sizing: border-box;
@@ -56,7 +56,6 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Scrollbar styling */
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
@@ -75,19 +74,15 @@
       background: rgba(255, 255, 255, 0.15);
     }
 
-    /* Layout */
     .layout {
       display: grid;
       grid-template-columns: 260px 1fr 380px;
       gap: 20px;
       min-height: 100vh;
       padding: 20px;
-      background: linear-gradient(to bottom,
-        rgba(14, 165, 233, 0.05) 0%,
-        transparent 40%);
+      background: linear-gradient(to bottom, rgba(14, 165, 233, 0.05) 0%, transparent 40%);
     }
 
-    /* Sidebar */
     .sidebar {
       display: flex;
       flex-direction: column;
@@ -109,9 +104,9 @@
     }
 
     .brand h1 {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
       background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -119,11 +114,10 @@
     }
 
     .brand p {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-tertiary);
       font-weight: 500;
       letter-spacing: 0.5px;
-      text-transform: uppercase;
     }
 
     .nav-links {
@@ -184,7 +178,6 @@
       50% { opacity: 0.5; }
     }
 
-    /* Main content */
     .main {
       display: grid;
       grid-template-rows: auto auto auto 1fr;
@@ -192,7 +185,6 @@
       min-width: 0;
     }
 
-    /* Hero section */
     .hero {
       padding: 28px;
       background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);
@@ -207,7 +199,7 @@
 
     .hero h2 {
       font-size: 28px;
-      font-weight: 700;
+      font-weight: 800;
       line-height: 1.3;
       margin-bottom: 12px;
       letter-spacing: -0.5px;
@@ -224,6 +216,7 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      margin-top: 12px;
     }
 
     .chip {
@@ -264,7 +257,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* Insights */
     .insight-strip {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -295,7 +287,7 @@
 
     .insight-value {
       font-size: 32px;
-      font-weight: 700;
+      font-weight: 800;
       line-height: 1;
       margin-bottom: 8px;
       letter-spacing: -1px;
@@ -306,7 +298,6 @@
       font-size: 12px;
     }
 
-    /* Metrics grid */
     .grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -339,7 +330,7 @@
 
     .metric-value {
       font-size: 36px;
-      font-weight: 700;
+      font-weight: 800;
       line-height: 1;
       margin-bottom: 8px;
       letter-spacing: -1px;
@@ -351,7 +342,6 @@
       color: var(--text-tertiary);
     }
 
-    /* Analytics section */
     .analytics {
       display: grid;
       grid-template-columns: 1.35fr 1fr;
@@ -373,18 +363,17 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: -0.3px;
     }
 
     canvas {
       width: 100%;
-      height: 200px;
+      height: 220px;
       border-radius: var(--radius-md);
       background: var(--bg-tertiary);
     }
 
-    /* Tables */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -399,7 +388,7 @@
 
     th {
       color: var(--text-tertiary);
-      font-weight: 600;
+      font-weight: 700;
       font-size: 11px;
       letter-spacing: 1px;
       text-transform: uppercase;
@@ -412,11 +401,11 @@
     .status {
       font-size: 11px;
       border-radius: 6px;
-      padding: 5px 10px;
+      padding: 6px 10px;
       display: inline-block;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .healthy {
@@ -429,7 +418,6 @@
       color: #fcd34d;
     }
 
-    /* Operations grid */
     .ops-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -449,7 +437,7 @@
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      min-height: 280px;
+      min-height: 300px;
     }
 
     .arch-layout {
@@ -460,7 +448,7 @@
 
     #arch-canvas {
       width: 100%;
-      height: 280px;
+      height: 320px;
       border-radius: var(--radius-md);
       background: var(--bg-tertiary);
       cursor: pointer;
@@ -476,6 +464,8 @@
       line-height: 1.7;
       white-space: pre-wrap;
       font-family: "JetBrains Mono", monospace;
+      overflow-y: auto;
+      max-height: 320px;
     }
 
     .rca-panel {
@@ -483,7 +473,7 @@
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      min-height: 280px;
+      min-height: 300px;
     }
 
     .mono {
@@ -494,7 +484,7 @@
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
       padding: 12px;
-      max-height: 250px;
+      max-height: 280px;
       overflow: auto;
       white-space: pre-wrap;
       line-height: 1.6;
@@ -505,7 +495,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      max-height: 250px;
+      max-height: 280px;
       overflow: auto;
       font-size: 13px;
       color: var(--text-secondary);
@@ -535,10 +525,9 @@
       font-size: 11px;
       margin-bottom: 4px;
       font-family: "JetBrains Mono", monospace;
-      font-weight: 600;
+      font-weight: 700;
     }
 
-    /* Incident controls */
     .incident-controls {
       display: flex;
       gap: 10px;
@@ -546,13 +535,12 @@
       margin-bottom: 16px;
     }
 
-    /* Buttons */
     button {
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      padding: 9px 14px;
+      padding: 10px 14px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-primary);
       cursor: pointer;
       background: transparent;
@@ -601,7 +589,6 @@
       border-color: rgba(16, 185, 129, 0.6);
     }
 
-    /* Assistant panel */
     .assistant {
       padding: 20px;
       display: grid;
@@ -615,6 +602,7 @@
       height: fit-content;
       position: sticky;
       top: 20px;
+      max-height: calc(100vh - 40px);
     }
 
     .assistant-head {
@@ -628,7 +616,7 @@
 
     .assistant-title h3 {
       font-size: 18px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: -0.5px;
     }
 
@@ -646,7 +634,7 @@
       padding: 12px;
       overflow: auto;
       min-height: 300px;
-      max-height: 400px;
+      max-height: 380px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -720,8 +708,8 @@
       background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
       border: none;
       color: white;
-      padding: 0 16px;
-      font-weight: 700;
+      padding: 0 14px;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       white-space: nowrap;
@@ -730,10 +718,9 @@
     .cta:hover {
       background: linear-gradient(135deg, #0284c7 0%, #059669 100%);
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(14, 165, 233, 0.2);
+      box-shadow: 0 8px 24px rgba(14, 165, 233, 0.25);
     }
 
-    /* Responsive design */
     @media (max-width: 1400px) {
       .layout {
         grid-template-columns: 1fr;
@@ -741,39 +728,39 @@
 
       .sidebar {
         position: static;
-        display: flex;
-        flex-direction: row;
-        gap: 48px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
         padding: 20px;
         align-items: center;
         height: auto;
       }
 
       .sidebar .nav-links {
+        grid-column: 2;
         flex-direction: row;
         gap: 12px;
       }
 
       .sidebar .status-pill {
+        grid-column: 3;
         margin-top: 0;
-        margin-left: auto;
       }
 
       .assistant {
         position: static;
-        grid-template-rows: auto 1fr auto;
-        min-height: 400px;
+        max-height: none;
       }
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1000px) {
       .layout {
         padding: 16px;
         gap: 16px;
       }
 
       .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, 1fr);
       }
 
       .analytics, .ops-grid {
@@ -785,25 +772,16 @@
       }
 
       .insight-strip {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, 1fr);
       }
 
       .hero {
         flex-direction: column;
         gap: 16px;
       }
-
-      .chip-row {
-        width: 100%;
-      }
-
-      .sidebar {
-        gap: 24px;
-        flex-wrap: wrap;
-      }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 640px) {
       .layout {
         padding: 12px;
         gap: 12px;
@@ -817,46 +795,26 @@
         grid-template-columns: 1fr;
       }
 
-      .insight-card, .card {
-        padding: 16px;
+      .sidebar {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .sidebar .nav-links {
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .sidebar .status-pill {
+        grid-column: auto;
       }
 
       .metric-value {
         font-size: 28px;
       }
 
-      .hero {
-        padding: 16px;
-        margin-bottom: -4px;
-      }
-
       .hero h2 {
-        font-size: 22px;
-      }
-
-      .sidebar {
-        flex-direction: column;
-        gap: 16px;
-        padding: 16px;
-      }
-
-      .sidebar .nav-links {
-        flex-direction: row;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-
-      .sidebar .status-pill {
-        margin-left: 0;
-      }
-
-      .section-title {
-        font-size: 12px;
-      }
-
-      button {
-        padding: 8px 10px;
-        font-size: 11px;
+        font-size: 24px;
       }
     }
   </style>
@@ -865,15 +823,16 @@
   <div class="layout">
     <aside class="sidebar">
       <div class="brand">
-        <h1>AtlaOps</h1>
-        <p>AI-Powered Cloud Dashboard</p>
+        <h1>obs.atla.in</h1>
+        <p>Advanced Cloud Operations Platform</p>
       </div>
       <nav class="nav-links">
         <a class="nav-link" href="#overview">Overview</a>
+        <a class="nav-link" href="#metrics">Metrics</a>
         <a class="nav-link" href="#services">Services</a>
         <a class="nav-link" href="#incidents">Incidents</a>
         <a class="nav-link" href="#architecture">Architecture</a>
-        <a class="nav-link" href="#assistant">Ops Guru</a>
+        <a class="nav-link" href="#assistant">Guru</a>
       </nav>
       <div class="status-pill"><span class="dot"></span><span id="health-pill">Checking backend...</span></div>
     </aside>
@@ -881,8 +840,8 @@
     <main class="main">
       <section id="overview" class="hero">
         <div>
-          <h2>Explore Cloud Operations in Real Time</h2>
-          <p>AtlaOps simulates live infrastructure telemetry, service health, and incident response. Ask Ops Guru how the system scales, fails, and recovers.</p>
+          <h2>Cloud Operations & Incident Management</h2>
+          <p>Advanced observability platform with real-time metrics, sophisticated incident simulation, AI-powered root cause analysis, and production-grade incident response. Explore architecture patterns, trigger incidents, and analyze system behavior.</p>
           <div class="hero-meta">
             <span class="hero-meta-item" id="meta-incident">INCIDENT: NORMAL</span>
             <span class="hero-meta-item" id="meta-time">UTC: --:--:--</span>
@@ -890,10 +849,11 @@
           </div>
         </div>
         <div class="chip-row">
-          <span class="chip">AWS-style Metrics</span>
+          <span class="chip">Real-time Metrics</span>
           <span class="chip">Incident Simulation</span>
-          <span class="chip">RAG Assistant</span>
-          <span class="chip">DevOps Storytelling</span>
+          <span class="chip">AI-Powered RCA</span>
+          <span class="chip">AWS-Scale Telemetry</span>
+          <span class="chip">Production Ready</span>
         </div>
       </section>
 
@@ -915,7 +875,7 @@
         </article>
       </section>
 
-      <section class="grid">
+      <section id="metrics" class="grid">
         <article class="card">
           <div class="metric-title">CPU Usage</div>
           <div class="metric-value" id="cpu">--</div>
@@ -1009,17 +969,17 @@
       <div class="assistant-head">
         <div class="assistant-title">
           <h3>Ops Guru</h3>
-          <p>RAG-enabled cloud operations assistant</p>
+          <p>AI-powered assistant</p>
         </div>
         <button onclick="clearChat()">Clear</button>
       </div>
 
       <div id="chat-box">
-        <div class="msg ai">Ask about scaling strategy, incident root cause, architecture, or remediation playbooks.</div>
+        <div class="msg ai">Ask about incident response, system architecture, scaling patterns, or observability best practices.</div>
       </div>
 
       <div class="chat-input">
-        <textarea id="prompt" placeholder="Example: What caused the current incident, and how would you mitigate it?"></textarea>
+        <textarea id="prompt" placeholder="Ask about system behavior, incidents, or operations..."></textarea>
         <button class="cta" id="send-btn" onclick="sendMessage()">Ask</button>
       </div>
     </aside>
@@ -1081,14 +1041,14 @@
       const map = {
         "Route53": "Public DNS routing layer. Directs user traffic to CloudFront.",
         "CloudFront": "Global edge CDN + TLS termination. Low-latency delivery and caching.",
-        "S3 Frontend": "Hosts static dashboard assets for AtlaOps UI.",
+        "S3 Frontend": "Hosts static dashboard assets for obs.atla.in UI.",
         "API Gateway": "Public API ingress for chat and ops endpoints.",
         "Lambda AtlaOps API": "Stateless orchestration for telemetry, RCA simulation, and AI requests.",
         "OpenAI LLM": "Managed inference endpoint for Ops Guru reasoning and response generation.",
         "Vector Store": "Retrieval context store for architecture docs, playbooks, and project notes.",
         "CloudWatch": "Metrics, alarms, and incident signal pipeline.",
       };
-      return map[name] || "Infrastructure component in the AtlaOps reference topology.";
+      return map[name] || "Infrastructure component in the obs.atla.in reference topology.";
     }
 
     function getArchitectureNodePositions(nodes, width, height) {
@@ -1106,14 +1066,14 @@
       return nodes.map((name, idx) => {
         const p = presets[name];
         if (p) {
-          return { name, x: p[0] * width, y: p[1] * height, r: 16, idx };
+          return { name, x: p[0] * width, y: p[1] * height, r: 18, idx };
         }
         const angle = (Math.PI * 2 * idx) / Math.max(nodes.length, 1);
         return {
           name,
           x: width * 0.5 + Math.cos(angle) * width * 0.25,
           y: height * 0.5 + Math.sin(angle) * height * 0.25,
-          r: 16,
+          r: 18,
           idx,
         };
       });
@@ -1132,7 +1092,7 @@
 
       const connected = archData.edges
         .filter((e) => edgeTouchesNode(e, nodeName))
-        .map((e) => `${e[0]} -> ${e[1]}`);
+        .map((e) => `${e[0]} → ${e[1]}`);
 
       const lines = [];
       lines.push(`Component: ${nodeName}`);
@@ -1152,14 +1112,13 @@
       const ctx = canvas.getContext("2d");
       const dpr = window.devicePixelRatio || 1;
       const cssW = canvas.clientWidth || 900;
-      const cssH = canvas.clientHeight || 260;
+      const cssH = canvas.clientHeight || 360;
       canvas.width = Math.floor(cssW * dpr);
       canvas.height = Math.floor(cssH * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, cssW, cssH);
 
       archNodePositions = getArchitectureNodePositions(archData.nodes, cssW, cssH);
-
       const nodeMap = new Map(archNodePositions.map((n) => [n.name, n]));
 
       archData.edges.forEach((edge) => {
@@ -1174,8 +1133,8 @@
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
-        ctx.strokeStyle = emphasis ? "rgba(14, 165, 233, 0.9)" : "rgba(255, 255, 255, 0.15)";
-        ctx.lineWidth = emphasis ? 2.5 : 1.2;
+        ctx.strokeStyle = emphasis ? "rgba(14, 165, 233, 0.95)" : "rgba(255, 255, 255, 0.15)";
+        ctx.lineWidth = emphasis ? 2.8 : 1.2;
         ctx.stroke();
       });
 
@@ -1188,16 +1147,17 @@
           ? "rgba(16, 185, 129, 0.95)"
           : isHover
           ? "rgba(14, 165, 233, 0.95)"
-          : "rgba(26, 35, 50, 0.95)";
+          : "rgba(26, 35, 50, 0.9)";
         ctx.fill();
-        ctx.lineWidth = isSelected || isHover ? 2.5 : 1.4;
-        ctx.strokeStyle = isSelected || isHover ? "rgba(245, 247, 250, 0.95)" : "rgba(255, 255, 255, 0.25)";
+        ctx.lineWidth = isSelected || isHover ? 3 : 1.6;
+        ctx.strokeStyle = isSelected || isHover ? "rgba(245, 247, 250, 0.95)" : "rgba(255, 255, 255, 0.2)";
         ctx.stroke();
 
         ctx.fillStyle = "#f5f7fa";
-        ctx.font = "600 12px Inter";
+        ctx.font = "600 13px Inter";
         ctx.textAlign = "center";
-        ctx.fillText(node.name, node.x, node.y - 22);
+        ctx.textBaseline = "middle";
+        ctx.fillText(node.name, node.x, node.y - 26);
       });
     }
 
@@ -1214,7 +1174,7 @@
         for (const node of archNodePositions) {
           const dx = x - node.x;
           const dy = y - node.y;
-          if (Math.sqrt(dx * dx + dy * dy) <= node.r + 4) {
+          if (Math.sqrt(dx * dx + dy * dy) <= node.r + 6) {
             hoveredArchNode = node.name;
             break;
           }
@@ -1266,7 +1226,7 @@
       }
 
       ctx.strokeStyle = "#0ea5e9";
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 2.8;
       ctx.beginPath();
 
       latencyHistory.forEach((v, i) => {
@@ -1279,8 +1239,8 @@
 
       const last = latencyHistory[latencyHistory.length - 1];
       ctx.fillStyle = "#38bdf8";
-      ctx.font = "500 12px JetBrains Mono";
-      ctx.fillText(`Latest: ${last.toFixed(1)}ms`, 10, 18);
+      ctx.font = "600 12px JetBrains Mono";
+      ctx.fillText(`Latest: ${last.toFixed(1)}ms`, 10, 20);
     }
 
     function renderServices(services) {
@@ -1473,7 +1433,7 @@
 
     function clearChat() {
       const box = document.getElementById("chat-box");
-      box.innerHTML = '<div class="msg ai">Ask about scaling strategy, incident root cause, architecture, or remediation playbooks.</div>';
+      box.innerHTML = '<div class="msg ai">Ask about incident response, system architecture, scaling patterns, or observability best practices.</div>';
     }
 
     async function sendMessage() {
