@@ -1206,7 +1206,7 @@
       addChat("user", text);
       promptEl.value = "";
       btn.disabled = true;
-      const ai = addChat("ai", "Analyzing current system state...");
+      const ai = addChat("ai", "Thinking . .. ...");
 
       try {
         const res = await fetch(`${API_BASE}/generate/`, {
