@@ -998,6 +998,124 @@
     let selectedArchNode = null;
     let hoveredArchNode = null;
 
+    // Sample scenario system
+    let currentScenario = "normal";
+    let scenarioStartTime = Date.now();
+    let timelineEvents = [];
+
+    const scenarios = {
+      normal: {
+        name: "Normal Operation",
+        description: "Healthy system with stable metrics",
+        cpuRange: [20, 45],
+        memoryRange: [30, 55],
+        latencyRange: [45, 95],
+        errorRange: [0.1, 0.8],
+        podRange: [8, 12],
+        rpmRange: [800, 1200],
+        duration: Infinity
+      },
+      traffic_spike: {
+        name: "Traffic Spike",
+        description: "Sudden traffic increase causing resource pressure",
+        cpuRange: [70, 95],
+        memoryRange: [75, 95],
+        latencyRange: [200, 500],
+        errorRange: [2, 8],
+        podRange: [15, 20],
+        rpmRange: [3000, 5000],
+        duration: 45000,
+        events: [
+          { time: 0, msg: "⚠️ Traffic spike detected - 3x normal load" },
+          { time: 3000, msg: "📈 Auto-scaling activated - spawning new pods" },
+          { time: 8000, msg: "⚡ CPU utilization critical - 92%" },
+          { time: 15000, msg: "🔴 Error rate elevated - 5.2%" },
+          { time: 25000, msg: "✓ Load balancing across new instances" },
+          { time: 35000, msg: "📉 Traffic normalizing - gradual recovery" }
+        ]
+      },
+      db_errors: {
+        name: "Database Error Burst",
+        description: "Connection pool exhaustion and database errors",
+        cpuRange: [45, 70],
+        memoryRange: [60, 85],
+        latencyRange: [300, 800],
+        errorRange: [8, 25],
+        podRange: [8, 12],
+        rpmRange: [1500, 2500],
+        duration: 40000,
+        events: [
+          { time: 0, msg: "🔴 Database connection pool exhausted" },
+          { time: 2000, msg: "💥 Error rate spike - 15% failures" },
+          { time: 5000, msg: "⏱️ Query timeout threshold breached" },
+          { time: 8000, msg: "🔍 Identified: Max connections = 100, current = 120" },
+          { time: 12000, msg: "🔧 Implementing connection retry logic" },
+          { time: 20000, msg: "♻️ Connection pool rebalancing" },
+          { time: 30000, msg: "✓ Error rate declining - 3.2%" }
+        ]
+      },
+      recovery: {
+        name: "Recovery Mode",
+        description: "System recovering from incident",
+        cpuRange: [30, 55],
+        memoryRange: [40, 65],
+        latencyRange: [80, 150],
+        errorRange: [0.5, 2],
+        podRange: [10, 14],
+        rpmRange: [1200, 1800],
+        duration: 30000,
+        events: [
+          { time: 0, msg: "🔄 Initiating recovery protocol" },
+          { time: 3000, msg: "✓ Health checks passing" },
+          { time: 6000, msg: "📊 Metrics stabilizing" },
+          { time: 12000, msg: "🟢 Error rate < 1%" },
+          { time: 18000, msg: "✓ All services healthy" },
+          { time: 24000, msg: "✅ Full recovery complete" }
+        ]
+      }
+    };
+
+    function generateMetricValue(min, max, smooth = true) {
+      if (smooth) {
+        return min + Math.random() * (max - min);
+      }
+      return Math.round(min + Math.random() * (max - min));
+    }
+
+    function getScenarioMetrics(scenario) {
+      const elapsed = Date.now() - scenarioStartTime;
+      if (elapsed > scenario.duration) {
+        currentScenario = "normal";
+        scenarioStartTime = Date.now();
+        return getScenarioMetrics(scenarios.normal);
+      }
+
+      return {
+        cpu_percent: generateMetricValue(scenario.cpuRange[0], scenario.cpuRange[1]),
+        memory_percent: generateMetricValue(scenario.memoryRange[0], scenario.memoryRange[1]),
+        latency_p95_ms: generateMetricValue(scenario.latencyRange[0], scenario.latencyRange[1]),
+        error_rate_percent: generateMetricValue(scenario.errorRange[0], scenario.errorRange[1], true),
+        pod_count: generateMetricValue(scenario.podRange[0], scenario.podRange[1], false),
+        requests_per_min: generateMetricValue(scenario.rpmRange[0], scenario.rpmRange[1], false)
+      };
+    }
+
+    function updateScenarioTimeline() {
+      const scenario = scenarios[currentScenario];
+      const elapsed = Date.now() - scenarioStartTime;
+
+      if (scenario.events) {
+        const newEvents = scenario.events.filter(e => e.time <= elapsed);
+        if (newEvents.length > timelineEvents.length) {
+          timelineEvents = newEvents;
+          renderTimeline(newEvents.map((e, i) => ({
+            time: new Date(scenarioStartTime + e.time).toISOString(),
+            event: e.msg
+          })));
+        }
+      }
+    }
+
     const metricEls = {
       cpu: document.getElementById("cpu"),
       memory: document.getElementById("memory"),
@@ -1269,29 +1387,87 @@
 
     async function refreshMetrics() {
       try {
-        const res = await fetch(`${API_BASE}/ops/metrics`);
-        const data = await res.json();
-        const m = data.metrics;
+        let m, incident;
 
-        metricEls.cpu.textContent = `${m.cpu_percent}%`;
-        metricEls.memory.textContent = `${m.memory_percent}%`;
-        metricEls.latency.textContent = `${m.latency_p95_ms}ms`;
-        metricEls.errors.textContent = `${m.error_rate_percent}%`;
+        // Try to fetch from backend, fall back to sample data
+        try {
+          const res = await fetch(`${API_BASE}/ops/metrics`, { timeout: 2000 });
+          if (res.ok) {
+            const data = await res.json();
+            m = data.metrics;
+            incident = data.incident;
+          } else {
+            throw new Error("Backend unavailable");
+          }
+        } catch (e) {
+          // Use sample scenario data
+          m = getScenarioMetrics(scenarios[currentScenario]);
+          incident = currentScenario;
+          updateScenarioTimeline();
+        }
+
+        metricEls.cpu.textContent = `${m.cpu_percent.toFixed(1)}%`;
+        metricEls.memory.textContent = `${m.memory_percent.toFixed(1)}%`;
+        metricEls.latency.textContent = `${m.latency_p95_ms.toFixed(0)}ms`;
+        metricEls.errors.textContent = `${m.error_rate_percent.toFixed(2)}%`;
         metricEls.pods.textContent = m.pod_count;
         metricEls.rpm.textContent = m.requests_per_min;
 
-        document.getElementById("incident-badge").textContent = `Incident: ${data.incident}`;
-        updateInsights(m, data.incident);
+        document.getElementById("incident-badge").textContent = `Incident: ${incident}`;
+        updateInsights(m, incident);
 
         latencyHistory.push(m.latency_p95_ms);
         while (latencyHistory.length > maxPoints) latencyHistory.shift();
         drawLatencyChart();
 
-        renderServices(data.services || []);
+        // Generate sample services data
+        const services = [
+          { name: "API Gateway", status: incident === "normal" ? "healthy" : incident === "recovery" ? "degraded" : "degraded", latency_ms: Math.round(m.latency_p95_ms * 0.8) },
+          { name: "Auth Service", status: incident === "db_errors" ? "degraded" : "healthy", latency_ms: Math.round(m.latency_p95_ms * 0.6) },
+          { name: "Database", status: incident === "db_errors" ? "degraded" : "healthy", latency_ms: Math.round(m.latency_p95_ms * 1.2) },
+          { name: "Cache Layer", status: "healthy", latency_ms: Math.round(m.latency_p95_ms * 0.3) },
+          { name: "LLM Service", status: incident === "traffic_spike" ? "degraded" : "healthy", latency_ms: Math.round(m.latency_p95_ms * 2) }
+        ];
+        renderServices(services);
       } catch {
-        document.getElementById("health-pill").textContent = "backend offline";
+        document.getElementById("health-pill").textContent = "using sample data";
       }
     }
+
+    const sampleLogs = {
+      normal: [
+        "✓ [API] Request processed in 45ms",
+        "✓ [DB] Query executed in 12ms",
+        "✓ [Cache] Hit rate: 87%",
+        "✓ [Auth] User authenticated successfully",
+        "✓ [API] Endpoint /metrics responded 200 OK",
+        "ℹ [Monitor] SLO compliance: 99.95%"
+      ],
+      traffic_spike: [
+        "⚠️ [LB] High traffic detected: 3500 req/min",
+        "⚠️ [Autoscale] Spawning 8 new instances",
+        "🔴 [API] Request queue depth: 450",
+        "⚠️ [Memory] 89% utilization on node-05",
+        "🔴 [DB] Connection pool at 98%",
+        "⚠️ [LLM] Response latency: 850ms"
+      ],
+      db_errors: [
+        "🔴 [DB] Connection refused on primary",
+        "🔴 [DB] Pool exhausted: 100/100 connections",
+        "⚠️ [API] Retry attempt #3 for query",
+        "🔴 [Error] QueryTimeoutError after 5s",
+        "🔴 [Service] DB service degraded",
+        "ℹ [Fallback] Using read-only replica"
+      ],
+      recovery: [
+        "🔄 [Recovery] Initiating recovery protocol",
+        "✓ [Health] Primary database responding",
+        "✓ [Connection] Pool rebalancing complete",
+        "✓ [Autoscale] Scaling down excess instances",
+        "✓ [Metrics] CPU returning to baseline",
+        "✅ [Recovery] System fully recovered"
+      ]
+    };
 
     async function refreshLogs() {
       try {
@@ -1300,7 +1476,13 @@
         const lines = (data.logs || []).map((l) => `[${formatTime(l.time)}] ${l.line}`);
         document.getElementById("log-output").textContent = lines.join("\n");
       } catch {
-        document.getElementById("log-output").textContent = "Unable to fetch logs.";
+        // Generate sample logs based on scenario
+        const logs = sampleLogs[currentScenario] || sampleLogs.normal;
+        const lines = logs.map((l, i) => {
+          const time = new Date(Date.now() - (logs.length - i) * 5000);
+          return `[${formatTime(time.toISOString())}] ${l}`;
+        });
+        document.getElementById("log-output").textContent = lines.join("\n");
       }
     }
 
@@ -1310,7 +1492,8 @@
         const data = await res.json();
         renderTimeline(data.timeline || []);
       } catch {
-        document.getElementById("timeline-list").innerHTML = "<li>Unable to load incident timeline.</li>";
+        // Generate timeline from scenario events
+        updateScenarioTimeline();
       }
     }
 
@@ -1333,6 +1516,52 @@
       }
     }
 
+    const rcaTemplates = {
+      normal: {
+        summary: "System operating within normal parameters. All metrics green.",
+        likely_root_cause: "No incident detected.",
+        mitigation_plan: [
+          "Continue monitoring system health",
+          "Maintain current resource allocation",
+          "Review logs for anomalies"
+        ]
+      },
+      traffic_spike: {
+        summary: "Unexpected spike in incoming traffic caused resource exhaustion.",
+        likely_root_cause: "Traffic surge from external source or viral content distribution. Load balancer scaling lag.",
+        mitigation_plan: [
+          "Enable rate limiting on API endpoints",
+          "Increase auto-scaling thresholds",
+          "Implement circuit breaker for downstream services",
+          "Cache frequently accessed data",
+          "Consider DDoS protection if malicious"
+        ]
+      },
+      db_errors: {
+        summary: "Database connection pool exhausted, causing cascading failures.",
+        likely_root_cause: "Connection pool size insufficient for current load. Possible connection leak or slow queries holding connections.",
+        mitigation_plan: [
+          "Increase max connections in connection pool",
+          "Implement connection timeout policy",
+          "Optimize slow-running queries",
+          "Add connection pooling proxy (PgBouncer)",
+          "Monitor connection lifecycle metrics",
+          "Implement query caching layer"
+        ]
+      },
+      recovery: {
+        summary: "System recovering from incident. Metrics normalizing.",
+        likely_root_cause: "Previous incident being resolved by mitigation measures.",
+        mitigation_plan: [
+          "Monitor SLO compliance as recovery continues",
+          "Verify all services are returning to baseline",
+          "Run post-incident diagnostics",
+          "Update runbooks with findings",
+          "Prepare detailed incident post-mortem"
+        ]
+      }
+    };
+
     function renderRca(data) {
       const lines = [];
       lines.push(`Incident: ${data.incident}`);
@@ -1342,10 +1571,10 @@
       lines.push(`Likely Root Cause: ${data.likely_root_cause}`);
       lines.push("");
       lines.push("Signals:");
-      lines.push(`- CPU: ${data.signals.cpu_percent}%`);
-      lines.push(`- Memory: ${data.signals.memory_percent}%`);
-      lines.push(`- P95 Latency: ${data.signals.latency_p95_ms} ms`);
-      lines.push(`- Error Rate: ${data.signals.error_rate_percent}%`);
+      lines.push(`- CPU: ${data.signals.cpu_percent.toFixed(1)}%`);
+      lines.push(`- Memory: ${data.signals.memory_percent.toFixed(1)}%`);
+      lines.push(`- P95 Latency: ${data.signals.latency_p95_ms.toFixed(0)} ms`);
+      lines.push(`- Error Rate: ${data.signals.error_rate_percent.toFixed(2)}%`);
       lines.push(`- Pods: ${data.signals.pod_count}`);
       lines.push(`- RPM: ${data.signals.requests_per_min}`);
       lines.push("");
@@ -1358,12 +1587,30 @@
       const el = document.getElementById("rca-output");
       el.textContent = "Generating incident analysis...";
       try {
-        const res = await fetch(`${API_BASE}/ops/incidents/rca`);
-        const data = await res.json();
-        renderRca(data);
-      } catch {
-        el.textContent = "Unable to generate RCA.";
+        // Try backend first
+        const res = await fetch(`${API_BASE}/ops/incidents/rca`, { timeout: 2000 });
+        if (res.ok) {
+          const data = await res.json();
+          renderRca(data);
+          return;
+        }
+      } catch (e) {
+        // Fall back to sample RCA
       }
+
+      // Generate sample RCA based on current scenario
+      const scenario = scenarios[currentScenario];
+      const metrics = getScenarioMetrics(scenario);
+      const template = rcaTemplates[currentScenario];
+
+      renderRca({
+        incident: currentScenario,
+        generated_at: new Date().toISOString(),
+        summary: template.summary,
+        likely_root_cause: template.likely_root_cause,
+        signals: metrics,
+        mitigation_plan: template.mitigation_plan
+      });
     }
 
     async function checkHealth() {
@@ -1380,16 +1627,32 @@
     }
 
     async function triggerIncident(type) {
+      // Map button types to scenario names
+      const scenarioMap = {
+        traffic_spike: "traffic_spike",
+        db_errors: "db_errors",
+        recovery: "recovery",
+        normal: "normal"
+      };
+
+      const scenario = scenarioMap[type] || type;
+      currentScenario = scenario;
+      scenarioStartTime = Date.now();
+      timelineEvents = [];
+
+      // Try backend trigger first
       try {
         await fetch(`${API_BASE}/ops/incidents/trigger`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ incident_type: type }),
         });
-        await Promise.all([refreshMetrics(), refreshLogs(), refreshIncidents(), generateRca()]);
       } catch {
-        alert("Failed to trigger incident.");
+        // Backend offline, will use sample data
       }
+
+      // Update immediately with new scenario
+      await Promise.all([refreshMetrics(), refreshLogs(), refreshIncidents(), generateRca()]);
     }
 
     function escapeHtml(text) {
@@ -1486,6 +1749,23 @@
 
     async function boot() {
       updateMetaClock();
+
+      // Initialize with sample architecture
+      archData = {
+        nodes: ["Route53", "CloudFront", "S3 Frontend", "API Gateway", "Lambda AtlaOps API", "OpenAI LLM", "Vector Store", "CloudWatch"],
+        edges: [
+          ["Route53", "CloudFront"],
+          ["CloudFront", "S3 Frontend"],
+          ["CloudFront", "API Gateway"],
+          ["API Gateway", "Lambda AtlaOps API"],
+          ["Lambda AtlaOps API", "OpenAI LLM"],
+          ["Lambda AtlaOps API", "Vector Store"],
+          ["CloudWatch", "Lambda AtlaOps API"],
+          ["Route53", "API Gateway"]
+        ]
+      };
+
+      // Load initial metrics and setup
       await Promise.all([
         checkHealth(),
         refreshMetrics(),
@@ -1494,9 +1774,17 @@
         refreshArchitecture(),
         generateRca(),
       ]);
-      setInterval(refreshMetrics, 3500);
-      setInterval(refreshLogs, 4500);
-      setInterval(refreshIncidents, 7000);
+
+      // Auto-trigger a sample scenario after 5 seconds for demo
+      setTimeout(() => {
+        if (currentScenario === "normal") {
+          triggerIncident("traffic_spike");
+        }
+      }, 5000);
+
+      setInterval(refreshMetrics, 2000);
+      setInterval(refreshLogs, 3000);
+      setInterval(refreshIncidents, 4000);
       setInterval(checkHealth, 15000);
       setInterval(updateMetaClock, 1000);
     }
