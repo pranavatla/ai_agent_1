@@ -5,6 +5,7 @@ import math
 import os
 import shutil
 import time
+import re
 
 try:
     import chromadb
@@ -30,12 +31,13 @@ app.add_middleware(
 )
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-client = OpenAI(api_key=OPENAI_API_KEY)
+openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 EMBEDDING_MODEL = "text-embedding-3-small"
 
-CHROMA_PATH = Path("./chroma_db")
 PROJECT_ROOT = Path(__file__).resolve().parent
+CHROMA_PATH = Path(os.environ.get("CHROMA_PATH", "/tmp/atlaops_chroma_db"))
 INDEX_HTML = PROJECT_ROOT / "index.html"
+KB_SOURCE_DIRS = [PROJECT_ROOT / "docs" / "atlaops-kb", PROJECT_ROOT / "knowledge_base"]
 
 request_log = defaultdict(list)
 RATE_LIMIT = 20
@@ -66,10 +68,10 @@ def utc_now() -> str:
 
 
 def embed_texts(texts: list[str]) -> list[list[float]]:
-    if not OPENAI_API_KEY:
+    if openai_client is None:
         return []
     try:
-        response = client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
+        response = openai_client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
         return [item.embedding for item in response.data]
     except Exception:
         return []
@@ -80,14 +82,16 @@ def init_collections():
         return None, None
 
     try:
+        CHROMA_PATH.mkdir(parents=True, exist_ok=True)
         chroma_client = chromadb.PersistentClient(path=str(CHROMA_PATH))
         user_memory = chroma_client.get_or_create_collection(name="user_memory")
         kb_docs = chroma_client.get_or_create_collection(name="atlaops_kb")
         return user_memory, kb_docs
     except Exception as exc:
-        backup_dir = Path(f"./chroma_db_legacy_{int(time.time())}")
+        backup_dir = CHROMA_PATH.with_name(f"{CHROMA_PATH.name}_legacy_{int(time.time())}")
         if CHROMA_PATH.exists():
             shutil.move(str(CHROMA_PATH), str(backup_dir))
+        CHROMA_PATH.mkdir(parents=True, exist_ok=True)
         chroma_client = chromadb.PersistentClient(path=str(CHROMA_PATH))
         user_memory = chroma_client.get_or_create_collection(name="user_memory")
         kb_docs = chroma_client.get_or_create_collection(name="atlaops_kb")
@@ -96,6 +100,95 @@ def init_collections():
 
 
 user_collection, kb_collection = init_collections()
+
+
+def chunk_text(text: str, chunk_size: int = 900, overlap: int = 120) -> list[str]:
+    normalized = "\n".join(line.strip() for line in text.splitlines() if line.strip())
+    if not normalized:
+        return []
+
+    chunks = []
+    start = 0
+    while start < len(normalized):
+        end = min(start + chunk_size, len(normalized))
+        chunks.append(normalized[start:end])
+        if end == len(normalized):
+            break
+        start = max(0, end - overlap)
+    return chunks
+
+
+def load_file_kb_chunks() -> list[dict]:
+    chunks = []
+    for kb_dir in KB_SOURCE_DIRS:
+        if not kb_dir.exists():
+            continue
+        for path in sorted(kb_dir.rglob("*")):
+            if not path.is_file() or path.suffix.lower() not in {".md", ".txt"}:
+                continue
+            try:
+                rel = path.relative_to(PROJECT_ROOT).as_posix()
+                for idx, chunk in enumerate(chunk_text(path.read_text(encoding="utf-8"))):
+                    chunks.append({"text": chunk, "source": rel, "chunk_index": idx})
+            except Exception:
+                continue
+    return chunks
+
+
+FILE_KB_CHUNKS = load_file_kb_chunks()
+FILE_KB_EMBEDDINGS: list[list[float]] | None = None
+
+
+def tokenize(text: str) -> set[str]:
+    return {token for token in re.findall(r"[a-z0-9][a-z0-9_-]{2,}", text.lower())}
+
+
+def cosine_similarity(left: list[float], right: list[float]) -> float:
+    dot = sum(a * b for a, b in zip(left, right))
+    left_norm = math.sqrt(sum(a * a for a in left))
+    right_norm = math.sqrt(sum(b * b for b in right))
+    if left_norm == 0 or right_norm == 0:
+        return 0.0
+    return dot / (left_norm * right_norm)
+
+
+def retrieve_file_kb_context(query: str, top_k: int = 4):
+    if not FILE_KB_CHUNKS:
+        return "", []
+
+    global FILE_KB_EMBEDDINGS
+
+    query_embedding = embed_texts([query])
+    if query_embedding:
+        if FILE_KB_EMBEDDINGS is None:
+            FILE_KB_EMBEDDINGS = embed_texts([item["text"] for item in FILE_KB_CHUNKS])
+        if FILE_KB_EMBEDDINGS:
+            scored = [
+                (cosine_similarity(query_embedding[0], embedding), item)
+                for item, embedding in zip(FILE_KB_CHUNKS, FILE_KB_EMBEDDINGS)
+            ]
+        else:
+            scored = []
+    else:
+        query_tokens = tokenize(query)
+        scored = [
+            (len(query_tokens & tokenize(item["text"])), item)
+            for item in FILE_KB_CHUNKS
+        ]
+
+    top = [item for score, item in sorted(scored, key=lambda row: row[0], reverse=True)[:top_k] if score > 0]
+    if not top:
+        top = FILE_KB_CHUNKS[:top_k]
+
+    contexts = [
+        f"[{item['source']}#chunk-{item['chunk_index']}] {item['text']}"
+        for item in top
+    ]
+    sources = [
+        {"source": item["source"], "chunk": item["chunk_index"]}
+        for item in top
+    ]
+    return "\n\n".join(contexts), sources
 
 
 def reset_user_collection():
@@ -128,11 +221,11 @@ def push_timeline(event: str) -> None:
 
 
 def get_ai_response(full_prompt: str) -> str:
-    if not OPENAI_API_KEY:
+    if openai_client is None:
         return "AI service configuration issue."
 
     try:
-        response = client.chat.completions.create(
+        response = openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
@@ -271,7 +364,7 @@ def build_ops_context() -> str:
 
 def retrieve_kb_context(query: str, top_k: int = 4):
     if kb_collection is None or kb_collection.count() == 0:
-        return "", []
+        return retrieve_file_kb_context(query, top_k=top_k)
 
     try:
         query_embedding = embed_texts([query])
@@ -279,7 +372,7 @@ def retrieve_kb_context(query: str, top_k: int = 4):
             return "", []
         results = kb_collection.query(query_embeddings=query_embedding, n_results=top_k)
     except Exception:
-        return "", []
+        return retrieve_file_kb_context(query, top_k=top_k)
     documents = results.get("documents", [[]])[0]
     metadatas = results.get("metadatas", [[]])[0]
 
@@ -331,13 +424,14 @@ def root():
 
 @app.get("/health")
 def health():
+    chroma_kb_count = kb_collection.count() if kb_collection is not None else 0
     return {
         "status": "ok",
         "backend": "openai" if OPENAI_API_KEY else "none",
         "rate_limit": f"{RATE_LIMIT} req/{WINDOW}s",
         "version": "4.1.0",
         "incident": ops_state["incident"],
-        "kb_chunks": kb_collection.count() if kb_collection is not None else 0,
+        "kb_chunks": chroma_kb_count or len(FILE_KB_CHUNKS),
     }
 
 
@@ -406,8 +500,10 @@ def ops_architecture():
 
 @app.get("/ops/kb/status")
 def kb_status():
+    chroma_kb_count = kb_collection.count() if kb_collection is not None else 0
     return {
-        "kb_chunks": kb_collection.count() if kb_collection is not None else 0,
+        "kb_chunks": chroma_kb_count or len(FILE_KB_CHUNKS),
+        "file_kb_chunks": len(FILE_KB_CHUNKS),
         "memory_chunks": user_collection.count() if user_collection is not None else 0,
     }
 
