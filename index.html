@@ -16,30 +16,30 @@
     }
 
     :root {
-      --bg-primary: #0a0e14;
-      --bg-secondary: #11151d;
-      --bg-tertiary: #1a2332;
-      --bg-hover: #232d3a;
+      --bg-primary: #f4f7fb;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #eef3f9;
+      --bg-hover: #e3ebf5;
 
-      --border-color: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.12);
+      --border-color: rgba(15, 23, 42, 0.08);
+      --border-hover: rgba(15, 23, 42, 0.14);
 
-      --text-primary: #f5f7fa;
-      --text-secondary: #b4bcc8;
-      --text-tertiary: #8b95a6;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-tertiary: #64748b;
 
-      --accent-primary: #0ea5e9;
-      --accent-secondary: #10b981;
-      --accent-danger: #ef4444;
-      --accent-warning: #f59e0b;
+      --accent-primary: #2563eb;
+      --accent-secondary: #0f766e;
+      --accent-danger: #dc2626;
+      --accent-warning: #d97706;
 
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
 
       --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08);
+      --shadow-md: 0 10px 24px rgba(15, 23, 42, 0.12);
     }
 
     html {
@@ -47,7 +47,10 @@
     }
 
     body {
-      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 30%),
+        radial-gradient(circle at top right, rgba(15, 118, 110, 0.08), transparent 28%),
+        linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
       color: var(--text-primary);
       font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 14px;
@@ -62,16 +65,16 @@
     }
 
     ::-webkit-scrollbar-track {
-      background: var(--bg-secondary);
+      background: var(--bg-primary);
     }
 
     ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(100, 116, 139, 0.28);
       border-radius: 4px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(100, 116, 139, 0.42);
     }
 
     .layout {
@@ -80,7 +83,7 @@
       gap: 20px;
       min-height: 100vh;
       padding: 20px;
-      background: linear-gradient(to bottom, rgba(14, 165, 233, 0.05) 0%, transparent 40%);
+      background: linear-gradient(to bottom, rgba(37, 99, 235, 0.05) 0%, transparent 40%);
     }
 
     .sidebar {
@@ -187,7 +190,7 @@
 
     .hero {
       padding: 28px;
-      background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(15, 118, 110, 0.05) 100%);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
       backdrop-filter: blur(20px);
@@ -226,14 +229,14 @@
       border: 1px solid var(--border-color);
       border-radius: 999px;
       color: var(--text-tertiary);
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.75);
       font-weight: 500;
       transition: var(--transition);
       cursor: default;
     }
 
     .chip:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.95);
       border-color: var(--border-hover);
       color: var(--text-secondary);
     }
@@ -252,7 +255,7 @@
       border: 1px solid var(--border-color);
       border-radius: 6px;
       color: var(--text-tertiary);
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.8);
       font-weight: 600;
       letter-spacing: 0.5px;
     }
@@ -371,7 +374,7 @@
       width: 100%;
       height: 220px;
       border-radius: var(--radius-md);
-      background: var(--bg-tertiary);
+      background: linear-gradient(180deg, #f8fbff 0%, #edf3fb 100%);
     }
 
     table {
@@ -409,13 +412,13 @@
     }
 
     .healthy {
-      background: rgba(16, 185, 129, 0.15);
-      color: #86efac;
+      background: rgba(16, 185, 129, 0.14);
+      color: #047857;
     }
 
     .degraded {
-      background: rgba(245, 158, 11, 0.15);
-      color: #fcd34d;
+      background: rgba(245, 158, 11, 0.14);
+      color: #b45309;
     }
 
     .ops-grid {
@@ -480,7 +483,7 @@
       font-family: "JetBrains Mono", monospace;
       font-size: 12px;
       color: var(--text-secondary);
-      background: var(--bg-tertiary);
+      background: #f8fbff;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
       padding: 12px;
@@ -561,31 +564,31 @@
 
     .btn-warn {
       border-color: rgba(245, 158, 11, 0.4);
-      color: #fcd34d;
+      color: #b45309;
     }
 
     .btn-warn:hover {
-      background: rgba(245, 158, 11, 0.1);
+      background: rgba(245, 158, 11, 0.08);
       border-color: rgba(245, 158, 11, 0.6);
     }
 
     .btn-bad {
       border-color: rgba(239, 68, 68, 0.4);
-      color: #fca5a5;
+      color: #b91c1c;
     }
 
     .btn-bad:hover {
-      background: rgba(239, 68, 68, 0.1);
+      background: rgba(239, 68, 68, 0.08);
       border-color: rgba(239, 68, 68, 0.6);
     }
 
     .btn-good {
       border-color: rgba(16, 185, 129, 0.4);
-      color: #86efac;
+      color: #047857;
     }
 
     .btn-good:hover {
-      background: rgba(16, 185, 129, 0.1);
+      background: rgba(16, 185, 129, 0.08);
       border-color: rgba(16, 185, 129, 0.6);
     }
 
@@ -653,13 +656,13 @@
 
     .msg.user {
       margin-left: auto;
-      background: rgba(14, 165, 233, 0.15);
-      border-color: rgba(14, 165, 233, 0.3);
+      background: rgba(37, 99, 235, 0.12);
+      border-color: rgba(37, 99, 235, 0.24);
       color: var(--text-primary);
     }
 
     .msg.ai {
-      background: var(--bg-secondary);
+      background: #ffffff;
       color: var(--text-secondary);
     }
 
@@ -683,7 +686,7 @@
       width: 100%;
       border-radius: var(--radius-md);
       border: 1px solid var(--border-color);
-      background: var(--bg-tertiary);
+      background: #f8fbff;
       color: var(--text-primary);
       padding: 10px 12px;
       font-size: 13px;
@@ -697,7 +700,7 @@
     #prompt:focus {
       outline: none;
       border-color: var(--accent-primary);
-      background: rgba(14, 165, 233, 0.05);
+      background: rgba(37, 99, 235, 0.05);
     }
 
     #prompt::placeholder {
@@ -718,7 +721,7 @@
     .cta:hover {
       background: linear-gradient(135deg, #0284c7 0%, #059669 100%);
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(14, 165, 233, 0.25);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2);
     }
 
     @media (max-width: 1400px) {
@@ -1251,7 +1254,7 @@
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
-        ctx.strokeStyle = emphasis ? "rgba(14, 165, 233, 0.95)" : "rgba(255, 255, 255, 0.15)";
+        ctx.strokeStyle = emphasis ? "rgba(37, 99, 235, 0.95)" : "rgba(148, 163, 184, 0.28)";
         ctx.lineWidth = emphasis ? 2.8 : 1.2;
         ctx.stroke();
       });
@@ -1262,16 +1265,16 @@
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
         ctx.fillStyle = isSelected
-          ? "rgba(16, 185, 129, 0.95)"
+          ? "rgba(15, 118, 110, 0.95)"
           : isHover
-          ? "rgba(14, 165, 233, 0.95)"
-          : "rgba(26, 35, 50, 0.9)";
+          ? "rgba(37, 99, 235, 0.95)"
+          : "rgba(255, 255, 255, 0.95)";
         ctx.fill();
         ctx.lineWidth = isSelected || isHover ? 3 : 1.6;
-        ctx.strokeStyle = isSelected || isHover ? "rgba(245, 247, 250, 0.95)" : "rgba(255, 255, 255, 0.2)";
+        ctx.strokeStyle = isSelected || isHover ? "rgba(15, 23, 42, 0.16)" : "rgba(148, 163, 184, 0.28)";
         ctx.stroke();
 
-        ctx.fillStyle = "#f5f7fa";
+        ctx.fillStyle = "#0f172a";
         ctx.font = "600 13px Inter";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -1325,7 +1328,7 @@
       const h = canvas.height;
 
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = "#1a2332";
+      ctx.fillStyle = "#f8fbff";
       ctx.fillRect(0, 0, w, h);
 
       if (latencyHistory.length < 2) return;
@@ -1333,7 +1336,7 @@
       const max = Math.max(...latencyHistory) + 10;
       const min = Math.max(0, Math.min(...latencyHistory) - 10);
 
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.strokeStyle = "rgba(148, 163, 184, 0.22)";
       ctx.lineWidth = 1;
       for (let i = 1; i <= 4; i++) {
         const y = (h / 5) * i;
@@ -1343,7 +1346,7 @@
         ctx.stroke();
       }
 
-      ctx.strokeStyle = "#0ea5e9";
+      ctx.strokeStyle = "#2563eb";
       ctx.lineWidth = 2.8;
       ctx.beginPath();
 
