@@ -1,801 +1,392 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>atla.in | Atla Home</title>
-  <meta name="description" content="A calm entry point for Atla services: AWS AI Practitioner certification prep, browser games, and observability." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>atla.in | Architecting Intelligence</title>
+  <meta name="description" content="Personal portfolio and service hub for AI/ML infrastructure, AWS AI certification prep, browser games, and observability tooling." />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface":                    "#f9f9f9",
+            "surface-dim":                "#dadada",
+            "surface-bright":             "#f9f9f9",
+            "surface-container-lowest":   "#ffffff",
+            "surface-container-low":      "#f3f3f3",
+            "surface-container":          "#eeeeee",
+            "surface-container-high":     "#e8e8e8",
+            "surface-container-highest":  "#e2e2e2",
+            "on-surface":                 "#1b1b1b",
+            "on-surface-variant":         "#484555",
+            "inverse-surface":            "#303030",
+            "inverse-on-surface":         "#f1f1f1",
+            "outline":                    "#797587",
+            "outline-variant":            "#c9c4d8",
+            "surface-tint":               "#5d3fe0",
+            "primary":                    "#5b3cdd",
+            "on-primary":                 "#ffffff",
+            "primary-container":          "#7459f7",
+            "on-primary-container":       "#fffbff",
+            "inverse-primary":            "#c9bfff",
+            "secondary":                  "#5f559a",
+            "on-secondary":               "#ffffff",
+            "secondary-container":        "#bdb2ff",
+            "on-secondary-container":     "#4b4185",
+            "tertiary":                   "#8d4b00",
+            "on-tertiary":                "#ffffff",
+            "tertiary-container":         "#b15f00",
+            "on-tertiary-container":      "#fffbff",
+            "error":                      "#ba1a1a",
+            "on-error":                   "#ffffff",
+            "error-container":            "#ffdad6",
+            "on-error-container":         "#93000a",
+            "primary-fixed":              "#e5deff",
+            "primary-fixed-dim":          "#c9bfff",
+            "on-primary-fixed":           "#1a0063",
+            "on-primary-fixed-variant":   "#441cc8",
+            "secondary-fixed":            "#e5deff",
+            "secondary-fixed-dim":        "#c9bfff",
+            "on-secondary-fixed":         "#1b0c53",
+            "on-secondary-fixed-variant": "#473d80",
+            "tertiary-fixed":             "#ffdcc3",
+            "tertiary-fixed-dim":         "#ffb77d",
+            "on-tertiary-fixed":          "#2f1500",
+            "on-tertiary-fixed-variant":  "#6e3900",
+            "background":                 "#f9f9f9",
+            "on-background":              "#1b1b1b",
+            "surface-variant":            "#e2e2e2",
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg":      "0.5rem",
+            "xl":      "0.75rem",
+            "2xl":     "1rem",
+            "3xl":     "1.5rem",
+            "full":    "9999px",
+          },
+          spacing: {
+            "xs":            "4px",
+            "sm":            "12px",
+            "md":            "24px",
+            "lg":            "48px",
+            "xl":            "80px",
+            "base":          "8px",
+            "container-max": "1200px",
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+          },
+          fontSize: {
+            "display-stat":        ["48px",  { lineHeight: "56px",  letterSpacing: "-0.04em", fontWeight: "800" }],
+            "display-stat-mobile": ["36px",  { lineHeight: "44px",  fontWeight: "800" }],
+            "headline-lg":         ["32px",  { lineHeight: "40px",  letterSpacing: "-0.02em", fontWeight: "800" }],
+            "headline-md":         ["24px",  { lineHeight: "32px",  letterSpacing: "-0.01em", fontWeight: "700" }],
+            "body-lg":             ["18px",  { lineHeight: "28px",  fontWeight: "400" }],
+            "body-md":             ["16px",  { lineHeight: "24px",  fontWeight: "400" }],
+            "label-md":            ["14px",  { lineHeight: "20px",  fontWeight: "600" }],
+            "caption":             ["12px",  { lineHeight: "16px",  fontWeight: "500" }],
+          },
+        },
+      },
+    };
+  </script>
   <style>
-    :root {
-      --white-bg: #ffffff;
-      --light-beige-bg: #fdf6e3;
-      --aqua-green: #a8dadc;
-      --soft-grey: #e0e0e0;
-      --sky-blue: #87ceeb;
-      --lavender: #e6e6fa;
-      --mint-green: #98fb98;
-      --light-brown: #d2b48c;
-      --charcoal: #333333;
-      --muted: #6f7775;
-      --line: rgba(51, 51, 51, 0.1);
-      --border-radius-md: 8px;
-      --font-main: "Nunito", sans-serif;
-      --font-mono: "JetBrains Mono", monospace;
-      --shadow-calm: 0 1px 3px rgba(0, 0, 0, 0.03);
-      --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      margin: 0;
-      background: var(--white-bg);
-      color: var(--charcoal);
-      font-family: var(--font-main);
-      font-size: 16px;
-      line-height: 1.6;
-      text-rendering: optimizeLegibility;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .page-shell {
-      min-height: 100dvh;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .ambient-wave,
-    .ambient-cloud {
-      pointer-events: none;
-      position: fixed;
-      z-index: 0;
-      opacity: 0.42;
-      transform: translate3d(0, 0, 0);
-    }
-
-    .ambient-wave {
-      left: -8vw;
-      top: 18vh;
-      width: min(48vw, 620px);
-      height: 160px;
-      border: 1px solid rgba(168, 218, 220, 0.56);
-      border-color: rgba(168, 218, 220, 0.56) transparent transparent transparent;
-      border-radius: 50%;
-      animation: driftWave 14s ease-in-out infinite alternate;
-    }
-
-    .ambient-cloud {
-      right: -80px;
-      bottom: 12vh;
-      width: 260px;
-      height: 88px;
-      background: var(--lavender);
-      border-radius: 999px;
-      animation: driftCloud 16s ease-in-out infinite alternate;
-    }
-
-    .ambient-cloud::before,
-    .ambient-cloud::after {
-      content: "";
-      position: absolute;
-      background: var(--lavender);
-      border-radius: 999px;
-    }
-
-    .ambient-cloud::before {
-      left: 42px;
-      top: -34px;
-      width: 92px;
-      height: 92px;
-    }
-
-    .ambient-cloud::after {
-      right: 38px;
-      top: -24px;
-      width: 74px;
-      height: 74px;
-    }
-
-    .site-header,
-    main,
-    footer {
-      position: relative;
-      z-index: 1;
-    }
-
-    .site-header {
-      background: rgba(255, 255, 255, 0.9);
-      border-bottom: 1px solid var(--line);
-      box-shadow: var(--shadow-calm);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(18px);
-    }
-
-    .container {
-      width: min(1280px, calc(100% - 48px));
-      margin: 0 auto;
-    }
-
-    .nav {
-      min-height: 72px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-    }
-
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 700;
-      font-size: 1.05rem;
-    }
-
-    .brand-mark {
-      width: 36px;
-      height: 36px;
-      border: 1px solid rgba(168, 218, 220, 0.8);
-      border-radius: var(--border-radius-md);
-      background: var(--light-beige-bg);
-      display: grid;
-      place-items: center;
-      transition: transform 220ms ease-out, background-color 220ms ease-out;
-    }
-
-    .brand:hover .brand-mark {
-      background: var(--aqua-green);
-      transform: translateY(-1px);
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .nav-links a {
-      border-radius: var(--border-radius-md);
-      color: var(--muted);
-      font-size: 0.875rem;
-      font-weight: 500;
-      padding: 8px 12px;
-      transition: background-color 200ms ease-out, color 200ms ease-out, transform 200ms ease-out;
-    }
-
-    .nav-links a:hover {
-      background: var(--light-beige-bg);
-      color: var(--charcoal);
-      transform: translateY(-1px);
-    }
-
-    .button {
-      align-items: center;
-      border-radius: var(--border-radius-md);
-      display: inline-flex;
-      font-weight: 600;
-      gap: 10px;
-      justify-content: center;
-      min-height: 44px;
-      padding: 10px 16px;
-      transition: background-color 200ms ease-out, border-color 200ms ease-out, box-shadow 200ms ease-out, color 200ms ease-out, transform 200ms ease-out;
-      white-space: nowrap;
-    }
-
-    .button svg {
-      flex: 0 0 auto;
-      width: 18px;
-      height: 18px;
-    }
-
-    .button-primary {
-      background: var(--aqua-green);
-      border: 1px solid rgba(51, 51, 51, 0.08);
-      color: #253c3d;
-      box-shadow: var(--shadow-calm);
-    }
-
-    .button-primary:hover {
-      background: #95ccce;
-      box-shadow: var(--shadow-card);
-      transform: translateY(-2px);
-    }
-
-    .button-primary:active,
-    .button-secondary:active {
-      transform: translateY(1px);
-    }
-
-    .button-secondary {
-      background: transparent;
-      border: 1.5px solid var(--soft-grey);
-      color: var(--charcoal);
-    }
-
-    .button-secondary:hover {
-      background: var(--light-beige-bg);
-      border-color: #cfcfcf;
-      transform: translateY(-2px);
-    }
-
-    .hero {
-      align-items: center;
-      display: grid;
-      gap: clamp(40px, 6vw, 96px);
-      grid-template-columns: minmax(0, 0.94fr) minmax(320px, 1.06fr);
-      min-height: calc(100dvh - 72px);
-      padding: clamp(56px, 8vw, 112px) 0 clamp(44px, 7vw, 88px);
-    }
-
-    .hero-copy {
-      animation: riseIn 520ms ease-out both;
-    }
-
-    h1,
-    h2,
-    h3,
-    p {
-      margin: 0;
-    }
-
-    h1 {
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 700;
-      line-height: 1.05;
-      max-width: 11ch;
-    }
-
-    .hero-copy p {
-      color: var(--muted);
-      font-size: clamp(1.05rem, 2vw, 1.2rem);
-      margin-top: 24px;
-      max-width: 58ch;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 32px;
-    }
-
-    .quiet-meta {
-      color: var(--muted);
-      display: flex;
-      flex-wrap: wrap;
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      gap: 10px;
-      margin-top: 28px;
-    }
-
-    .quiet-meta span {
-      border: 1px solid var(--line);
-      border-radius: var(--border-radius-md);
-      padding: 6px 8px;
-    }
-
-    .hero-visual {
-      animation: riseIn 520ms 120ms ease-out both;
-      background: var(--light-beige-bg);
-      border: 1px solid rgba(51, 51, 51, 0.08);
-      border-radius: var(--border-radius-md);
-      box-shadow: var(--shadow-card);
-      min-height: min(58vh, 560px);
-      overflow: hidden;
-      position: relative;
-    }
-
-    .hero-visual svg {
-      display: block;
-      height: 100%;
-      min-height: inherit;
-      width: 100%;
-    }
-
-    .hero-visual .soft-line {
-      animation: softFloat 7s ease-in-out infinite alternate;
-      transform-origin: center;
-    }
-
-    .service-section {
-      padding: clamp(64px, 8vw, 120px) 0;
-    }
-
-    .section-heading {
-      max-width: 680px;
-    }
-
-    .section-heading h2 {
-      font-size: clamp(2rem, 3vw, 2.25rem);
-      font-weight: 700;
-      line-height: 1.15;
-    }
-
-    .section-heading p {
-      color: var(--muted);
-      margin-top: 14px;
-      max-width: 62ch;
-    }
-
-    .service-list {
-      display: grid;
-      gap: clamp(56px, 7vw, 96px);
-      margin-top: clamp(48px, 6vw, 80px);
-    }
-
-    .service-row {
-      align-items: center;
-      display: grid;
-      gap: clamp(28px, 5vw, 72px);
-      grid-template-columns: minmax(0, 0.95fr) minmax(300px, 1.05fr);
-    }
-
-    .service-row:nth-child(even) .service-art {
-      order: 2;
-    }
-
-    .service-copy {
-      max-width: 560px;
-    }
-
-    .service-copy h3 {
-      font-size: clamp(1.6rem, 3vw, 2.25rem);
-      font-weight: 700;
-      line-height: 1.18;
-    }
-
-    .service-copy p {
-      color: var(--muted);
-      margin-top: 14px;
-      max-width: 56ch;
-    }
-
-    .service-copy .button {
-      margin-top: 24px;
-    }
-
-    .service-art {
-      background: var(--white-bg);
-      border: 1px solid var(--line);
-      border-radius: var(--border-radius-md);
-      box-shadow: var(--shadow-card);
-      min-height: 300px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .service-art svg {
-      display: block;
-      height: 100%;
-      min-height: 300px;
-      width: 100%;
-    }
-
-    .soft-panel {
-      background: var(--light-beige-bg);
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-      padding: clamp(64px, 8vw, 104px) 0;
-    }
-
-    .directory {
-      align-items: start;
-      display: grid;
-      gap: 32px;
-      grid-template-columns: 0.8fr 1.2fr;
-    }
-
-    .directory h2 {
-      font-size: clamp(1.85rem, 3vw, 2.25rem);
-      line-height: 1.15;
-    }
-
-    .directory-links {
-      display: grid;
-      gap: 12px;
-    }
-
-    .directory-link {
-      align-items: center;
-      background: rgba(255, 255, 255, 0.72);
-      border: 1px solid rgba(51, 51, 51, 0.08);
-      border-radius: var(--border-radius-md);
-      box-shadow: var(--shadow-calm);
-      display: grid;
-      gap: 10px;
-      grid-template-columns: 40px 1fr auto;
-      padding: 14px;
-      transition: background-color 200ms ease-out, box-shadow 200ms ease-out, transform 200ms ease-out;
-    }
-
-    .directory-link:hover {
-      background: var(--white-bg);
-      box-shadow: var(--shadow-card);
-      transform: translateY(-2px);
-    }
-
-    .directory-icon {
-      align-items: center;
-      background: var(--white-bg);
-      border: 1px solid var(--line);
-      border-radius: var(--border-radius-md);
-      color: #426a6c;
-      display: flex;
-      height: 40px;
-      justify-content: center;
-      width: 40px;
-    }
-
-    .directory-icon svg,
-    .directory-link > svg {
-      height: 18px;
-      width: 18px;
-    }
-
-    .directory-link strong {
-      display: block;
-      font-weight: 700;
-      line-height: 1.25;
-    }
-
-    .directory-link span {
-      color: var(--muted);
-      display: block;
-      font-size: 0.875rem;
-      line-height: 1.45;
-      margin-top: 2px;
-    }
-
-    footer {
-      padding: 28px 0 36px;
-    }
-
-    .footer-line {
-      align-items: center;
-      color: var(--muted);
-      display: flex;
-      flex-wrap: wrap;
-      font-size: 0.875rem;
-      gap: 12px;
-      justify-content: space-between;
-    }
-
-    .footer-line a {
-      color: var(--charcoal);
-      font-weight: 600;
-    }
-
-    @media (max-width: 860px) {
-      .container {
-        width: min(100% - 32px, 1280px);
-      }
-
-      .nav {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 16px 0;
-      }
-
-      .nav-links {
-        flex-wrap: wrap;
-      }
-
-      .hero,
-      .service-row,
-      .directory {
-        grid-template-columns: 1fr;
-      }
-
-      .hero {
-        min-height: auto;
-      }
-
-      .hero-visual {
-        min-height: 360px;
-      }
-
-      .service-row:nth-child(even) .service-art {
-        order: 0;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .nav-links a {
-        padding: 7px 9px;
-      }
-
-      .button {
-        width: 100%;
-      }
-
-      .hero-actions {
-        width: 100%;
-      }
-
-      .quiet-meta {
-        display: grid;
-      }
-
-      .directory-link {
-        grid-template-columns: 40px 1fr;
-      }
-
-      .directory-link > svg {
-        display: none;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        animation-duration: 1ms !important;
-        animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
-        transition-duration: 1ms !important;
-      }
-    }
-
-    @keyframes riseIn {
-      from {
-        opacity: 0;
-        transform: translateY(16px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes driftWave {
-      from {
-        transform: translate3d(0, 0, 0) rotate(-5deg);
-      }
-      to {
-        transform: translate3d(34px, 18px, 0) rotate(3deg);
-      }
-    }
-
-    @keyframes driftCloud {
-      from {
-        transform: translate3d(0, 0, 0);
-      }
-      to {
-        transform: translate3d(-28px, -12px, 0);
-      }
-    }
-
-    @keyframes softFloat {
-      from {
-        transform: translateY(0);
-      }
-      to {
-        transform: translateY(-10px);
-      }
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .icon-filled {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
   </style>
 </head>
-<body>
-  <div class="page-shell">
-    <div class="ambient-wave" aria-hidden="true"></div>
-    <div class="ambient-cloud" aria-hidden="true"></div>
 
-    <header class="site-header">
-      <div class="container nav">
-        <a class="brand" href="#top" aria-label="atla.in home">
-          <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M5 14.5c4.2-7.4 9.8-7.4 14 0" stroke="#426A6C" stroke-width="1.8" stroke-linecap="round" />
-              <path d="M7.5 15.5h9" stroke="#426A6C" stroke-width="1.8" stroke-linecap="round" />
-            </svg>
-          </span>
-          <span>atla.in</span>
-        </a>
-        <nav class="nav-links" aria-label="Atla services">
-          <a href="https://aif.atla.in">AIF</a>
-          <a href="http://games.atla.in">Games</a>
-          <a href="https://obs.atla.in">OBS</a>
-        </nav>
-      </div>
-    </header>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
 
-    <main id="top">
-      <section class="container hero" aria-labelledby="hero-title">
-        <div class="hero-copy">
-          <h1 id="hero-title">Atla services, in one quiet place.</h1>
-          <p>Open the AWS AI Practitioner study path, the browser games space, or the observability dashboard from a calm home base built for quick return visits.</p>
-          <div class="hero-actions" aria-label="Primary service links">
-            <a class="button button-primary" href="https://aif.atla.in">
-              <span>Start AIF study</span>
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </a>
-            <a class="button button-secondary" href="#services">
-              <span>View services</span>
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M12 5v14M18 13l-6 6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </a>
-          </div>
-          <div class="quiet-meta" aria-label="Available services">
-            <span>aif.atla.in</span>
-            <span>games.atla.in</span>
-            <span>obs.atla.in</span>
-          </div>
-        </div>
+  <!-- ── Nav ─────────────────────────────────────────────────────────── -->
+  <nav class="bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-50">
+    <div class="flex justify-between items-center w-full px-md md:px-lg max-w-container-max mx-auto h-16">
 
-        <div class="hero-visual" aria-hidden="true">
-          <svg viewBox="0 0 720 560" role="img">
-            <rect width="720" height="560" fill="#FDF6E3" />
-            <path class="soft-line" d="M70 384C160 314 222 426 324 350C430 270 498 320 650 250" fill="none" stroke="#A8DADC" stroke-width="26" stroke-linecap="round" opacity="0.72" />
-            <path d="M0 456C108 408 222 450 330 414C452 374 548 360 720 396V560H0Z" fill="#FFFFFF" opacity="0.9" />
-            <path d="M0 488C118 438 240 484 352 448C470 410 590 430 720 374V560H0Z" fill="#E6E6FA" opacity="0.74" />
-            <circle cx="548" cy="132" r="62" fill="#87CEEB" opacity="0.58" />
-            <circle cx="548" cy="132" r="35" fill="#FFFFFF" opacity="0.54" />
-            <path d="M132 286c22-58 56-94 104-108 49 13 84 50 106 108-38 20-73 30-106 30-34 0-69-10-104-30Z" fill="#FFFFFF" stroke="#D2B48C" stroke-width="2" />
-            <path d="M235 181v133" stroke="#D2B48C" stroke-width="2" stroke-linecap="round" />
-            <path d="M235 240c-28-8-54-25-78-52" stroke="#D2B48C" stroke-width="2" stroke-linecap="round" />
-            <path d="M235 254c34-11 63-29 88-56" stroke="#D2B48C" stroke-width="2" stroke-linecap="round" />
-            <rect x="404" y="342" width="190" height="92" rx="8" fill="#FFFFFF" stroke="#E0E0E0" />
-            <path d="M432 374h76M432 398h126" stroke="#6F7775" stroke-width="8" stroke-linecap="round" opacity="0.48" />
-            <circle cx="552" cy="374" r="14" fill="#98FB98" opacity="0.78" />
+      <a href="#" class="text-headline-md font-extrabold text-primary tracking-tight leading-none">
+        atla.in
+      </a>
+
+      <div class="hidden md:flex gap-md items-center">
+        <a href="https://aif.atla.in"   class="text-on-surface-variant hover:text-primary transition-colors text-label-md duration-200">AIF</a>
+        <a href="http://games.atla.in"  class="text-on-surface-variant hover:text-primary transition-colors text-label-md duration-200">Games</a>
+        <a href="https://obs.atla.in"   class="text-on-surface-variant hover:text-primary transition-colors text-label-md duration-200">OBS</a>
+        <a href="https://github.com/pranavatla" target="_blank" rel="noopener"
+           class="text-on-surface-variant hover:text-primary transition-colors duration-200 flex items-center gap-xs text-label-md">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/>
           </svg>
-        </div>
-      </section>
-
-      <section class="container service-section" id="services" aria-labelledby="services-title">
-        <div class="section-heading">
-          <h2 id="services-title">Choose the space you need.</h2>
-          <p>Each service keeps its own domain and purpose. This page stays simple so the routes are easy to find.</p>
-        </div>
-
-        <div class="service-list">
-          <article class="service-row">
-            <div class="service-art" aria-hidden="true">
-              <svg viewBox="0 0 560 340" role="img">
-                <rect width="560" height="340" fill="#FFFFFF" />
-                <rect x="54" y="54" width="452" height="232" rx="8" fill="#FDF6E3" stroke="#E0E0E0" />
-                <path d="M96 126h160M96 166h252M96 206h198" stroke="#333333" stroke-width="10" stroke-linecap="round" opacity="0.62" />
-                <rect x="340" y="104" width="84" height="84" rx="8" fill="#A8DADC" opacity="0.78" />
-                <path d="M358 148l18 18 32-42" stroke="#253C3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M62 276C156 238 224 302 306 264C390 226 430 250 506 226" fill="none" stroke="#87CEEB" stroke-width="8" stroke-linecap="round" opacity="0.74" />
-              </svg>
-            </div>
-            <div class="service-copy">
-              <h3>AWS AI Practitioner certification</h3>
-              <p>Study for the AWS Certified AI Practitioner exam with the focused AIF-C01 learning path.</p>
-              <a class="button button-primary" href="https://aif.atla.in">
-                <span>Open aif.atla.in</span>
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </a>
-            </div>
-          </article>
-
-          <article class="service-row">
-            <div class="service-art" aria-hidden="true">
-              <svg viewBox="0 0 560 340" role="img">
-                <rect width="560" height="340" fill="#FFFFFF" />
-                <rect x="56" y="72" width="448" height="196" rx="8" fill="#E6E6FA" stroke="#E0E0E0" />
-                <rect x="106" y="118" width="88" height="72" rx="8" fill="#FFFFFF" stroke="#D2B48C" />
-                <rect x="236" y="116" width="88" height="112" rx="8" fill="#FFFFFF" stroke="#D2B48C" />
-                <rect x="366" y="118" width="88" height="72" rx="8" fill="#FFFFFF" stroke="#D2B48C" />
-                <path d="M128 154h44M150 132v44M258 172h44M388 154h44" stroke="#426A6C" stroke-width="7" stroke-linecap="round" />
-                <circle cx="284" cy="204" r="11" fill="#98FB98" />
-                <path d="M80 250C162 214 234 250 306 220C388 186 438 204 486 178" fill="none" stroke="#A8DADC" stroke-width="8" stroke-linecap="round" opacity="0.82" />
-              </svg>
-            </div>
-            <div class="service-copy">
-              <h3>Browser games</h3>
-              <p>Jump into the small game launcher and play the browser-hosted experiments from the Atla games space.</p>
-              <a class="button button-primary" href="http://games.atla.in">
-                <span>Open games.atla.in</span>
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </a>
-            </div>
-          </article>
-
-          <article class="service-row">
-            <div class="service-art" aria-hidden="true">
-              <svg viewBox="0 0 560 340" role="img">
-                <rect width="560" height="340" fill="#FFFFFF" />
-                <rect x="58" y="58" width="444" height="224" rx="8" fill="#FDF6E3" stroke="#E0E0E0" />
-                <path d="M104 218c36-42 64-8 98-54 34-45 70 20 110-20 38-38 66-10 116-58" fill="none" stroke="#87CEEB" stroke-width="10" stroke-linecap="round" />
-                <path d="M104 238h350" stroke="#D2B48C" stroke-width="3" stroke-linecap="round" opacity="0.7" />
-                <circle cx="202" cy="164" r="11" fill="#98FB98" />
-                <circle cx="312" cy="144" r="11" fill="#A8DADC" />
-                <circle cx="428" cy="86" r="11" fill="#E6E6FA" stroke="#D2B48C" />
-                <rect x="104" y="92" width="114" height="12" rx="6" fill="#333333" opacity="0.5" />
-                <rect x="104" y="116" width="74" height="8" rx="4" fill="#6F7775" opacity="0.42" />
-              </svg>
-            </div>
-            <div class="service-copy">
-              <h3>Observability</h3>
-              <p>Open the OBS dashboard for platform health, incident response practice, and cloud operations signals.</p>
-              <a class="button button-primary" href="https://obs.atla.in">
-                <span>Open obs.atla.in</span>
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </a>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="soft-panel" aria-labelledby="directory-title">
-        <div class="container directory">
-          <div>
-            <h2 id="directory-title">Service directory</h2>
-            <p>Direct links for the current Atla network.</p>
-          </div>
-          <div class="directory-links">
-            <a class="directory-link" href="https://aif.atla.in">
-              <span class="directory-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M5 5h10a4 4 0 0 1 4 4v10H9a4 4 0 0 1-4-4V5Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" />
-                  <path d="M9 9h6M9 13h4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
-                </svg>
-              </span>
-              <span><strong>aif.atla.in</strong><span>AWS AI Practitioner certification study path</span></span>
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </a>
-            <a class="directory-link" href="http://games.atla.in">
-              <span class="directory-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M7 10h10a4 4 0 0 1 3.8 2.7l.8 2.5a3 3 0 0 1-5 3l-1.8-1.8H9.2l-1.8 1.8a3 3 0 0 1-5-3l.8-2.5A4 4 0 0 1 7 10Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-                  <path d="M8 13v3M6.5 14.5h3M16.5 14h.1M18.5 16h.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                </svg>
-              </span>
-              <span><strong>games.atla.in</strong><span>Browser games launcher</span></span>
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </a>
-            <a class="directory-link" href="https://obs.atla.in">
-              <span class="directory-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M4 19h16M7 16V9M12 16V5M17 16v-4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
-                </svg>
-              </span>
-              <span><strong>obs.atla.in</strong><span>Observability and operations dashboard</span></span>
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </a>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer>
-      <div class="container footer-line">
-        <span>atla.in</span>
-        <span><a href="#top">Back to top</a></span>
+          GitHub
+        </a>
       </div>
-    </footer>
-  </div>
+
+      <a href="mailto:pranavatla@gmail.com"
+         class="bg-primary hover:bg-surface-tint text-on-primary text-label-md px-md py-sm rounded-lg transition-colors duration-200">
+        Contact
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Main ──────────────────────────────────────────────────────────── -->
+  <main class="flex-grow flex flex-col px-md md:px-lg max-w-container-max mx-auto w-full pt-xl pb-xl gap-xl">
+
+    <!-- Hero -->
+    <section class="flex flex-col items-center text-center max-w-3xl mx-auto pt-xl">
+      <div class="inline-flex items-center gap-xs bg-primary-fixed text-on-primary-fixed-variant text-caption font-semibold px-sm py-xs rounded-full mb-md uppercase tracking-widest">
+        <span class="material-symbols-outlined icon-filled text-[14px]">bolt</span>
+        AWS · AI/ML · Observability
+      </div>
+
+      <h1 class="text-display-stat text-on-background mb-md leading-none">
+        Architecting Intelligence<br />
+        <span class="text-primary">at Scale.</span>
+      </h1>
+
+      <p class="text-body-lg text-on-surface-variant mb-lg max-w-2xl">
+        Building robust, scalable infrastructure for the next generation of AI-driven
+        applications. Specialising in AWS environments, advanced machine learning models,
+        and real-time observability pipelines.
+      </p>
+
+      <div class="flex flex-wrap gap-md justify-center">
+        <a href="https://aif.atla.in"
+           class="bg-primary hover:bg-surface-tint text-on-primary text-label-md px-lg py-sm rounded-lg transition-colors h-12 flex items-center justify-center gap-xs">
+          Get Started
+          <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </a>
+        <a href="https://github.com/pranavatla/AI_Agent_1" target="_blank" rel="noopener"
+           class="bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-background text-label-md px-lg py-sm rounded-lg transition-colors h-12 flex items-center justify-center gap-xs">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/>
+          </svg>
+          View on GitHub
+        </a>
+      </div>
+    </section>
+
+    <!-- ── Bento grid ──────────────────────────────────────────────────── -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md pt-lg">
+
+      <!-- AIF Study Path -->
+      <div class="bg-surface-bright border border-outline-variant rounded-xl p-md flex flex-col h-full hover:bg-surface-container-lowest transition-colors group">
+        <div class="w-12 h-12 bg-primary-fixed rounded-lg flex items-center justify-center mb-md text-primary">
+          <span class="material-symbols-outlined icon-filled">menu_book</span>
+        </div>
+        <h3 class="text-headline-md text-on-background mb-sm">AIF Study Path</h3>
+        <p class="text-body-md text-on-surface-variant flex-grow mb-lg">
+          A comprehensive, structured roadmap for mastering the AWS Certified AI Practitioner
+          exam. Includes study guides, practice questions, and architectural labs — hosted on
+          AWS via this repo.
+        </p>
+        <div class="flex gap-sm mt-auto">
+          <a href="https://aif.atla.in"
+             class="flex-1 bg-surface-container-lowest border border-outline-variant hover:border-primary text-on-background text-label-md px-md py-sm rounded-lg transition-colors flex items-center justify-center gap-xs group-hover:text-primary">
+            Explore Path <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+          <a href="https://github.com/pranavatla/AI_Agent_1" target="_blank" rel="noopener"
+             class="w-10 h-10 bg-surface-container-lowest border border-outline-variant hover:border-primary rounded-lg flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"
+             aria-label="View AIF repo on GitHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- AI Games Warehouse -->
+      <div class="bg-surface-bright border border-outline-variant rounded-xl p-md flex flex-col h-full hover:bg-surface-container-lowest transition-colors group">
+        <div class="w-12 h-12 bg-secondary-fixed rounded-lg flex items-center justify-center mb-md text-secondary">
+          <span class="material-symbols-outlined icon-filled">sports_esports</span>
+        </div>
+        <h3 class="text-headline-md text-on-background mb-sm">AI Games Warehouse</h3>
+        <p class="text-body-md text-on-surface-variant flex-grow mb-lg">
+          Experimental, browser-based games powered by on-device and cloud AI inference.
+          Testing the limits of generative content in real-time — deployed via GitHub Actions
+          to games.atla.in.
+        </p>
+        <div class="flex gap-sm mt-auto">
+          <a href="http://games.atla.in"
+             class="flex-1 bg-surface-container-lowest border border-outline-variant hover:border-secondary text-on-background text-label-md px-md py-sm rounded-lg transition-colors flex items-center justify-center gap-xs group-hover:text-secondary">
+            Play Now <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+          <a href="https://github.com/pranavatla/AI_Agent_1" target="_blank" rel="noopener"
+             class="w-10 h-10 bg-surface-container-lowest border border-outline-variant hover:border-secondary rounded-lg flex items-center justify-center text-on-surface-variant hover:text-secondary transition-colors"
+             aria-label="View Games repo on GitHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Observability Nexus -->
+      <div class="bg-surface-bright border border-outline-variant rounded-xl p-md flex flex-col h-full hover:bg-surface-container-lowest transition-colors group md:col-span-2 lg:col-span-1">
+        <div class="w-12 h-12 bg-tertiary-fixed rounded-lg flex items-center justify-center mb-md text-tertiary">
+          <span class="material-symbols-outlined icon-filled">monitoring</span>
+        </div>
+        <h3 class="text-headline-md text-on-background mb-sm">Observability Nexus</h3>
+        <p class="text-body-md text-on-surface-variant flex-grow mb-lg">
+          Real-time platform health monitoring and distributed telemetry dashboard.
+          Aggregates logs, metrics, and traces for rapid anomaly detection — running on
+          EC2 with a FastAPI backend.
+        </p>
+        <div class="flex gap-sm mt-auto">
+          <a href="https://obs.atla.in"
+             class="flex-1 bg-surface-container-lowest border border-outline-variant hover:border-tertiary text-on-background text-label-md px-md py-sm rounded-lg transition-colors flex items-center justify-center gap-xs group-hover:text-tertiary">
+            View Dashboard <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+          <a href="https://github.com/pranavatla/AI_Agent_1" target="_blank" rel="noopener"
+             class="w-10 h-10 bg-surface-container-lowest border border-outline-variant hover:border-tertiary rounded-lg flex items-center justify-center text-on-surface-variant hover:text-tertiary transition-colors"
+             aria-label="View OBS repo on GitHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Platform Stats ──────────────────────────────────────────────── -->
+    <section class="bg-surface-bright border border-outline-variant rounded-xl p-lg flex flex-col md:flex-row justify-between items-center gap-lg">
+      <div class="flex flex-col items-center md:items-start text-center md:text-left">
+        <span class="text-label-md text-on-surface-variant mb-xs uppercase tracking-wider">Inference Speed</span>
+        <span class="text-display-stat-mobile text-on-background flex items-center gap-xs">
+          24ms
+          <span class="material-symbols-outlined text-primary text-[24px]">trending_down</span>
+        </span>
+      </div>
+      <div class="hidden md:block w-px h-16 bg-outline-variant"></div>
+      <div class="flex flex-col items-center md:items-start text-center md:text-left">
+        <span class="text-label-md text-on-surface-variant mb-xs uppercase tracking-wider">Uptime</span>
+        <span class="text-display-stat-mobile text-on-background flex items-center gap-xs">
+          99.99%
+          <span class="material-symbols-outlined text-primary text-[24px]">trending_up</span>
+        </span>
+      </div>
+      <div class="hidden md:block w-px h-16 bg-outline-variant"></div>
+      <div class="flex flex-col items-center md:items-start text-center md:text-left">
+        <span class="text-label-md text-on-surface-variant mb-xs uppercase tracking-wider">Active Models</span>
+        <span class="text-display-stat-mobile text-on-background flex items-center gap-xs">
+          12
+          <span class="material-symbols-outlined text-outline text-[24px]">horizontal_rule</span>
+        </span>
+      </div>
+      <div class="hidden md:block w-px h-16 bg-outline-variant"></div>
+      <div class="flex flex-col items-center md:items-start text-center md:text-left">
+        <span class="text-label-md text-on-surface-variant mb-xs uppercase tracking-wider">AWS Region</span>
+        <span class="text-display-stat-mobile text-on-background flex items-center gap-xs">
+          ap-south-1
+          <span class="material-symbols-outlined icon-filled text-primary text-[24px]">cloud</span>
+        </span>
+      </div>
+    </section>
+
+    <!-- ── Skills / Stack ──────────────────────────────────────────────── -->
+    <section class="flex flex-col gap-md">
+      <h2 class="text-headline-lg text-on-background">Engineering Depth</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+          <div class="flex items-center gap-sm mb-sm">
+            <span class="material-symbols-outlined icon-filled text-primary">cloud</span>
+            <h3 class="text-label-md text-on-background uppercase tracking-wider">AWS</h3>
+          </div>
+          <div class="flex flex-wrap gap-xs">
+            <span class="bg-primary-fixed text-on-primary-fixed-variant text-caption px-sm py-xs rounded-full">EC2</span>
+            <span class="bg-primary-fixed text-on-primary-fixed-variant text-caption px-sm py-xs rounded-full">Lambda</span>
+            <span class="bg-primary-fixed text-on-primary-fixed-variant text-caption px-sm py-xs rounded-full">S3</span>
+            <span class="bg-primary-fixed text-on-primary-fixed-variant text-caption px-sm py-xs rounded-full">CloudWatch</span>
+            <span class="bg-primary-fixed text-on-primary-fixed-variant text-caption px-sm py-xs rounded-full">Bedrock</span>
+            <span class="bg-primary-fixed text-on-primary-fixed-variant text-caption px-sm py-xs rounded-full">AIF-C01</span>
+          </div>
+        </div>
+
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+          <div class="flex items-center gap-sm mb-sm">
+            <span class="material-symbols-outlined icon-filled text-secondary">psychology</span>
+            <h3 class="text-label-md text-on-background uppercase tracking-wider">AI / LLM</h3>
+          </div>
+          <div class="flex flex-wrap gap-xs">
+            <span class="bg-secondary-fixed text-on-secondary-fixed-variant text-caption px-sm py-xs rounded-full">Claude API</span>
+            <span class="bg-secondary-fixed text-on-secondary-fixed-variant text-caption px-sm py-xs rounded-full">RAG</span>
+            <span class="bg-secondary-fixed text-on-secondary-fixed-variant text-caption px-sm py-xs rounded-full">Multi-Agent</span>
+            <span class="bg-secondary-fixed text-on-secondary-fixed-variant text-caption px-sm py-xs rounded-full">Embeddings</span>
+            <span class="bg-secondary-fixed text-on-secondary-fixed-variant text-caption px-sm py-xs rounded-full">Vector DB</span>
+            <span class="bg-secondary-fixed text-on-secondary-fixed-variant text-caption px-sm py-xs rounded-full">Prompt Eng.</span>
+          </div>
+        </div>
+
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+          <div class="flex items-center gap-sm mb-sm">
+            <span class="material-symbols-outlined icon-filled text-tertiary">code</span>
+            <h3 class="text-label-md text-on-background uppercase tracking-wider">Platform</h3>
+          </div>
+          <div class="flex flex-wrap gap-xs">
+            <span class="bg-tertiary-fixed text-on-tertiary-fixed-variant text-caption px-sm py-xs rounded-full">Python</span>
+            <span class="bg-tertiary-fixed text-on-tertiary-fixed-variant text-caption px-sm py-xs rounded-full">FastAPI</span>
+            <span class="bg-tertiary-fixed text-on-tertiary-fixed-variant text-caption px-sm py-xs rounded-full">Next.js</span>
+            <span class="bg-tertiary-fixed text-on-tertiary-fixed-variant text-caption px-sm py-xs rounded-full">Docker</span>
+            <span class="bg-tertiary-fixed text-on-tertiary-fixed-variant text-caption px-sm py-xs rounded-full">GitHub Actions</span>
+            <span class="bg-tertiary-fixed text-on-tertiary-fixed-variant text-caption px-sm py-xs rounded-full">Grafana</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── CTA ────────────────────────────────────────────────────────── -->
+    <section class="bg-primary rounded-xl p-lg flex flex-col md:flex-row items-center justify-between gap-lg">
+      <div>
+        <h2 class="text-headline-lg text-on-primary mb-sm">Open to opportunities.</h2>
+        <p class="text-body-md text-on-primary opacity-80 max-w-xl">
+          Looking for roles in AI/ML infrastructure, cloud architecture, or platform engineering.
+          Let's build something together.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-sm shrink-0">
+        <a href="mailto:pranavatla@gmail.com"
+           class="bg-on-primary text-primary font-semibold text-label-md px-lg py-sm rounded-lg transition-colors hover:bg-primary-fixed h-12 flex items-center justify-center gap-xs whitespace-nowrap">
+          <span class="material-symbols-outlined text-[18px]">mail</span>
+          Get in touch
+        </a>
+        <a href="https://github.com/pranavatla" target="_blank" rel="noopener"
+           class="bg-transparent border border-on-primary text-on-primary font-semibold text-label-md px-lg py-sm rounded-lg transition-colors hover:bg-primary-container h-12 flex items-center justify-center gap-xs whitespace-nowrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/></svg>
+          View GitHub
+        </a>
+        <a href="https://linkedin.com/in/saipranavatla/" target="_blank" rel="noopener"
+           class="bg-transparent border border-on-primary text-on-primary font-semibold text-label-md px-lg py-sm rounded-lg transition-colors hover:bg-primary-container h-12 flex items-center justify-center gap-xs whitespace-nowrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
+          LinkedIn
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────── -->
+  <footer class="bg-surface-container-low border-t border-outline-variant mt-auto">
+    <div class="w-full px-md md:px-lg py-sm flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto text-caption text-on-surface-variant gap-sm">
+      <div class="text-label-md text-on-surface">
+        © 2025 atla.in · Sai Pranav Atla
+      </div>
+      <div class="flex flex-wrap gap-md justify-center items-center">
+        <span class="opacity-80">Status: AWS Active</span>
+        <span class="opacity-80">Region: ap-south-1 (Mumbai)</span>
+        <a href="https://github.com/pranavatla/AI_Agent_1" target="_blank" rel="noopener"
+           class="hover:text-primary opacity-80 hover:opacity-100 transition-opacity flex items-center gap-xs">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/></svg>
+          pranavatla/AI_Agent_1
+        </a>
+      </div>
+    </div>
+  </footer>
+
 </body>
 </html>
