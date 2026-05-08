@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>obs.atla.in | Advanced Cloud Operations Platform</title>
-  <meta name="description" content="Advanced cloud operations and incident management platform with real-time monitoring, AI-powered RCA, and sophisticated incident simulation." />
+  <title>obs.atla.in | Atla Hub</title>
+  <meta name="description" content="A multi-site operations hub for obs.atla.in, aif.atla.in, games.atla.in, and ai.atla.in with site-specific metrics and incident detail." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -258,6 +258,131 @@
       background: rgba(255, 255, 255, 0.8);
       font-weight: 600;
       letter-spacing: 0.5px;
+    }
+
+    .site-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .site-tile {
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 18px;
+      padding: 18px;
+      text-align: left;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .site-tile:hover, .site-tile.active {
+      transform: translateY(-3px);
+      border-color: rgba(37, 99, 235, 0.28);
+      box-shadow: var(--shadow-md);
+    }
+
+    .site-tile h3 {
+      font-size: 22px;
+      letter-spacing: -0.04em;
+      margin-top: 10px;
+    }
+
+    .site-tile p {
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.55;
+      margin-top: 10px;
+    }
+
+    .site-tile .chip {
+      width: fit-content;
+      margin-top: 0;
+    }
+
+    .tile-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      color: var(--accent-primary);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .detail-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.34);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    .detail-modal.open {
+      display: flex;
+    }
+
+    .detail-card {
+      width: min(760px, 100%);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.22);
+      padding: 24px;
+    }
+
+    .detail-card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .close-btn {
+      border: 1px solid var(--border-color);
+      background: white;
+      border-radius: 999px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .detail-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .detail-stat {
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--border-color);
+    }
+
+    .detail-stat span {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .detail-stat strong {
+      font-size: 18px;
+      letter-spacing: -0.04em;
     }
 
     .insight-strip {
@@ -819,6 +944,14 @@
       .hero h2 {
         font-size: 24px;
       }
+
+      .site-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-stats {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -859,6 +992,8 @@
           <span class="chip">Production Ready</span>
         </div>
       </section>
+
+      <section class="site-grid" id="site-grid"></section>
 
       <section class="insight-strip">
         <article class="insight-card">
@@ -988,6 +1123,25 @@
     </aside>
   </div>
 
+  <div class="detail-modal" id="site-modal" aria-hidden="true">
+    <div class="detail-card">
+      <div class="detail-card-head">
+        <div>
+          <div class="chip" id="modal-chip">OBS</div>
+          <h3 id="modal-title" style="margin-top:10px;font-size:28px;letter-spacing:-0.04em;">obs.atla.in</h3>
+          <p id="modal-copy" style="margin-top:10px;color:var(--text-secondary);max-width:620px;">This tile is showing the OBS metrics profile.</p>
+        </div>
+        <button class="close-btn" id="close-modal" aria-label="Close">×</button>
+      </div>
+      <div class="detail-stats">
+        <div class="detail-stat"><span>CPU</span><strong id="modal-cpu">--</strong></div>
+        <div class="detail-stat"><span>Memory</span><strong id="modal-memory">--</strong></div>
+        <div class="detail-stat"><span>P95 latency</span><strong id="modal-latency">--</strong></div>
+        <div class="detail-stat"><span>Error rate</span><strong id="modal-errors">--</strong></div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API_BASE =
       window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
@@ -996,6 +1150,42 @@
 
     const latencyHistory = [];
     const maxPoints = 28;
+    const siteProfiles = {
+      obs: {
+        key: "obs",
+        label: "OBS",
+        host: "obs.atla.in",
+        description: "Observability, incident response, and platform health for OBS.",
+        apiBase: API_BASE,
+        comingSoon: false
+      },
+      aif: {
+        key: "aif",
+        label: "AIF",
+        host: "aif.atla.in",
+        description: "AIF-specific operational metrics and platform signals.",
+        apiBase: API_BASE,
+        comingSoon: false
+      },
+      games: {
+        key: "games",
+        label: "Games",
+        host: "games.atla.in",
+        description: "Planned game platform dashboard.",
+        apiBase: null,
+        comingSoon: true
+      },
+      ai: {
+        key: "ai",
+        label: "AI",
+        host: "ai.atla.in",
+        description: "Planned AI hub dashboard.",
+        apiBase: null,
+        comingSoon: true
+      }
+    };
+    const latestMetricsBySite = {};
+    let activeSite = "obs";
     let archData = { nodes: [], edges: [] };
     let archNodePositions = [];
     let selectedArchNode = null;
@@ -1127,6 +1317,71 @@
       pods: document.getElementById("pods"),
       rpm: document.getElementById("rpm"),
     };
+
+    function currentProfile() {
+      return siteProfiles[activeSite] || siteProfiles.obs;
+    }
+
+    function renderSiteGrid() {
+      const grid = document.getElementById("site-grid");
+      grid.innerHTML = "";
+      Object.values(siteProfiles).forEach((profile) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `site-tile ${profile.key === activeSite ? "active" : ""}`;
+        btn.innerHTML = `
+          <div>
+            <span class="chip">${profile.label}</span>
+            <h3>${profile.host}</h3>
+            <p>${profile.description}</p>
+          </div>
+          <div class="tile-footer">
+            <span>${profile.comingSoon ? "Coming soon" : "Open site metrics"}</span>
+            <span>→</span>
+          </div>
+        `;
+        btn.addEventListener("click", () => selectSite(profile.key));
+        grid.appendChild(btn);
+      });
+    }
+
+    function syncModal(metrics) {
+      const profile = currentProfile();
+      document.getElementById("modal-chip").textContent = profile.label;
+      document.getElementById("modal-title").textContent = profile.host;
+      document.getElementById("modal-copy").textContent = profile.description;
+      document.getElementById("modal-cpu").textContent = metrics ? `${metrics.cpu_percent.toFixed(1)}%` : "--";
+      document.getElementById("modal-memory").textContent = metrics ? `${metrics.memory_percent.toFixed(1)}%` : "--";
+      document.getElementById("modal-latency").textContent = metrics ? `${metrics.latency_p95_ms.toFixed(0)}ms` : "--";
+      document.getElementById("modal-errors").textContent = metrics ? `${metrics.error_rate_percent.toFixed(2)}%` : "--";
+    }
+
+    function openModal() {
+      document.getElementById("site-modal").classList.add("open");
+      document.getElementById("site-modal").setAttribute("aria-hidden", "false");
+    }
+
+    function closeModal() {
+      document.getElementById("site-modal").classList.remove("open");
+      document.getElementById("site-modal").setAttribute("aria-hidden", "true");
+    }
+
+    function selectSite(siteKey) {
+      activeSite = siteKey;
+      renderSiteGrid();
+      const profile = currentProfile();
+      const metrics = latestMetricsBySite[siteKey] || latestMetricsBySite.obs || null;
+      document.getElementById("meta-incident").textContent = `${profile.label} MODE`;
+      document.getElementById("health-pill").textContent = profile.comingSoon ? "coming soon" : "checking backend...";
+      syncModal(metrics);
+      openModal();
+      if (!profile.comingSoon) {
+        refreshMetrics();
+        refreshLogs();
+        refreshIncidents();
+        generateRca();
+      }
+    }
 
     function updateMetaClock() {
       const now = new Date();
@@ -1390,11 +1645,13 @@
 
     async function refreshMetrics() {
       try {
+        const profile = currentProfile();
         let m, incident;
 
         // Try to fetch from backend, fall back to sample data
         try {
-          const res = await fetch(`${API_BASE}/ops/metrics`, { timeout: 2000 });
+          const apiBase = profile.apiBase || API_BASE;
+          const res = await fetch(`${apiBase}/ops/metrics`, { timeout: 2000 });
           if (res.ok) {
             const data = await res.json();
             m = data.metrics;
@@ -1416,7 +1673,10 @@
         metricEls.pods.textContent = m.pod_count;
         metricEls.rpm.textContent = m.requests_per_min;
 
+        latestMetricsBySite[activeSite] = m;
         document.getElementById("incident-badge").textContent = `Incident: ${incident}`;
+        document.getElementById("meta-incident").textContent = `${profile.label} / ${incident.toUpperCase().replace("_", " ")}`;
+        syncModal(m);
         updateInsights(m, incident);
 
         latencyHistory.push(m.latency_p95_ms);
@@ -1474,7 +1734,8 @@
 
     async function refreshLogs() {
       try {
-        const res = await fetch(`${API_BASE}/ops/logs?limit=18`);
+        const profile = currentProfile();
+        const res = await fetch(`${API_BASE}/ops/logs?site=${profile.key}&limit=18`);
         const data = await res.json();
         const lines = (data.logs || []).map((l) => `[${formatTime(l.time)}] ${l.line}`);
         document.getElementById("log-output").textContent = lines.join("\n");
@@ -1491,7 +1752,8 @@
 
     async function refreshIncidents() {
       try {
-        const res = await fetch(`${API_BASE}/ops/incidents`);
+        const profile = currentProfile();
+        const res = await fetch(`${API_BASE}/ops/incidents?site=${profile.key}`);
         const data = await res.json();
         renderTimeline(data.timeline || []);
       } catch {
@@ -1591,7 +1853,8 @@
       el.textContent = "Generating incident analysis...";
       try {
         // Try backend first
-        const res = await fetch(`${API_BASE}/ops/incidents/rca`, { timeout: 2000 });
+        const profile = currentProfile();
+        const res = await fetch(`${API_BASE}/ops/incidents/rca?site=${profile.key}`, { timeout: 2000 });
         if (res.ok) {
           const data = await res.json();
           renderRca(data);
@@ -1645,7 +1908,8 @@
 
       // Try backend trigger first
       try {
-        await fetch(`${API_BASE}/ops/incidents/trigger`, {
+        const profile = currentProfile();
+        await fetch(`${API_BASE}/ops/incidents/trigger?site=${profile.key}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ incident_type: type }),
@@ -1752,6 +2016,11 @@
 
     async function boot() {
       updateMetaClock();
+      renderSiteGrid();
+      document.getElementById("site-modal").addEventListener("click", (event) => {
+        if (event.target.id === "site-modal") closeModal();
+      });
+      document.getElementById("close-modal").addEventListener("click", closeModal);
 
       // Initialize with sample architecture
       archData = {
@@ -1777,13 +2046,6 @@
         refreshArchitecture(),
         generateRca(),
       ]);
-
-      // Auto-trigger a sample scenario after 5 seconds for demo
-      setTimeout(() => {
-        if (currentScenario === "normal") {
-          triggerIncident("traffic_spike");
-        }
-      }, 5000);
 
       setInterval(refreshMetrics, 2000);
       setInterval(refreshLogs, 3000);

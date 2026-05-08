@@ -1,11 +1,14 @@
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+import json
 import math
 import os
 import shutil
+import sqlite3
 import time
 import re
+from threading import Lock
 
 try:
     import chromadb
@@ -20,7 +23,7 @@ from openai import APIError, AuthenticationError, OpenAI, RateLimitError
 from pydantic import BaseModel
 
 
-app = FastAPI(title="AtlaOps AI Agent", version="4.1.0")
+app = FastAPI(title="AtlaOps AI Agent", version="4.2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,14 +39,17 @@ EMBEDDING_MODEL = "text-embedding-3-small"
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 CHROMA_PATH = Path(os.environ.get("CHROMA_PATH", "/tmp/atlaops_chroma_db"))
+DB_PATH = PROJECT_ROOT / "obs_backend.db"
 INDEX_HTML = PROJECT_ROOT / "index.html"
 KB_SOURCE_DIRS = [PROJECT_ROOT / "docs" / "atlaops-kb", PROJECT_ROOT / "knowledge_base"]
 
 request_log = defaultdict(list)
 RATE_LIMIT = 20
 WINDOW = 60
+db_lock = Lock()
 
 ALLOWED_INCIDENTS = {"normal", "traffic_spike", "db_errors", "recovery"}
+ALLOWED_SITES = {"obs", "aif"}
 
 SYSTEM_PROMPT = (
     "You are AtlaOps Guru, an AI cloud operations assistant built by Sai Pranav Atla. "
@@ -61,6 +67,32 @@ ops_state = {
         }
     ],
 }
+
+site_states = {
+    "obs": {
+        "incident": "normal",
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "timeline": [
+            {
+                "time": datetime.now(timezone.utc).isoformat(),
+                "event": "OBS system initialized in healthy state.",
+            }
+        ],
+    },
+    "aif": {
+        "incident": "normal",
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "timeline": [
+            {
+                "time": datetime.now(timezone.utc).isoformat(),
+                "event": "AIF system initialized in healthy state.",
+            }
+        ],
+    },
+}
+
+# Track incident start time for duration calculation per site
+incident_start_times = {"obs": time.time(), "aif": time.time()}
 
 
 def utc_now() -> str:
@@ -100,6 +132,245 @@ def init_collections():
 
 
 user_collection, kb_collection = init_collections()
+
+
+def init_database():
+    """Create SQLite database and schema if not present (idempotent)."""
+    with db_lock:
+        try:
+            conn = sqlite3.connect(str(DB_PATH))
+            cursor = conn.cursor()
+
+            # Historical metrics table
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS historical_metrics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT NOT NULL,
+                incident_type TEXT NOT NULL,
+                cpu_percent REAL,
+                memory_percent REAL,
+                latency_p95_ms REAL,
+                error_rate_percent REAL,
+                pod_count INTEGER,
+                requests_per_min INTEGER,
+                services_json TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            """)
+
+            cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_historical_metrics_timestamp
+              ON historical_metrics(timestamp)
+            """)
+            cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_historical_metrics_incident
+              ON historical_metrics(incident_type)
+            """)
+
+            # Incident logs table
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS incident_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT NOT NULL,
+                incident_type TEXT NOT NULL,
+                event_type TEXT NOT NULL,
+                event_message TEXT NOT NULL,
+                triggered_by TEXT,
+                related_metric_name TEXT,
+                metric_value REAL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            """)
+
+            cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_incident_logs_timestamp
+              ON incident_logs(timestamp)
+            """)
+            cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_incident_logs_incident_type
+              ON incident_logs(incident_type)
+            """)
+
+            # Conversations table
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS conversations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT NOT NULL,
+                user_prompt TEXT NOT NULL,
+                ai_response TEXT NOT NULL,
+                incident_state TEXT NOT NULL,
+                cpu_at_time REAL,
+                latency_at_time REAL,
+                error_rate_at_time REAL,
+                kb_sources_json TEXT,
+                response_ms INTEGER,
+                tokens_used INTEGER,
+                model TEXT DEFAULT 'gpt-4o-mini',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            """)
+
+            cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_conversations_timestamp
+              ON conversations(timestamp)
+            """)
+            cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_conversations_incident
+              ON conversations(incident_state)
+            """)
+
+            # Performance analytics table
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS performance_analytics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT NOT NULL,
+                incident_type TEXT NOT NULL,
+                cpu_avg REAL,
+                cpu_max REAL,
+                cpu_min REAL,
+                memory_avg REAL,
+                memory_max REAL,
+                latency_avg REAL,
+                latency_p99_ms REAL,
+                error_rate_avg REAL,
+                error_rate_max REAL,
+                service_count_healthy INTEGER,
+                service_count_degraded INTEGER,
+                slo_latency_met INTEGER,
+                slo_error_rate_met INTEGER,
+                duration_seconds INTEGER,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            """)
+
+            cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_analytics_timestamp
+              ON performance_analytics(timestamp)
+            """)
+            cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_analytics_incident
+              ON performance_analytics(incident_type)
+            """)
+
+            conn.commit()
+            conn.close()
+            print(f"Database initialized at {DB_PATH}")
+        except Exception as exc:
+            print(f"Database init error: {exc}")
+
+
+def log_metrics_to_db(metrics_dict: dict):
+    """Persist metrics snapshot to database."""
+    with db_lock:
+        try:
+            conn = sqlite3.connect(str(DB_PATH))
+            cursor = conn.cursor()
+
+            cursor.execute("""
+            INSERT INTO historical_metrics (
+                timestamp, incident_type, cpu_percent, memory_percent,
+                latency_p95_ms, error_rate_percent, pod_count, requests_per_min,
+                services_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                metrics_dict["timestamp"],
+                metrics_dict["incident"],
+                metrics_dict["metrics"]["cpu_percent"],
+                metrics_dict["metrics"]["memory_percent"],
+                metrics_dict["metrics"]["latency_p95_ms"],
+                metrics_dict["metrics"]["error_rate_percent"],
+                metrics_dict["metrics"]["pod_count"],
+                metrics_dict["metrics"]["requests_per_min"],
+                json.dumps(metrics_dict["services"])
+            ))
+
+            conn.commit()
+            conn.close()
+        except Exception as exc:
+            print(f"Metrics logging error: {exc}")
+
+
+def log_incident_event_to_db(event_message: str, triggered_by: str = None,
+                            metric_name: str = None, metric_value: float = None):
+    """Persist incident event to database."""
+    with db_lock:
+        try:
+            conn = sqlite3.connect(str(DB_PATH))
+            cursor = conn.cursor()
+
+            cursor.execute("""
+            INSERT INTO incident_logs (
+                timestamp, incident_type, event_type, event_message,
+                triggered_by, related_metric_name, metric_value
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                utc_now(),
+                ops_state["incident"],
+                "milestone",
+                event_message,
+                triggered_by,
+                metric_name,
+                metric_value
+            ))
+
+            conn.commit()
+            conn.close()
+        except Exception as exc:
+            print(f"Event logging error: {exc}")
+
+
+def log_conversation_to_db(user_prompt: str, ai_response: str, metrics_snapshot: dict,
+                          kb_sources: list, response_ms: int):
+    """Persist conversation pair to database."""
+    with db_lock:
+        try:
+            conn = sqlite3.connect(str(DB_PATH))
+            cursor = conn.cursor()
+
+            cursor.execute("""
+            INSERT INTO conversations (
+                timestamp, user_prompt, ai_response, incident_state,
+                cpu_at_time, latency_at_time, error_rate_at_time,
+                kb_sources_json, response_ms
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                utc_now(),
+                user_prompt,
+                ai_response,
+                ops_state["incident"],
+                metrics_snapshot.get("cpu_percent"),
+                metrics_snapshot.get("latency_p95_ms"),
+                metrics_snapshot.get("error_rate_percent"),
+                json.dumps(kb_sources),
+                response_ms
+            ))
+
+            conn.commit()
+            conn.close()
+        except Exception as exc:
+            print(f"Conversation logging error: {exc}")
+
+
+def cleanup_old_data(retention_days: int = 30):
+    """Remove metrics older than retention_days."""
+    with db_lock:
+        try:
+            conn = sqlite3.connect(str(DB_PATH))
+            cursor = conn.cursor()
+
+            cutoff = (datetime.now(timezone.utc) - timedelta(days=retention_days)).isoformat()
+
+            cursor.execute("DELETE FROM historical_metrics WHERE timestamp < ?", (cutoff,))
+            cursor.execute("DELETE FROM incident_logs WHERE timestamp < ?", (cutoff,))
+
+            # Keep conversations longer for audit (90 days)
+            conv_cutoff = (datetime.now(timezone.utc) - timedelta(days=90)).isoformat()
+            cursor.execute("DELETE FROM conversations WHERE timestamp < ?", (conv_cutoff,))
+
+            conn.commit()
+            conn.close()
+        except Exception as exc:
+            print(f"Cleanup error: {exc}")
 
 
 def chunk_text(text: str, chunk_size: int = 900, overlap: int = 120) -> list[str]:
@@ -214,10 +485,14 @@ class IncidentRequest(BaseModel):
     incident_type: str
 
 
-def push_timeline(event: str) -> None:
-    ops_state["timeline"].insert(0, {"time": utc_now(), "event": event})
-    ops_state["timeline"] = ops_state["timeline"][:30]
-    ops_state["updated_at"] = utc_now()
+def push_timeline(event: str, site: str = "obs") -> None:
+    state = get_site_state(site)
+    state["timeline"].insert(0, {"time": utc_now(), "event": event})
+    state["timeline"] = state["timeline"][:30]
+    state["updated_at"] = utc_now()
+
+    # Also persist to database
+    log_incident_event_to_db(event)
 
 
 def get_ai_response(full_prompt: str) -> str:
@@ -245,41 +520,101 @@ def get_ai_response(full_prompt: str) -> str:
         return "Unexpected AI service error."
 
 
-def generate_metrics() -> dict:
-    t = time.time() / 6.0
-    incident = ops_state["incident"]
+# ============================================================================
+# STEP 3: METRIC CORRELATION - Realistic metric interdependencies
+# ============================================================================
+def get_site_state(site: str) -> dict:
+    return site_states.get(site, site_states["obs"])
 
-    cpu = 42 + 8 * math.sin(t)
-    memory = 58 + 6 * math.cos(t / 2)
-    latency = 120 + 20 * math.sin(t / 1.3)
-    error_rate = 0.4 + 0.2 * abs(math.sin(t / 1.1))
-    pods = 6 + int(abs(math.sin(t / 1.8)) * 2)
-    rps = 190 + int(abs(math.sin(t)) * 35)
+
+def generate_metrics(site: str = "obs") -> dict:
+    """
+    Generate correlated metrics where incidents create cascading effects.
+
+    Correlation logic:
+    - traffic_spike: Traffic increases → CPU/Memory increase → Pods scale up →
+                     Latency increases → Error rate increases
+    - db_errors: Database errors → Memory spikes more than CPU →
+                 Latency increases significantly → Error rate very high
+    - recovery: All metrics smoothly return to baseline
+    """
+    t = time.time() / 6.0
+    incident = get_site_state(site)["incident"]
+
+    # Baseline sinusoidal curves (normal state)
+    base_cpu = 42 + 8 * math.sin(t)
+    base_memory = 58 + 6 * math.cos(t / 2)
+    base_latency = 120 + 20 * math.sin(t / 1.3)
+    base_error_rate = 0.4 + 0.2 * abs(math.sin(t / 1.1))
+    base_pods = 6 + int(abs(math.sin(t / 1.8)) * 2)
+    base_rps = 190 + int(abs(math.sin(t)) * 35)
+
+    # Start with baselines
+    cpu = base_cpu
+    memory = base_memory
+    latency = base_latency
+    error_rate = base_error_rate
+    pods = base_pods
+    rps = base_rps
 
     if incident == "traffic_spike":
-        cpu += 35
-        latency += 120
-        error_rate += 1.4
-        pods += 5
+        # CORRELATION CHAIN 1: RPS spike → CPU → Memory → Pod scaling → Latency → Errors
+        rps_multiplier = 2.8  # RPS increases significantly
         rps += 340
-    elif incident == "db_errors":
-        cpu += 12
-        memory += 10
-        latency += 85
-        error_rate += 3.2
-    elif incident == "recovery":
-        cpu -= 8
-        latency -= 20
-        error_rate -= 0.2
 
+        # Traffic spike directly increases CPU and Memory
+        cpu += 35  # Traffic handling overhead
+        memory += 8  # RPS increases memory usage less than CPU
+
+        # High CPU triggers pod scaling, which increases RPS but reduces per-pod load slightly
+        pods += 5  # Autoscaler adds pods
+
+        # Even with scaling, latency increases due to network contention and queueing
+        latency += 120  # Network bottleneck, request queueing
+
+        # Under load, error rate increases (timeouts, circuit breakers)
+        error_rate += 1.4  # Timeout errors, failed connections
+
+    elif incident == "db_errors":
+        # CORRELATION CHAIN 2: DB errors → Memory thrashing → CPU increases → Latency → Errors
+        # Database errors cause connection pool exhaustion and memory pressure
+
+        cpu += 12   # CPU needed for retry logic and error handling
+        memory += 10  # Retry buffers, error logs, connection queue memory > CPU increase
+
+        # DB errors don't trigger autoscaling the same way (fewer pods helps sometimes)
+        pods += 1   # Minimal scaling; the issue is backend, not frontend load
+
+        # Checkout service becomes severely latent due to DB timeouts
+        latency += 85  # DB query timeouts (not as high as traffic spike)
+
+        # Error rate spikes much more than traffic spike (database is critical path)
+        error_rate += 3.2  # Payment failures, checkout aborts
+
+    elif incident == "recovery":
+        # Smooth decay back to baseline
+        recovery_factor = 0.15  # Reduce the delta by 15% each call
+
+        cpu = base_cpu + (cpu - base_cpu) * (1 - recovery_factor)
+        memory = base_memory + (memory - base_memory) * (1 - recovery_factor)
+        latency = base_latency + (latency - base_latency) * (1 - recovery_factor)
+        error_rate = max(base_error_rate, base_error_rate + (error_rate - base_error_rate) * (1 - recovery_factor))
+        pods = max(base_pods, int(pods * (1 - recovery_factor * 0.5)))  # Pods scale down more slowly
+        rps = base_rps + (rps - base_rps) * (1 - recovery_factor)
+
+    # Clamp to realistic ranges
     cpu = max(5, min(99, round(cpu, 1)))
     memory = max(10, min(99, round(memory, 1)))
     latency = max(40, round(latency, 1))
     error_rate = max(0.0, round(error_rate, 2))
+    pods = max(3, int(pods))
+    rps = max(100, int(rps))
 
+    # Service status reflects the incident state
     checkout_status = "degraded" if incident == "db_errors" else "healthy"
     api_status = "degraded" if incident in {"traffic_spike", "db_errors"} else "healthy"
 
+    # Service latencies scale with overall latency
     services = [
         {"name": "api-gateway", "status": api_status, "latency_ms": round(latency * 0.9, 1)},
         {"name": "orders-service", "status": checkout_status, "latency_ms": latency},
@@ -287,7 +622,7 @@ def generate_metrics() -> dict:
         {"name": "ops-guru-rag", "status": "healthy", "latency_ms": round(latency * 0.75, 1)},
     ]
 
-    return {
+    metrics_dict = {
         "timestamp": utc_now(),
         "incident": incident,
         "metrics": {
@@ -301,9 +636,14 @@ def generate_metrics() -> dict:
         "services": services,
     }
 
+    # STEP 4: Log metrics to database for persistence & analytics
+    log_metrics_to_db(metrics_dict)
 
-def generate_logs(limit: int) -> list[dict]:
-    incident = ops_state["incident"]
+    return metrics_dict
+
+
+def generate_logs(limit: int, site: str = "obs") -> list[dict]:
+    incident = get_site_state(site)["incident"]
     base = [
         "INFO api-gateway request completed route=/health status=200",
         "INFO orders-service cache hit ratio=0.93",
@@ -343,17 +683,18 @@ def generate_logs(limit: int) -> list[dict]:
     return logs
 
 
-def build_ops_context() -> str:
-    metrics_payload = generate_metrics()
+def build_ops_context(site: str = "obs") -> str:
+    metrics_payload = generate_metrics(site)
     metrics = metrics_payload["metrics"]
-    recent_logs = generate_logs(4)
-    recent_events = ops_state["timeline"][:3]
+    state = get_site_state(site)
+    recent_logs = generate_logs(4, site)
+    recent_events = state["timeline"][:3]
 
     log_lines = " | ".join(log["line"] for log in recent_logs)
     timeline_lines = " | ".join(event["event"] for event in recent_events)
 
     return (
-        f"Incident mode: {ops_state['incident']}. "
+        f"Site: {site}. Incident mode: {state['incident']}. "
         f"CPU={metrics['cpu_percent']}%, Memory={metrics['memory_percent']}%, "
         f"P95 Latency={metrics['latency_p95_ms']}ms, Errors={metrics['error_rate_percent']}%, "
         f"Pods={metrics['pod_count']}, RPM={metrics['requests_per_min']}. "
@@ -415,6 +756,13 @@ def retrieve_memory_context(query: str, top_k: int = 2) -> str:
     return "\n".join(documents)
 
 
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database and other resources on app startup."""
+    init_database()
+    print("AtlaOps backend v4.2.0 started with database persistence enabled")
+
+
 @app.get("/")
 def root():
     if INDEX_HTML.exists():
@@ -429,48 +777,66 @@ def health():
         "status": "ok",
         "backend": "openai" if OPENAI_API_KEY else "none",
         "rate_limit": f"{RATE_LIMIT} req/{WINDOW}s",
-        "version": "4.1.0",
+        "version": "4.2.0",
         "incident": ops_state["incident"],
         "kb_chunks": chroma_kb_count or len(FILE_KB_CHUNKS),
+        "database": "sqlite" if DB_PATH.exists() else "not_initialized",
     }
 
 
 @app.get("/ops/metrics")
-def ops_metrics():
-    return generate_metrics()
+def ops_metrics(site: str = Query("obs", description="Site key: obs or aif")):
+    if site not in ALLOWED_SITES:
+        raise HTTPException(status_code=400, detail="Unsupported site")
+    return generate_metrics(site)
 
 
 @app.get("/ops/logs")
-def ops_logs(limit: int = Query(default=20, ge=5, le=100)):
-    return {"incident": ops_state["incident"], "logs": generate_logs(limit)}
+def ops_logs(site: str = Query("obs", description="Site key: obs or aif"), limit: int = Query(default=20, ge=5, le=100)):
+    if site not in ALLOWED_SITES:
+        raise HTTPException(status_code=400, detail="Unsupported site")
+    state = get_site_state(site)
+    return {"incident": state["incident"], "site": site, "logs": generate_logs(limit, site)}
 
 
 @app.get("/ops/incidents")
-def ops_incidents():
+def ops_incidents(site: str = Query("obs", description="Site key: obs or aif")):
+    if site not in ALLOWED_SITES:
+        raise HTTPException(status_code=400, detail="Unsupported site")
+    state = get_site_state(site)
     return {
-        "incident": ops_state["incident"],
-        "updated_at": ops_state["updated_at"],
-        "timeline": ops_state["timeline"],
+        "incident": state["incident"],
+        "site": site,
+        "updated_at": state["updated_at"],
+        "timeline": state["timeline"],
     }
 
 
 @app.post("/ops/incidents/trigger")
-def trigger_incident(payload: IncidentRequest):
+def trigger_incident(payload: IncidentRequest, site: str = Query("obs", description="Site key: obs or aif")):
+    global incident_start_times
+    if site not in ALLOWED_SITES:
+        raise HTTPException(status_code=400, detail="Unsupported site")
+
     incident_type = payload.incident_type.strip().lower()
     if incident_type not in ALLOWED_INCIDENTS:
         raise HTTPException(status_code=400, detail="Unsupported incident type")
 
-    ops_state["incident"] = incident_type
-    if incident_type == "traffic_spike":
-        push_timeline("Traffic spike simulation started. Autoscaling initiated.")
-    elif incident_type == "db_errors":
-        push_timeline("Database error burst simulated. Checkout degradation detected.")
-    elif incident_type == "recovery":
-        push_timeline("Recovery workflow simulated. Services stabilizing.")
-    else:
-        push_timeline("System returned to normal baseline.")
+    state = get_site_state(site)
+    state["incident"] = incident_type
+    state["updated_at"] = utc_now()
+    incident_start_times[site] = time.time()
 
-    return {"ok": True, "incident": ops_state["incident"], "updated_at": ops_state["updated_at"]}
+    if incident_type == "traffic_spike":
+        push_timeline("Traffic spike simulation started. Autoscaling initiated.", site)
+    elif incident_type == "db_errors":
+        push_timeline("Database error burst simulated. Checkout degradation detected.", site)
+    elif incident_type == "recovery":
+        push_timeline("Recovery workflow simulated. Services stabilizing.", site)
+    else:
+        push_timeline("System returned to normal baseline.", site)
+
+    return {"ok": True, "incident": state["incident"], "site": site, "updated_at": state["updated_at"]}
 
 
 @app.get("/ops/architecture")
@@ -509,11 +875,14 @@ def kb_status():
 
 
 @app.get("/ops/incidents/rca")
-def incident_rca():
-    incident = ops_state["incident"]
-    metrics = generate_metrics()["metrics"]
-    recent_logs = [entry["line"] for entry in generate_logs(8)]
-    recent_events = [entry["event"] for entry in ops_state["timeline"][:4]]
+def incident_rca(site: str = Query("obs", description="Site key: obs or aif")):
+    if site not in ALLOWED_SITES:
+        raise HTTPException(status_code=400, detail="Unsupported site")
+    state = get_site_state(site)
+    incident = state["incident"]
+    metrics = generate_metrics(site)["metrics"]
+    recent_logs = [entry["line"] for entry in generate_logs(8, site)]
+    recent_events = [entry["event"] for entry in state["timeline"][:4]]
 
     if incident == "traffic_spike":
         summary = "Traffic surge caused latency amplification and autoscaling pressure."
@@ -550,6 +919,7 @@ def incident_rca():
 
     return {
         "incident": incident,
+        "site": site,
         "generated_at": utc_now(),
         "summary": summary,
         "likely_root_cause": likely_root_cause,
@@ -589,6 +959,8 @@ async def generate_text(request: Request, prompt_req: PromptRequest):
         if not user_message:
             raise HTTPException(status_code=400, detail="Prompt is required.")
 
+        start_time = time.time()
+
         ops_context = build_ops_context()
         kb_context, sources = retrieve_kb_context(user_message, top_k=4)
         memory_context = retrieve_memory_context(user_message, top_k=2)
@@ -603,7 +975,15 @@ async def generate_text(request: Request, prompt_req: PromptRequest):
         )
 
         ai_response = get_ai_response(full_prompt)
+        response_ms = int((time.time() - start_time) * 1000)
 
+        # Get current metrics for context snapshot
+        current_metrics = generate_metrics()["metrics"]
+
+        # Log conversation to database
+        log_conversation_to_db(user_message, ai_response, current_metrics, sources, response_ms)
+
+        # Store in vector memory as well
         memory_doc = f"User asked: {user_message}. AtlaOps Guru replied: {ai_response}"
         memory_embeddings = embed_texts([memory_doc])
         if user_collection is not None and memory_embeddings:
@@ -624,8 +1004,6 @@ async def generate_text(request: Request, prompt_req: PromptRequest):
                             metadatas=[{"source": "conversation", "time": utc_now()}],
                             ids=[f"conv_{time.time()}"],
                         )
-                else:
-                    raise
 
         return {
             "response": ai_response,
@@ -640,6 +1018,149 @@ async def generate_text(request: Request, prompt_req: PromptRequest):
             "sources": [],
             "incident": ops_state["incident"],
         }
+
+
+# ============================================================================
+# ANALYTICS ENDPOINTS
+# ============================================================================
+
+@app.get("/analytics/metrics-history")
+def metrics_history(
+    start: str = Query(..., description="ISO 8601 start timestamp"),
+    end: str = Query(..., description="ISO 8601 end timestamp"),
+    incident_type: str | None = Query(None, description="Filter by incident type")
+):
+    """Return historical metric snapshots for charting/analysis."""
+    with db_lock:
+        try:
+            conn = sqlite3.connect(str(DB_PATH))
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+
+            query = "SELECT * FROM historical_metrics WHERE timestamp BETWEEN ? AND ?"
+            params = [start, end]
+
+            if incident_type:
+                query += " AND incident_type = ?"
+                params.append(incident_type)
+
+            query += " ORDER BY timestamp DESC LIMIT 1000"
+
+            cursor.execute(query, params)
+            rows = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+
+            return {"metrics": rows, "count": len(rows)}
+        except Exception as exc:
+            return {"metrics": [], "count": 0, "error": str(exc)}
+
+
+@app.get("/analytics/incident-timeline")
+def incident_timeline(
+    start: str = Query(..., description="ISO 8601 start timestamp"),
+    end: str = Query(..., description="ISO 8601 end timestamp"),
+    incident_type: str | None = Query(None, description="Filter by incident type")
+):
+    """Return structured incident events with context."""
+    with db_lock:
+        try:
+            conn = sqlite3.connect(str(DB_PATH))
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+
+            query = "SELECT * FROM incident_logs WHERE timestamp BETWEEN ? AND ?"
+            params = [start, end]
+
+            if incident_type:
+                query += " AND incident_type = ?"
+                params.append(incident_type)
+
+            query += " ORDER BY timestamp DESC"
+
+            cursor.execute(query, params)
+            rows = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+
+            return {"events": rows, "count": len(rows)}
+        except Exception as exc:
+            return {"events": [], "count": 0, "error": str(exc)}
+
+
+@app.get("/analytics/slo-report")
+def slo_report(
+    start: str = Query(..., description="ISO 8601 start timestamp"),
+    end: str = Query(..., description="ISO 8601 end timestamp")
+):
+    """Return SLO compliance metrics."""
+    with db_lock:
+        try:
+            conn = sqlite3.connect(str(DB_PATH))
+            cursor = conn.cursor()
+
+            cursor.execute("""
+            SELECT
+                COUNT(*) as total_hours,
+                SUM(CASE WHEN slo_latency_met = 1 THEN 1 ELSE 0 END) as latency_met_hours,
+                SUM(CASE WHEN slo_error_rate_met = 1 THEN 1 ELSE 0 END) as error_rate_met_hours
+            FROM performance_analytics
+            WHERE timestamp BETWEEN ? AND ?
+            """, (start, end))
+
+            row = cursor.fetchone()
+            conn.close()
+
+            total = row[0] or 0
+            latency_met = row[1] or 0
+            error_rate_met = row[2] or 0
+
+            return {
+                "slo_latency_compliance_percent": (latency_met / total * 100) if total > 0 else 0,
+                "slo_error_rate_compliance_percent": (error_rate_met / total * 100) if total > 0 else 0,
+                "total_hours_tracked": total
+            }
+        except Exception as exc:
+            return {"error": str(exc)}
+
+
+@app.get("/analytics/conversation-stats")
+def conversation_stats(
+    start: str = Query(..., description="ISO 8601 start timestamp"),
+    end: str = Query(..., description="ISO 8601 end timestamp")
+):
+    """Return conversation statistics and KB usage metrics."""
+    with db_lock:
+        try:
+            conn = sqlite3.connect(str(DB_PATH))
+            cursor = conn.cursor()
+
+            cursor.execute("""
+            SELECT
+                COUNT(*) as conversation_count,
+                AVG(response_ms) as avg_response_ms,
+                MIN(response_ms) as min_response_ms,
+                MAX(response_ms) as max_response_ms,
+                incident_state
+            FROM conversations
+            WHERE timestamp BETWEEN ? AND ?
+            GROUP BY incident_state
+            """, (start, end))
+
+            rows = cursor.fetchall()
+            conn.close()
+
+            stats = []
+            for row in rows:
+                stats.append({
+                    "incident_state": row[4],
+                    "conversation_count": row[0],
+                    "avg_response_ms": round(row[1], 2) if row[1] else 0,
+                    "min_response_ms": row[2] or 0,
+                    "max_response_ms": row[3] or 0
+                })
+
+            return {"stats": stats}
+        except Exception as exc:
+            return {"stats": [], "error": str(exc)}
 
 
 handler = Mangum(app)
