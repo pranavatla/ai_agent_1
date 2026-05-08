@@ -281,10 +281,45 @@
       justify-content: space-between;
     }
 
+    .site-tile:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      transform: none;
+      box-shadow: none;
+      filter: saturate(0.8);
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,248,252,0.92));
+    }
+
     .site-tile:hover, .site-tile.active {
       transform: translateY(-3px);
       border-color: rgba(37, 99, 235, 0.28);
       box-shadow: var(--shadow-md);
+    }
+
+    .site-tile:disabled:hover {
+      transform: none;
+      border-color: var(--border-color);
+      box-shadow: none;
+    }
+
+    .site-tile.coming-soon {
+      position: relative;
+    }
+
+    .site-tile.coming-soon::before {
+      content: "Launching soon";
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-primary);
+      background: rgba(37, 99, 235, 0.08);
+      border: 1px solid rgba(37, 99, 235, 0.12);
+      border-radius: 999px;
+      padding: 5px 8px;
     }
 
     .site-tile h3 {
@@ -314,6 +349,26 @@
       color: var(--accent-primary);
       font-weight: 700;
       font-size: 13px;
+    }
+
+    .tile-footer .muted {
+      color: var(--text-tertiary);
+      font-weight: 600;
+    }
+
+    .launch-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .launch-dot::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-secondary);
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.08);
     }
 
     .detail-modal {
@@ -362,6 +417,26 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
+    }
+
+    .detail-card.coming-soon .detail-stats {
+      display: none;
+    }
+
+    .coming-soon-panel {
+      display: none;
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(37, 99, 235, 0.06), rgba(15, 118, 110, 0.04));
+      border: 1px solid rgba(37, 99, 235, 0.12);
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.7;
+      margin-top: 8px;
+    }
+
+    .detail-card.coming-soon .coming-soon-panel {
+      display: block;
     }
 
     .detail-stat {
@@ -1124,7 +1199,7 @@
   </div>
 
   <div class="detail-modal" id="site-modal" aria-hidden="true">
-    <div class="detail-card">
+    <div class="detail-card" id="site-detail-card">
       <div class="detail-card-head">
         <div>
           <div class="chip" id="modal-chip">OBS</div>
@@ -1132,6 +1207,14 @@
           <p id="modal-copy" style="margin-top:10px;color:var(--text-secondary);max-width:620px;">This tile is showing the OBS metrics profile.</p>
         </div>
         <button class="close-btn" id="close-modal" aria-label="Close">×</button>
+      </div>
+      <div class="coming-soon-panel" id="coming-soon-panel">
+        Launching soon. Stay tuned. No live metrics are available yet for this site.
+      </div>
+      <div style="display:flex;justify-content:flex-start;margin:14px 0 4px;">
+        <a id="launch-site-btn" href="#" target="_blank" rel="noreferrer" style="display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 16px;border-radius:14px;background:linear-gradient(135deg,#67c3ff,#8cffe1);color:#06111b;text-decoration:none;font-weight:700;">
+          Launch site
+        </a>
       </div>
       <div class="detail-stats">
         <div class="detail-stat"><span>CPU</span><strong id="modal-cpu">--</strong></div>
@@ -1171,15 +1254,18 @@
         key: "games",
         label: "Games",
         host: "games.atla.in",
-        description: "Planned game platform dashboard.",
+        description: "Launch hub for browser games like Glitch.",
+        statusCopy: "Open launcher",
         apiBase: null,
-        comingSoon: true
+        launchUrl: "https://games.atla.in",
+        comingSoon: false
       },
       ai: {
         key: "ai",
         label: "AI",
         host: "ai.atla.in",
         description: "Planned AI hub dashboard.",
+        statusCopy: "Launching soon",
         apiBase: null,
         comingSoon: true
       }
@@ -1328,7 +1414,8 @@
       Object.values(siteProfiles).forEach((profile) => {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = `site-tile ${profile.key === activeSite ? "active" : ""}`;
+        btn.className = `site-tile ${profile.key === activeSite ? "active" : ""} ${profile.comingSoon ? "coming-soon" : ""}`;
+        if (profile.comingSoon) btn.disabled = true;
         btn.innerHTML = `
           <div>
             <span class="chip">${profile.label}</span>
@@ -1336,24 +1423,43 @@
             <p>${profile.description}</p>
           </div>
           <div class="tile-footer">
-            <span>${profile.comingSoon ? "Coming soon" : "Open site metrics"}</span>
-            <span>→</span>
+            <span class="${profile.comingSoon ? "muted launch-dot" : ""}">${profile.comingSoon ? profile.statusCopy : "Open site metrics"}</span>
+            <span>${profile.comingSoon ? "—" : "→"}</span>
           </div>
         `;
-        btn.addEventListener("click", () => selectSite(profile.key));
+        if (!profile.comingSoon) {
+          btn.addEventListener("click", () => selectSite(profile.key));
+        }
         grid.appendChild(btn);
       });
     }
 
     function syncModal(metrics) {
       const profile = currentProfile();
+      const card = document.getElementById("site-detail-card");
       document.getElementById("modal-chip").textContent = profile.label;
       document.getElementById("modal-title").textContent = profile.host;
-      document.getElementById("modal-copy").textContent = profile.description;
-      document.getElementById("modal-cpu").textContent = metrics ? `${metrics.cpu_percent.toFixed(1)}%` : "--";
-      document.getElementById("modal-memory").textContent = metrics ? `${metrics.memory_percent.toFixed(1)}%` : "--";
-      document.getElementById("modal-latency").textContent = metrics ? `${metrics.latency_p95_ms.toFixed(0)}ms` : "--";
-      document.getElementById("modal-errors").textContent = metrics ? `${metrics.error_rate_percent.toFixed(2)}%` : "--";
+      document.getElementById("modal-copy").textContent = profile.comingSoon
+        ? "Launching soon. Stay tuned."
+        : profile.description;
+      const launchBtn = document.getElementById("launch-site-btn");
+      if (profile.launchUrl) {
+        launchBtn.href = profile.launchUrl;
+        launchBtn.textContent = profile.comingSoon ? "Coming soon" : "Open games.atla.in";
+        launchBtn.style.pointerEvents = profile.comingSoon ? "none" : "auto";
+        launchBtn.style.opacity = profile.comingSoon ? "0.45" : "1";
+      } else {
+        launchBtn.href = "#";
+        launchBtn.textContent = "Launch site";
+        launchBtn.style.pointerEvents = "none";
+        launchBtn.style.opacity = "0.45";
+      }
+      const comingSoon = profile.comingSoon;
+      card.classList.toggle("coming-soon", comingSoon);
+      document.getElementById("modal-cpu").textContent = comingSoon ? "Launching soon" : metrics ? `${metrics.cpu_percent.toFixed(1)}%` : "--";
+      document.getElementById("modal-memory").textContent = comingSoon ? "Stay tuned" : metrics ? `${metrics.memory_percent.toFixed(1)}%` : "--";
+      document.getElementById("modal-latency").textContent = comingSoon ? "Launching soon" : metrics ? `${metrics.latency_p95_ms.toFixed(0)}ms` : "--";
+      document.getElementById("modal-errors").textContent = comingSoon ? "Stay tuned" : metrics ? `${metrics.error_rate_percent.toFixed(2)}%` : "--";
     }
 
     function openModal() {
@@ -1370,16 +1476,20 @@
       activeSite = siteKey;
       renderSiteGrid();
       const profile = currentProfile();
-      const metrics = latestMetricsBySite[siteKey] || latestMetricsBySite.obs || null;
       document.getElementById("meta-incident").textContent = `${profile.label} MODE`;
       document.getElementById("health-pill").textContent = profile.comingSoon ? "coming soon" : "checking backend...";
-      syncModal(metrics);
+      syncModal(profile.comingSoon ? null : (latestMetricsBySite[siteKey] || latestMetricsBySite.obs || null));
       openModal();
       if (!profile.comingSoon) {
         refreshMetrics();
         refreshLogs();
         refreshIncidents();
         generateRca();
+      } else {
+        document.getElementById("log-output").textContent = "Launching soon. No live logs yet.";
+        document.getElementById("arch-details").textContent = "Launching soon. Architecture view will appear here later.";
+        document.getElementById("rca-output").textContent = "Launching soon. RCA analysis is not available yet.";
+        document.getElementById("incident-badge").textContent = "Incident: not launched";
       }
     }
 
