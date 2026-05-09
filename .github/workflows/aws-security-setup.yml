@@ -1,0 +1,118 @@
+name: AWS Security Setup
+
+# Run once manually to enable security services for atla.in
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  setup-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # ── GuardDuty ──────────────────────────────────────────────────────────
+      - name: Enable GuardDuty
+        run: |
+          EXISTING=$(aws guardduty list-detectors --query 'DetectorIds[0]' --output text 2>/dev/null)
+          if [ -z "$EXISTING" ] || [ "$EXISTING" = "None" ]; then
+            DETECTOR_ID=$(aws guardduty create-detector \
+              --enable \
+              --finding-publishing-frequency FIFTEEN_MINUTES \
+              --query 'DetectorId' --output text)
+            echo "GuardDuty enabled. Detector ID: $DETECTOR_ID"
+          else
+            echo "GuardDuty already active. Detector ID: $EXISTING"
+          fi
+
+      # ── Security Hub ───────────────────────────────────────────────────────
+      - name: Enable Security Hub
+        run: |
+          if aws securityhub describe-hub --query 'HubArn' --output text 2>/dev/null; then
+            echo "Security Hub already enabled"
+          else
+            aws securityhub enable-security-hub --enable-default-standards
+            echo "Security Hub enabled with AWS Foundational Security Best Practices"
+          fi
+
+      # ── IAM Access Analyzer ────────────────────────────────────────────────
+      - name: Enable IAM Access Analyzer
+        run: |
+          EXISTING=$(aws accessanalyzer list-analyzers \
+            --query 'analyzers[?name==`atla-account-analyzer`].name' \
+            --output text 2>/dev/null)
+          if [ -z "$EXISTING" ]; then
+            aws accessanalyzer create-analyzer \
+              --analyzer-name atla-account-analyzer \
+              --type ACCOUNT
+            echo "IAM Access Analyzer created: atla-account-analyzer"
+          else
+            echo "IAM Access Analyzer already exists"
+          fi
+
+      # ── SNS topic for security alerts ─────────────────────────────────────
+      - name: Create SNS security alerts topic
+        id: sns
+        run: |
+          TOPIC_ARN=$(aws sns create-topic \
+            --name atla-security-alerts \
+            --query 'TopicArn' --output text)
+          echo "topic_arn=$TOPIC_ARN" >> "$GITHUB_OUTPUT"
+          echo "SNS topic: $TOPIC_ARN"
+          echo ""
+          echo "Subscribe an email: aws sns subscribe --topic-arn $TOPIC_ARN --protocol email --notification-endpoint YOUR_EMAIL"
+
+      # ── EventBridge rule: HIGH/CRITICAL GuardDuty findings → SNS ──────────
+      - name: Create EventBridge rule for high-severity GuardDuty findings
+        run: |
+          TOPIC_ARN="${{ steps.sns.outputs.topic_arn }}"
+
+          aws events put-rule \
+            --name atla-guardduty-high-findings \
+            --event-pattern '{"source":["aws.guardduty"],"detail-type":["GuardDuty Finding"],"detail":{"severity":[{"numeric":[">=",7]}]}}' \
+            --state ENABLED \
+            --description "Alert on GuardDuty HIGH and CRITICAL findings for atla.in"
+
+          # Allow EventBridge to publish to the SNS topic
+          aws sns set-topic-attributes \
+            --topic-arn "$TOPIC_ARN" \
+            --attribute-name Policy \
+            --attribute-value "{
+              \"Version\": \"2012-10-17\",
+              \"Statement\": [{
+                \"Effect\": \"Allow\",
+                \"Principal\": {\"Service\": \"events.amazonaws.com\"},
+                \"Action\": \"sns:Publish\",
+                \"Resource\": \"$TOPIC_ARN\"
+              }]
+            }"
+
+          aws events put-targets \
+            --rule atla-guardduty-high-findings \
+            --targets "Id=atla-security-sns,Arn=$TOPIC_ARN"
+
+          echo "EventBridge rule created: alerts on GuardDuty severity >= 7 (HIGH/CRITICAL)"
+
+      # ── Summary ────────────────────────────────────────────────────────────
+      - name: Print setup summary
+        run: |
+          echo "=== Security setup complete for atla.in ==="
+          echo ""
+          echo "Services enabled:"
+          echo "  GuardDuty         - continuous threat detection"
+          echo "  Security Hub      - centralised findings (AWS FSBP standards)"
+          echo "  IAM Access Analyzer - detects overly permissive IAM policies"
+          echo "  EventBridge rule  - SNS alert on HIGH/CRITICAL GuardDuty findings"
+          echo ""
+          echo "Next step: subscribe an email to the atla-security-alerts SNS topic"
+          echo "  aws sns subscribe --topic-arn ${{ steps.sns.outputs.topic_arn }} \\"
+          echo "    --protocol email --notification-endpoint you@example.com"
