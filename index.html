@@ -6,7 +6,7 @@
   <title>atla.in | Architecting Intelligence</title>
   <meta name="description" content="Personal portfolio and service hub for AI/ML infrastructure, AWS AI certification prep, browser games, and observability tooling." />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
   <script id="tailwind-config">
     tailwind.config = {
@@ -107,6 +107,8 @@
     @keyframes arcade-blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
     @keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
     .arcade-blink { animation: arcade-blink 1s step-end infinite; }
+    @keyframes obs-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
+    .obs-pulse { animation: obs-pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
   </style>
 </head>
 
@@ -251,27 +253,57 @@
         </div>
       </div>
 
-      <!-- Observability Nexus -->
-      <div class="bg-surface-bright border border-outline-variant rounded-xl p-md flex flex-col h-full hover:bg-surface-container-lowest transition-colors group md:col-span-2 lg:col-span-1">
-        <div class="w-12 h-12 bg-tertiary-fixed rounded-lg flex items-center justify-center mb-md text-tertiary">
-          <span class="material-symbols-outlined icon-filled">monitoring</span>
+      <!-- Observability Nexus — obs.atla.in design system -->
+      <div style="background:#ffffff;border:1px solid rgba(15,23,42,0.08);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,0.08),0 4px 16px rgba(15,23,42,0.04);font-family:'Inter',-apple-system,sans-serif;" class="md:col-span-2 lg:col-span-1">
+
+        <!-- Header band — mirrors the dashboard hero gradient -->
+        <div style="background:linear-gradient(135deg,rgba(37,99,235,0.10) 0%,rgba(15,118,110,0.07) 100%);border-bottom:1px solid rgba(15,23,42,0.06);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:42px;height:42px;background:linear-gradient(135deg,#2563eb 0%,#0f766e 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(37,99,235,0.25);">
+              <span class="material-symbols-outlined icon-filled" style="color:#ffffff;font-size:22px;">monitoring</span>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#64748b;">Advanced Ops</span>
+          </div>
+          <!-- LIVE pill — exact replica of sidebar status-pill -->
+          <div style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.30);flex-shrink:0;">
+            <span class="obs-pulse" style="width:7px;height:7px;border-radius:50%;background:#0f766e;display:inline-block;flex-shrink:0;"></span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#0f172a;">LIVE</span>
+          </div>
         </div>
-        <h3 class="text-headline-md text-on-background mb-sm">Observability Nexus</h3>
-        <p class="text-body-md text-on-surface-variant flex-grow mb-lg">
-          Real-time platform health monitoring and distributed telemetry dashboard.
-          Aggregates logs, metrics, and traces for rapid anomaly detection — running on
-          EC2 with a FastAPI backend.
-        </p>
-        <div class="flex gap-sm mt-auto">
-          <a href="https://obs.atla.in"
-             class="flex-1 bg-surface-container-lowest border border-outline-variant hover:border-tertiary text-on-background text-label-md px-md py-sm rounded-lg transition-colors flex items-center justify-center gap-xs group-hover:text-tertiary">
-            View Dashboard <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-          </a>
-          <a href="https://github.com/pranavatla/AI_Agent_1" target="_blank" rel="noopener"
-             class="w-10 h-10 bg-surface-container-lowest border border-outline-variant hover:border-tertiary rounded-lg flex items-center justify-center text-on-surface-variant hover:text-tertiary transition-colors"
-             aria-label="View OBS repo on GitHub">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/></svg>
-          </a>
+
+        <!-- Card body -->
+        <div style="padding:20px 22px 22px;display:flex;flex-direction:column;flex-grow:1;background:linear-gradient(180deg,#f8fafc 0%,#f1f5f9 100%);">
+          <h3 style="font-size:20px;font-weight:800;line-height:1.3;letter-spacing:-0.5px;color:#0f172a;margin:0 0 10px 0;">Observability Nexus</h3>
+          <p style="font-size:13px;font-weight:400;line-height:1.7;color:#475569;flex-grow:1;margin:0 0 16px 0;">
+            Real-time platform health monitoring, distributed telemetry, and AI-powered root cause analysis. Incident simulation, live logs, and architecture maps — on EC2 + FastAPI.
+          </p>
+
+          <!-- Tech chips — JetBrains Mono, exact chip style from dashboard -->
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;padding:5px 10px;border:1px solid rgba(15,23,42,0.08);border-radius:999px;color:#64748b;background:rgba(255,255,255,0.75);">Real-time Metrics</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;padding:5px 10px;border:1px solid rgba(15,23,42,0.08);border-radius:999px;color:#64748b;background:rgba(255,255,255,0.75);">AI-Powered RCA</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;padding:5px 10px;border:1px solid rgba(15,23,42,0.08);border-radius:999px;color:#64748b;background:rgba(255,255,255,0.75);">Incident Sim</span>
+          </div>
+
+          <!-- Buttons -->
+          <div style="display:flex;gap:8px;margin-top:auto;">
+            <a href="https://obs.atla.in" target="_blank" rel="noopener"
+               style="flex:1;background:linear-gradient(135deg,#2563eb 0%,#0f766e 100%);color:#ffffff;border:none;border-radius:12px;padding:11px 16px;font-size:13px;font-weight:700;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);text-transform:uppercase;"
+               onmouseover="this.style.background='linear-gradient(135deg,#1d4ed8 0%,#0d6658 100%)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(37,99,235,0.22)'"
+               onmouseout="this.style.background='linear-gradient(135deg,#2563eb 0%,#0f766e 100%)';this.style.transform='';this.style.boxShadow='none'"
+               onmousedown="this.style.transform='translateY(0)'"
+               onmouseup="this.style.transform='translateY(-2px)'">
+              View Dashboard
+              <span class="material-symbols-outlined" style="font-size:15px;">arrow_forward</span>
+            </a>
+            <a href="https://github.com/pranavatla/AI_Agent_1" target="_blank" rel="noopener"
+               style="width:42px;height:42px;flex-shrink:0;background:#ffffff;border:1px solid rgba(15,23,42,0.08);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#475569;text-decoration:none;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);box-shadow:0 1px 2px rgba(15,23,42,0.06);"
+               onmouseover="this.style.background='#eef3f9';this.style.borderColor='rgba(15,23,42,0.14)';this.style.transform='translateY(-1px)'"
+               onmouseout="this.style.background='#ffffff';this.style.borderColor='rgba(15,23,42,0.08)';this.style.transform=''"
+               aria-label="View OBS repo on GitHub">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/></svg>
+            </a>
+          </div>
         </div>
       </div>
     </section>
