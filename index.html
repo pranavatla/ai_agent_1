@@ -49,12 +49,17 @@
     .btn.secondary{background:#fff;border:1px solid var(--line-strong);color:var(--text)}
     .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:96px}
     .card{border:1px solid var(--line-strong);border-radius:var(--radius-lg);background:var(--surface-bright);padding:24px 20px 18px;min-height:402px;display:flex;flex-direction:column}
+    .cardTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:30px}
     .icon{width:48px;height:48px;border-radius:10px;display:grid;place-items:center;margin-bottom:30px}
     .icon .material-symbols-outlined{font-size:22px}
     .icon.aif{background:var(--primary-soft);color:var(--primary)}
     .icon.games{background:#e7e0ff;color:#5b3cdd}
     .icon.obs{background:#ffe2c8;color:#a55c00}
     .icon.nifty{background:#dff4e9;color:#157a56}
+    .liveBadge{display:inline-flex;align-items:center;gap:8px;border:1px solid #a8d8bf;background:#eefaf4;color:#157a56;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.03em;white-space:nowrap}
+    .liveBadge::before{content:"";width:8px;height:8px;border-radius:50%;background:#2bb673;box-shadow:0 0 0 4px rgba(43,182,115,.12)}
+    .liveBadge.partial{background:#fff8e8;border-color:#e6c46b;color:#8d6500}
+    .liveBadge.partial::before{background:#e4ad22;box-shadow:0 0 0 4px rgba(228,173,34,.14)}
     .card h3{font-size:30px;line-height:1.18;letter-spacing:-.04em;font-weight:800;margin-bottom:14px}
     .card p{font-size:16px;line-height:1.55;color:var(--text-muted);flex:1}
     .card .cta{margin-top:24px;height:48px;border:1px solid var(--line-strong);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:500;gap:10px;background:#fff}
@@ -140,10 +145,13 @@
       </article>
 
       <article class="card" id="nifty">
-        <div class="icon nifty"><span class="material-symbols-outlined">show_chart</span></div>
+        <div class="cardTop">
+          <div class="icon nifty"><span class="material-symbols-outlined">show_chart</span></div>
+          <div class="liveBadge partial">Live Preview · Partial</div>
+        </div>
         <h3>NIFTY Options Console</h3>
-        <p>FastAPI trading console for NIFTY index options with live market data, hard risk limits, manual confirm flow, kill switch controls, and a read-only advisory layer.</p>
-        <a class="cta" href="https://nifty.atla.in" target="_blank" rel="noreferrer">Open Console <span class="material-symbols-outlined">arrow_forward</span></a>
+        <p>FastAPI trading console for NIFTY index options with live market data, hard risk limits, manual confirm flow, kill switch controls, and a read-only advisory layer. This surface is live as a preview, but it is not yet a fully production-hardened trading entrypoint.</p>
+        <a class="cta" href="https://nifty.atla.in" target="_blank" rel="noreferrer">Open Live Preview <span class="material-symbols-outlined">arrow_forward</span></a>
       </article>
     </section>
 
