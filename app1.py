@@ -15,7 +15,7 @@ try:
 except Exception:
     chromadb = None
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from mangum import Mangum
@@ -93,6 +93,10 @@ site_states = {
 
 # Track incident start time for duration calculation per site
 incident_start_times = {"obs": time.time(), "aif": time.time()}
+
+REMOTE_CONTROL_API_KEY = os.environ.get("REMOTE_CONTROL_API_KEY", "")
+# Per-site metric overrides set by the remote control API; merged into generated metrics
+metric_overrides: dict[str, dict] = {"obs": {}, "aif": {}}
 
 
 def utc_now() -> str:
@@ -477,12 +481,33 @@ def reset_user_collection():
     user_collection = client_local.get_or_create_collection(name="user_memory")
 
 
+OVERRIDABLE_METRIC_FIELDS = {
+    "cpu_percent", "memory_percent", "latency_p95_ms",
+    "error_rate_percent", "pod_count", "requests_per_min",
+}
+
+
+def require_remote_key(x_api_key: str = Header(...)):
+    if not REMOTE_CONTROL_API_KEY or x_api_key != REMOTE_CONTROL_API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid or missing X-API-Key")
+
+
 class PromptRequest(BaseModel):
     prompt: str
 
 
 class IncidentRequest(BaseModel):
     incident_type: str
+
+
+class RemoteMetricOverride(BaseModel):
+    site: str = "obs"
+    overrides: dict
+
+
+class RemoteIncidentTrigger(BaseModel):
+    incident_type: str
+    site: str = "obs"
 
 
 def push_timeline(event: str, site: str = "obs") -> None:
@@ -622,17 +647,24 @@ def generate_metrics(site: str = "obs") -> dict:
         {"name": "ops-guru-rag", "status": "healthy", "latency_ms": round(latency * 0.75, 1)},
     ]
 
+    m = {
+        "cpu_percent": cpu,
+        "memory_percent": memory,
+        "latency_p95_ms": latency,
+        "error_rate_percent": error_rate,
+        "pod_count": pods,
+        "requests_per_min": rps,
+    }
+
+    # Apply remote-control overrides (only recognised metric fields)
+    for field, value in metric_overrides.get(site, {}).items():
+        if field in m:
+            m[field] = value
+
     metrics_dict = {
         "timestamp": utc_now(),
         "incident": incident,
-        "metrics": {
-            "cpu_percent": cpu,
-            "memory_percent": memory,
-            "latency_p95_ms": latency,
-            "error_rate_percent": error_rate,
-            "pod_count": pods,
-            "requests_per_min": rps,
-        },
+        "metrics": m,
         "services": services,
     }
 
@@ -1161,6 +1193,93 @@ def conversation_stats(
             return {"stats": stats}
         except Exception as exc:
             return {"stats": [], "error": str(exc)}
+
+
+# ============================================================================
+# REMOTE CONTROL API  — authenticated endpoints for external clients
+# All routes require X-API-Key matching REMOTE_CONTROL_API_KEY env var.
+# ============================================================================
+
+@app.get("/remote/status")
+def remote_status(_: str = Depends(require_remote_key)):
+    """Return full state for all sites plus active metric overrides."""
+    return {
+        "sites": {
+            site: {
+                "incident": site_states[site]["incident"],
+                "updated_at": site_states[site]["updated_at"],
+                "timeline": site_states[site]["timeline"],
+                "metric_overrides": metric_overrides.get(site, {}),
+            }
+            for site in ALLOWED_SITES
+        }
+    }
+
+
+@app.post("/remote/incidents/trigger")
+def remote_trigger_incident(payload: RemoteIncidentTrigger, _: str = Depends(require_remote_key)):
+    """Trigger an incident on a site (authenticated)."""
+    global incident_start_times
+    site = payload.site.strip().lower()
+    if site not in ALLOWED_SITES:
+        raise HTTPException(status_code=400, detail="Unsupported site")
+
+    incident_type = payload.incident_type.strip().lower()
+    if incident_type not in ALLOWED_INCIDENTS:
+        raise HTTPException(status_code=400, detail="Unsupported incident type")
+
+    state = get_site_state(site)
+    state["incident"] = incident_type
+    state["updated_at"] = utc_now()
+    incident_start_times[site] = time.time()
+
+    messages = {
+        "traffic_spike": "Traffic spike simulation started via remote control.",
+        "db_errors": "Database error burst simulated via remote control.",
+        "recovery": "Recovery workflow triggered via remote control.",
+        "normal": "System reset to normal baseline via remote control.",
+    }
+    push_timeline(messages[incident_type], site)
+
+    return {"ok": True, "incident": state["incident"], "site": site, "updated_at": state["updated_at"]}
+
+
+@app.put("/remote/metrics")
+def remote_set_metric_overrides(payload: RemoteMetricOverride, _: str = Depends(require_remote_key)):
+    """Override specific metric values for a site. Unrecognised fields are ignored."""
+    site = payload.site.strip().lower()
+    if site not in ALLOWED_SITES:
+        raise HTTPException(status_code=400, detail="Unsupported site")
+
+    cleaned = {k: v for k, v in payload.overrides.items() if k in OVERRIDABLE_METRIC_FIELDS}
+    metric_overrides[site].update(cleaned)
+
+    return {"ok": True, "site": site, "active_overrides": metric_overrides[site]}
+
+
+@app.delete("/remote/metrics")
+def remote_clear_metric_overrides(site: str = Query("obs"), _: str = Depends(require_remote_key)):
+    """Clear all metric overrides for a site, resuming normal simulation."""
+    if site not in ALLOWED_SITES:
+        raise HTTPException(status_code=400, detail="Unsupported site")
+
+    metric_overrides[site] = {}
+    return {"ok": True, "site": site, "active_overrides": {}}
+
+
+@app.post("/remote/reset")
+def remote_reset(_: str = Depends(require_remote_key)):
+    """Reset all sites to normal incident state and clear all metric overrides."""
+    global incident_start_times
+    for site in ALLOWED_SITES:
+        state = get_site_state(site)
+        state["incident"] = "normal"
+        state["updated_at"] = utc_now()
+        incident_start_times[site] = time.time()
+        metric_overrides[site] = {}
+        push_timeline("Remote reset: system returned to normal baseline.", site)
+
+    return {"ok": True, "message": "All sites reset to normal, overrides cleared."}
 
 
 handler = Mangum(app)
