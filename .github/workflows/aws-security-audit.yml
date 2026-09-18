@@ -1,0 +1,106 @@
+name: AWS Security Audit
+
+# Weekly security posture check for atla.in
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Every Monday at 08:00 UTC
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # ── GuardDuty ──────────────────────────────────────────────────────────
+      - name: GuardDuty – report HIGH/CRITICAL findings
+        run: |
+          DETECTOR_ID=$(aws guardduty list-detectors --query 'DetectorIds[0]' --output text 2>/dev/null)
+          if [ -z "$DETECTOR_ID" ] || [ "$DETECTOR_ID" = "None" ]; then
+            echo "::warning::GuardDuty is NOT enabled. Run the aws-security-setup workflow."
+            exit 0
+          fi
+          echo "GuardDuty detector: $DETECTOR_ID"
+
+          FINDING_IDS=$(aws guardduty list-findings \
+            --detector-id "$DETECTOR_ID" \
+            --finding-criteria '{"Criterion":{"severity":{"Gte":7},"service.archived":{"Eq":["false"]}}}' \
+            --query 'FindingIds' --output json)
+          COUNT=$(echo "$FINDING_IDS" | jq 'length')
+          echo "HIGH/CRITICAL active findings: $COUNT"
+
+          if [ "$COUNT" -gt "0" ]; then
+            echo "::warning::$COUNT HIGH/CRITICAL GuardDuty finding(s) require attention"
+            aws guardduty get-findings \
+              --detector-id "$DETECTOR_ID" \
+              --finding-ids $(echo "$FINDING_IDS" | jq -r '.[]' | head -10 | tr '\n' ' ') \
+              --query 'Findings[].{Severity:Severity,Type:Type,Title:Title,UpdatedAt:UpdatedAt}' \
+              --output table
+          else
+            echo "No HIGH/CRITICAL findings. All clear."
+          fi
+
+      # ── IAM Access Analyzer ────────────────────────────────────────────────
+      - name: IAM Access Analyzer – report active findings
+        run: |
+          ANALYZER=$(aws accessanalyzer list-analyzers \
+            --query 'analyzers[?name==`atla-account-analyzer`].arn' \
+            --output text 2>/dev/null)
+          if [ -z "$ANALYZER" ]; then
+            echo "::warning::IAM Access Analyzer is NOT enabled. Run the aws-security-setup workflow."
+            exit 0
+          fi
+
+          FINDINGS=$(aws accessanalyzer list-findings \
+            --analyzer-arn "$ANALYZER" \
+            --filter '{"status":{"eq":["ACTIVE"]}}' \
+            --query 'findings[].{Id:id,ResourceType:resourceType,Condition:condition}' \
+            --output json 2>/dev/null || echo "[]")
+          COUNT=$(echo "$FINDINGS" | jq 'length')
+          echo "IAM Access Analyzer active findings: $COUNT"
+
+          if [ "$COUNT" -gt "0" ]; then
+            echo "::warning::$COUNT IAM policy finding(s) – review overly permissive access"
+            echo "$FINDINGS" | jq '.[]'
+          else
+            echo "No IAM Access Analyzer findings. All clear."
+          fi
+
+      # ── Security Hub ───────────────────────────────────────────────────────
+      - name: Security Hub – report HIGH/CRITICAL findings
+        run: |
+          if ! aws securityhub describe-hub --query 'HubArn' --output text 2>/dev/null; then
+            echo "::warning::Security Hub is NOT enabled. Run the aws-security-setup workflow."
+            exit 0
+          fi
+
+          COUNT=$(aws securityhub get-findings \
+            --filters '{"RecordState":[{"Value":"ACTIVE","Comparison":"EQUALS"}],"SeverityLabel":[{"Value":"HIGH","Comparison":"EQUALS"},{"Value":"CRITICAL","Comparison":"EQUALS"}]}' \
+            --query 'length(Findings)' --output text 2>/dev/null || echo "0")
+          echo "Security Hub HIGH/CRITICAL active findings: $COUNT"
+
+          if [ "$COUNT" -gt "0" ]; then
+            echo "::warning::$COUNT Security Hub finding(s) require attention"
+            aws securityhub get-findings \
+              --filters '{"RecordState":[{"Value":"ACTIVE","Comparison":"EQUALS"}],"SeverityLabel":[{"Value":"HIGH","Comparison":"EQUALS"},{"Value":"CRITICAL","Comparison":"EQUALS"}]}' \
+              --query 'Findings[0:10].{Severity:Severity.Label,Title:Title,ProductName:ProductName}' \
+              --output table 2>/dev/null
+          else
+            echo "No HIGH/CRITICAL Security Hub findings. All clear."
+          fi
+
+      # ── Summary ────────────────────────────────────────────────────────────
+      - name: Audit complete
+        run: |
+          echo "Security audit finished for atla.in — $(date -u '+%Y-%m-%d %H:%M UTC')"
+          echo "Review any ::warning:: annotations above for items needing action."
