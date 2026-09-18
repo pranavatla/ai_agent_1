@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sai Pranav Atla | Cloud and AI Infrastructure</title>
 <meta name="description" content="Sai Pranav Atla builds practical AI infrastructure, cloud platforms, and production-minded tools in public.">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0B1A22" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ffffff">
 <link rel="canonical" href="https://atla.in/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://atla.in/">
@@ -77,32 +76,6 @@
   --shadow-lift: 0 18px 50px -20px rgba(5,26,36,.35);
 }
 
-/* ---------- dark mode ----------
-   Only tokens are redefined. --inverse stays dark (it is a background, not
-   text) and --on-dark stays light, so the dark card and the social hover
-   fill keep working in both modes. */
-@media(prefers-color-scheme:dark){
-  :root{
-    --ink:#E3EEF3;
-    --ink-2:#F6FCFF;
-    --muted:#A3B9C3;
-    --paper:#0B1A22;
-    --surface:#13252F;
-    --inverse:#061219;
-    --signal:#54B9C3;
-    --warn:#E0A04E;
-    --hairline:rgba(246,252,255,.15);
-
-    --shadow-primary:
-      0 1px 2px 0 rgba(0,0,0,.44),
-      0 4px 4px 0 rgba(0,0,0,.34),
-      0 9px 6px 0 rgba(0,0,0,.22),
-      inset 0 1px 0 0 rgba(246,252,255,.07);
-    --shadow-soft: 0 0 0 .5px rgba(246,252,255,.10), 0 4px 30px rgba(0,0,0,.50);
-    --shadow-card: 0 4px 16px rgba(0,0,0,.50);
-    --shadow-lift: 0 18px 50px -20px rgba(0,0,0,.75);
-  }
-}
 
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
