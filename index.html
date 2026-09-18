@@ -180,14 +180,17 @@ a{color:inherit;text-decoration:none}
 .projects{padding:80px 0 0}
 .projects-intro{max-width:620px;margin:0 0 56px}
 .projects-intro h2{font-size:32px;line-height:1.1;letter-spacing:-.02em;font-weight:600;color:var(--ink-2);margin:0 0 14px}
-.projects-intro p{margin:0;color:var(--muted);font-size:15px;line-height:1.65}
+.projects-intro p{margin:0;color:var(--muted);font-size:15px;line-height:1.65;text-wrap:balance}
 @media(min-width:768px){.projects-intro h2{font-size:40px}}
 
 .tile{margin-bottom:96px}
 .tile:last-child{margin-bottom:0}
 .tile-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:18px}
-.tile-head h3{font-family:var(--display);font-weight:500;font-size:32px;letter-spacing:-.02em;margin:0;color:var(--ink)}
+.tile-head h3{font-family:var(--display);font-weight:500;font-size:32px;line-height:1.15;letter-spacing:-.02em;margin:0;color:var(--ink);text-wrap:balance}
 .tile-url{font-family:var(--mono);font-size:12px;color:var(--muted)}
+a.tile-url{text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--hairline)}
+a.tile-url:hover{color:var(--signal);text-decoration-color:currentColor}
+a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;border-radius:2px}
 .live{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--signal)}
 .live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal);animation:pulse 2.4s ease-out infinite}
 .tile-body{max-width:660px}
@@ -409,7 +412,7 @@ a{color:inherit;text-decoration:none}
     <div class="tile-inner">
       <div class="tile-head">
         <h3>Gita Reflection</h3>
-        <span class="tile-url">gita.atla.in</span>
+        <a class="tile-url" href="https://gita.atla.in/" target="_blank" rel="noopener noreferrer">gita.atla.in</a>
         <span class="live">live</span>
       </div>
       <div class="tile-body">
@@ -435,7 +438,7 @@ a{color:inherit;text-decoration:none}
     <div class="tile-inner">
       <div class="tile-head">
         <h3>Games</h3>
-        <span class="tile-url">games.atla.in</span>
+        <a class="tile-url" href="https://games.atla.in/" target="_blank" rel="noopener noreferrer">games.atla.in</a>
         <span class="live">live</span>
       </div>
       <div class="tile-body">
@@ -467,7 +470,7 @@ a{color:inherit;text-decoration:none}
     <div class="tile-inner">
       <div class="tile-head">
         <h3>Observability</h3>
-        <span class="tile-url">obs.atla.in</span>
+        <a class="tile-url" href="https://obs.atla.in/" target="_blank" rel="noopener noreferrer">obs.atla.in</a>
         <span class="live">live</span>
       </div>
       <div class="tile-body">
