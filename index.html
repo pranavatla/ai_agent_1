@@ -17,14 +17,14 @@
 
 <!--
   ============================================================
-  MEDIA SLOTS  -  one per tile
+  MEDIA  -  one per tile
   ------------------------------------------------------------
-  Tile 1 (gita)  : real video, embedded below as a data: URI.
-  Tile 2 (games) : animated CSS mock. Marked SLOT 2.
-  Tile 3 (obs)   : animated CSS mock. Marked SLOT 3.
+  Tile 1 (gita)  : video, embedded below as a data: URI.
+  Tile 2 (games) : /media/games.jpg
+  Tile 3 (obs)   : /media/obs.jpg
 
-  To drop a video into slot 2 or 3, replace the whole
-  <div class="mock ..."> ... </div> block with:
+  The two stills are real screenshots of the live sites, framed
+  16:9. To move either to video, swap the <img class="shot"> for:
 
       <video class="shot" autoplay muted loop playsinline
              preload="metadata" poster="/media/games.jpg">
@@ -35,11 +35,6 @@
       ffmpeg -i in.mov -an -vf scale=1000:-2 -c:v libx264 \
              -crf 30 -preset slow -movflags +faststart out.mp4
   Aim for under 400 KB and 4-6 seconds, looping cleanly.
-
-  The gita video is inlined so this file stays genuinely
-  self-contained. If you'd rather host the media in the same
-  S3 bucket, swap the giant data: URI for src="/media/gita.mp4"
-  and the file drops by about half a megabyte.
   ============================================================
 -->
 
@@ -215,76 +210,6 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
   .tile:nth-of-type(even) .tile-visual{grid-column:1}
 }
 
-/* ---------- animated mocks ---------- */
-.mock{aspect-ratio:16/9;width:100%;height:100%;position:relative;overflow:hidden}
-
-/* --- games: falling tetrominoes --- */
-.mock-games{background:#0D212C}
-.mock-games .grid{
-  position:absolute;inset:0;
-  background-image:linear-gradient(rgba(246,252,255,.06) 1px,transparent 1px),
-                   linear-gradient(90deg,rgba(246,252,255,.06) 1px,transparent 1px);
-  background-size:5% 8.34%;
-}
-.mock-games .well{position:absolute;left:24%;right:24%;top:0;bottom:0;background:rgba(246,252,255,.03);border-left:1px solid rgba(246,252,255,.10);border-right:1px solid rgba(246,252,255,.10)}
-.mock-games b{position:absolute;display:block;border-radius:2px;opacity:0}
-.mock-games .p1{width:15%;height:7%;left:27%;bottom:6%;background:#5BC0C9;animation:drop 7s cubic-bezier(.5,0,.75,0) infinite}
-.mock-games .p2{width:7.5%;height:14%;left:43%;bottom:6%;background:#F6FCFF;animation:drop 7s cubic-bezier(.5,0,.75,0) 1.1s infinite}
-.mock-games .p3{width:15%;height:7%;left:52%;bottom:6%;background:#E8B44A;animation:drop 7s cubic-bezier(.5,0,.75,0) 2.2s infinite}
-.mock-games .p4{width:7.5%;height:7%;left:68%;bottom:6%;background:#C96B6B;animation:drop 7s cubic-bezier(.5,0,.75,0) 3.3s infinite}
-@keyframes drop{
-  0%{transform:translateY(-420%);opacity:0}
-  4%{opacity:1}
-  26%{transform:translateY(0);opacity:1}
-  82%{transform:translateY(0);opacity:1}
-  90%{opacity:0;transform:translateY(0)}
-  100%{opacity:0;transform:translateY(-420%)}
-}
-.mock-games .floor{position:absolute;left:24%;right:24%;bottom:0;height:6%;background:rgba(246,252,255,.07)}
-.mock-games .clearline{
-  position:absolute;left:24%;right:24%;bottom:6%;height:7%;background:#F6FCFF;opacity:0;
-  animation:clearflash 7s linear 4.2s infinite;
-}
-@keyframes clearflash{0%,88%{opacity:0}90%{opacity:.85}94%{opacity:0}100%{opacity:0}}
-.mock-games .hud{position:absolute;left:5%;top:8%;font-family:var(--mono);font-weight:500;color:#F6FCFF}
-.mock-games .hud em{display:block;font-family:var(--mono);font-size:9px;font-style:normal;color:rgba(246,252,255,.45);margin-bottom:4px}
-.mock-games .roll{height:1.25em;overflow:hidden;font-size:19px;line-height:1.25em;letter-spacing:.02em}
-.mock-games .roll span{display:block;animation:roll 7s steps(1,end) infinite}
-@keyframes roll{0%{transform:translateY(0)}25%{transform:translateY(-1.25em)}50%{transform:translateY(-2.5em)}75%{transform:translateY(-3.75em)}100%{transform:translateY(0)}}
-.mock-games .next{position:absolute;right:5%;top:8%;font-family:var(--mono);font-size:9px;color:rgba(246,252,255,.45);text-align:right}
-.mock-games .next u{display:block;width:26px;height:13px;background:#5BC0C9;margin-top:6px;margin-left:auto;border-radius:2px}
-
-/* --- obs: normal / incident / recovery cycle --- */
-.mock-obs{background:#051A24;padding:5% 5% 0}
-.mock-obs .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:3.5%}
-.mock-obs .state{position:relative;font-family:var(--mono);font-size:10px;height:14px;min-width:150px}
-.mock-obs .state span{position:absolute;left:0;top:0;opacity:0}
-.mock-obs .s1{color:#5BC0C9;animation:st1 12s linear infinite}
-.mock-obs .s2{color:#E8B44A;animation:st2 12s linear infinite}
-.mock-obs .s3{color:#F6FCFF;animation:st3 12s linear infinite}
-@keyframes st1{0%,36%{opacity:1}40%,100%{opacity:0}}
-@keyframes st2{0%,36%{opacity:0}42%,68%{opacity:1}72%,100%{opacity:0}}
-@keyframes st3{0%,68%{opacity:0}74%,94%{opacity:1}98%,100%{opacity:0}}
-.mock-obs .clock{font-family:var(--mono);font-size:10px;color:rgba(246,252,255,.4)}
-.mock-obs .row{display:flex;gap:2%;margin-bottom:4%}
-.mock-obs .kpi{flex:1;border:1px solid rgba(246,252,255,.13);border-radius:10px;padding:2.4% 3%;position:relative;overflow:hidden}
-.mock-obs .kpi em{display:block;font-family:var(--mono);font-size:8.5px;color:rgba(246,252,255,.45);font-style:normal}
-.mock-obs .kpi .v{position:relative;height:1.35em;margin-top:5px;font-family:var(--mono);font-size:16px;font-weight:500}
-.mock-obs .kpi .v span{position:absolute;left:0;top:0;color:#F6FCFF}
-.mock-obs .kpi .a{animation:st1 12s linear infinite}
-.mock-obs .kpi .b{color:#E8B44A;animation:kpib 12s linear infinite}
-@keyframes kpib{0%,36%{opacity:0}42%,72%{opacity:1}78%,100%{opacity:0}}
-.mock-obs .kpi .c{animation:st3 12s linear infinite}
-.mock-obs .chart{position:relative;height:38%}
-.mock-obs svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.mock-obs .line-n{animation:st1 12s linear infinite}
-.mock-obs .line-i{animation:kpib 12s linear infinite}
-.mock-obs .line-r{animation:st3 12s linear infinite}
-.mock-obs .sweep{
-  position:absolute;top:0;bottom:0;width:2px;background:rgba(91,192,201,.55);
-  animation:sweep 12s linear infinite;
-}
-@keyframes sweep{from{left:0}to{left:100%}}
 
 /* ---------- contact ---------- */
 .contact{padding:96px 24px 72px}
@@ -335,8 +260,6 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
 @media(prefers-reduced-motion:reduce){
   *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
   [data-reveal]{opacity:1}
-  .mock-obs .s1,.mock-obs .kpi .a,.mock-obs .line-n{opacity:1 !important}
-  .mock-games b{opacity:1 !important}
 }
 </style>
 </head>
@@ -452,16 +375,8 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
       <a class="tile-link" href="https://games.atla.in" target="_blank" rel="noopener">Play something</a>
     </div>
     <div class="tile-visual">
-      <!-- SLOT 2 - swap this whole div for a <video class="shot"> when you have the clip -->
-      <div class="mock mock-games" role="img" aria-label="Browser arcade, pieces dropping">
-        <span class="grid"></span>
-        <span class="well"></span>
-        <span class="hud"><em>score</em><span class="roll"><span>04820<br>05140<br>05620<br>06080<br>04820</span></span></span>
-        <span class="next">next<u></u></span>
-        <b class="p1"></b><b class="p2"></b><b class="p3"></b><b class="p4"></b>
-        <span class="clearline"></span>
-        <span class="floor"></span>
-      </div>
+      <img class="shot" src="/media/games.jpg" width="1280" height="720" loading="lazy" decoding="async"
+           alt="The games.atla.in arcade: Drop, Invaders and Break, each in a neon-bordered card.">
     </div>
   </article>
 
@@ -484,33 +399,8 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
       <a class="tile-link" href="https://obs.atla.in" target="_blank" rel="noopener">Trigger an incident</a>
     </div>
     <div class="tile-visual">
-      <!-- SLOT 3 - swap this whole div for a <video class="shot"> when you have the clip -->
-      <div class="mock mock-obs" role="img" aria-label="Cloud operations console running an incident cycle">
-        <div class="bar">
-          <div class="state">
-            <span class="s1">incident: normal</span>
-            <span class="s2">incident: db error burst</span>
-            <span class="s3">incident: recovering</span>
-          </div>
-          <div class="clock">sample data</div>
-        </div>
-        <div class="row">
-          <div class="kpi"><em>SLO compliance</em><div class="v"><span class="a">99.4%</span><span class="b">96.1%</span><span class="c">98.8%</span></div></div>
-          <div class="kpi"><em>p95 latency</em><div class="v"><span class="a">218ms</span><span class="b">940ms</span><span class="c">306ms</span></div></div>
-          <div class="kpi"><em>error rate</em><div class="v"><span class="a">0.4%</span><span class="b">7.9%</span><span class="c">1.2%</span></div></div>
-          <div class="kpi"><em>pods</em><div class="v"><span class="a">14</span><span class="b">31</span><span class="c">22</span></div></div>
-        </div>
-        <div class="chart">
-          <svg viewBox="0 0 600 150" preserveAspectRatio="none" aria-hidden="true">
-            <polyline points="0,128 600,128" fill="none" stroke="rgba(246,252,255,.12)" stroke-width="1"/>
-            <polyline points="0,74 600,74" fill="none" stroke="rgba(246,252,255,.12)" stroke-width="1" stroke-dasharray="4 7"/>
-            <polyline class="line-n" points="0,116 75,110 150,118 225,104 300,112 375,101 450,109 525,103 600,110" fill="none" stroke="#5BC0C9" stroke-width="3"/>
-            <polyline class="line-i" points="0,116 75,108 150,96 225,52 300,18 375,26 450,14 525,30 600,22" fill="none" stroke="#E8B44A" stroke-width="3"/>
-            <polyline class="line-r" points="0,30 75,44 150,66 225,82 300,96 375,104 450,110 525,108 600,112" fill="none" stroke="#F6FCFF" stroke-width="3"/>
-          </svg>
-          <span class="sweep"></span>
-        </div>
-      </div>
+      <img class="shot" src="/media/obs.jpg" width="1280" height="720" loading="lazy" decoding="async"
+           alt="The obs.atla.in console showing SLO compliance, p95 latency, error rate and pod count.">
     </div>
   </article>
 </main>
