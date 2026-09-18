@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>atla.in — Sai Pranav Atla</title>
+<title>atla.in - Sai Pranav Atla</title>
 <meta name="description" content="Cloud and AI infrastructure, learned in public. Three services designed, built and run on my own AWS account: a grounded Gita RAG, a browser arcade, and a cloud-ops console.">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B1A22" media="(prefers-color-scheme: dark)">
 
 <!--
   ============================================================
-  MEDIA SLOTS  —  one per tile
+  MEDIA SLOTS  -  one per tile
   ------------------------------------------------------------
   Tile 1 (gita)  : real video, embedded below as a data: URI.
   Tile 2 (games) : animated CSS mock. Marked SLOT 2.
@@ -47,6 +48,8 @@
   --on-dark:#F6FCFF;
   --on-dark-2:#E0EBF0;
   --paper:#ffffff;
+  --surface:#ffffff;
+  --inverse:#051A24;
   --signal:#0E6E78;
   --warn:#C77B2B;
   --hairline:rgba(5,26,36,.12);
@@ -66,6 +69,33 @@
   --shadow-lift: 0 18px 50px -20px rgba(5,26,36,.35);
 }
 
+/* ---------- dark mode ----------
+   Only tokens are redefined. --inverse stays dark (it is a background, not
+   text) and --on-dark stays light, so the dark card and the social hover
+   fill keep working in both modes. */
+@media(prefers-color-scheme:dark){
+  :root{
+    --ink:#E3EEF3;
+    --ink-2:#F6FCFF;
+    --muted:#A3B9C3;
+    --paper:#0B1A22;
+    --surface:#13252F;
+    --inverse:#061219;
+    --signal:#54B9C3;
+    --warn:#E0A04E;
+    --hairline:rgba(246,252,255,.15);
+
+    --shadow-primary:
+      0 1px 2px 0 rgba(0,0,0,.44),
+      0 4px 4px 0 rgba(0,0,0,.34),
+      0 9px 6px 0 rgba(0,0,0,.22),
+      inset 0 1px 0 0 rgba(246,252,255,.07);
+    --shadow-soft: 0 0 0 .5px rgba(246,252,255,.10), 0 4px 30px rgba(0,0,0,.50);
+    --shadow-card: 0 4px 16px rgba(0,0,0,.50);
+    --shadow-lift: 0 18px 50px -20px rgba(0,0,0,.75);
+  }
+}
+
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{
@@ -77,7 +107,8 @@ img,video{max-width:100%;display:block}
 a{color:inherit;text-decoration:none}
 :focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:4px}
 .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
-.pixel{font-family:var(--display);font-weight:500;font-style:italic;letter-spacing:-.015em}
+/* same-family emphasis: weight + colour, not a serif word dropped into a sans headline */
+.pixel{font-weight:600;color:var(--signal);letter-spacing:-.015em}
 
 /* ---------- reveal ---------- */
 @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
@@ -109,7 +140,7 @@ a{color:inherit;text-decoration:none}
   border:1px solid var(--hairline);color:var(--ink);
   transition:background-color .25s,color .25s,border-color .25s,transform .25s;
 }
-.socials a:hover{background:var(--ink);color:#fff;border-color:var(--ink);transform:translateY(-2px)}
+.socials a:hover{background:var(--inverse);color:var(--on-dark);border-color:var(--inverse);transform:translateY(-2px)}
 .socials svg{width:18px;height:18px;fill:currentColor;display:block}
 
 /* ---------- hero ---------- */
@@ -154,8 +185,8 @@ a{color:inherit;text-decoration:none}
 .cards{display:grid;grid-template-columns:1fr;gap:24px;max-width:1000px;margin:0 auto;padding:72px 24px 0}
 @media(min-width:900px){.cards{grid-template-columns:1fr 1fr;gap:32px}}
 .card{border-radius:40px;padding:36px 32px 40px;display:flex;flex-direction:column}
-.card-dark{background:var(--ink);color:var(--on-dark);box-shadow:var(--shadow-lift)}
-.card-light{background:#fff;color:var(--ink-2);box-shadow:var(--shadow-card)}
+.card-dark{background:var(--inverse);color:var(--on-dark);box-shadow:var(--shadow-lift)}
+.card-light{background:var(--surface);color:var(--ink-2);box-shadow:var(--shadow-card)}
 .card h3{font-size:21px;font-weight:500;margin:0 0 14px;letter-spacing:-.01em}
 .card p{margin:0;font-size:15px;line-height:1.65}
 .card-dark p{color:var(--on-dark-2)}
@@ -267,7 +298,7 @@ a{color:inherit;text-decoration:none}
 /* ---------- contact ---------- */
 .contact{padding:96px 24px 72px}
 .contact-box{
-  position:relative;overflow:hidden;max-width:1200px;margin:0 auto;background:#fff;
+  position:relative;overflow:hidden;max-width:1200px;margin:0 auto;background:var(--surface);
   border-radius:40px;box-shadow:var(--shadow-soft);padding:120px 24px;text-align:center;
 }
 @media(min-width:768px){.contact-box{padding:180px 24px}}
@@ -281,7 +312,7 @@ a{color:inherit;text-decoration:none}
 .contact a.mail:hover{border-color:var(--ink)}
 .trail{
   position:absolute;pointer-events:none;z-index:1;font-family:var(--mono);font-size:11px;color:var(--ink);
-  background:#fff;border:1px solid var(--hairline);border-radius:999px;padding:5px 11px;white-space:nowrap;
+  background:var(--surface);border:1px solid var(--hairline);border-radius:999px;padding:5px 11px;white-space:nowrap;
   transition:opacity 1s ease-out, transform 1s ease-out;
 }
 
@@ -303,7 +334,7 @@ a{color:inherit;text-decoration:none}
 /* ---------- dock ---------- */
 .dock{
   position:fixed;z-index:50;bottom:24px;left:50%;transform:translateX(-50%);
-  display:flex;align-items:center;gap:20px;background:#fff;border-radius:999px;
+  display:flex;align-items:center;gap:20px;background:var(--surface);border-radius:999px;
   padding:10px 26px;box-shadow:var(--shadow-primary);
 }
 .dock .mark{font-family:var(--mono);font-size:12px;font-weight:500;line-height:1;color:var(--muted)}
@@ -346,10 +377,7 @@ a{color:inherit;text-decoration:none}
   </h1>
 
   <div class="hero-copy" data-reveal style="--d:.4s">
-    <p>I'm a cloud and infrastructure architect — ten years in enterprise IT, the last six on AWS. AI is moving faster than the documentation can follow, so I stopped reading about it and started deploying it.</p>
-    <p>This site is the record. Three services I designed, built and pay for myself, running on my own account in ap-south-1 behind Route 53 and CloudFront, shipped through GitHub Actions with OIDC instead of long-lived keys. Each one started as a question I couldn't answer from a blog post: does retrieval actually stay grounded, what breaks first when traffic spikes, how much can a model really do inside a browser tab.</p>
-    <p>Before this I led a 16-person cloud and service operations team for the SAP Industries &amp; Customer Experience portfolio at Accenture, where the SLA and KPI reporting platform I built was picked for the company's Top 25 Global AI Programme. AWS certified on AI Practitioner and Cloud Practitioner, and a HashiCorp Terraform Associate.</p>
-    <p>I'm between roles right now and looking for the next one — AI infrastructure, cloud architecture, platform engineering.</p>
+    <p>Cloud and infrastructure architect. Ten years in enterprise IT, six on AWS. Three services I built and run myself.</p>
   </div>
 
   <div class="hero-actions" data-reveal style="--d:.5s">
@@ -364,7 +392,7 @@ a{color:inherit;text-decoration:none}
 <section class="cards">
   <article class="card card-dark" data-reveal style="--d:.1s">
     <h3>Ten years of other people's production</h3>
-    <p>Incident and service management at IBM, delivery at TCS and NTT Data, then six years architecting on AWS. Most recently the single point of contact between SAP and the account — scope changes, new product inclusions, effort models and every annual contract cycle came through me.</p>
+    <p>Incident and service management at IBM, delivery at TCS and NTT Data, then six years architecting on AWS. Most recently I led a 16-person cloud and service operations team for the SAP Industries &amp; Customer Experience portfolio at Accenture, the single point of contact between SAP and the account. AWS certified on AI Practitioner and Cloud Practitioner, and a HashiCorp Terraform Associate.</p>
     <div class="card-figure">
       <b>Top 25</b>
       <small>Accenture Global AI Programme, for the SLA reporting platform</small>
@@ -373,7 +401,7 @@ a{color:inherit;text-decoration:none}
 
   <article class="card card-light" data-reveal style="--d:.2s">
     <h3>What I'm doing with the time</h3>
-    <p>Building the three services below end to end — architecture, infrastructure as code, pipeline, cost. No sandbox credits and no toy deployments. It's my own card on the account, so every bad design decision turns up on the bill at the end of the month.</p>
+    <p>Building the three services below end to end: architecture, infrastructure as code, pipeline, cost. They run on my own account in ap-south-1 behind Route 53 and CloudFront, shipped through GitHub Actions with OIDC instead of long-lived keys. No sandbox credits and no toy deployments, so every bad design decision turns up on the bill at the end of the month.</p>
     <div class="card-figure">
       <b>3</b>
       <small>services live in ap-south-1, built and run solo</small>
@@ -385,7 +413,7 @@ a{color:inherit;text-decoration:none}
 <main class="projects wrap" id="work">
   <div class="projects-intro" data-reveal style="--d:.1s">
     <h2>Three things I built and still maintain</h2>
-    <p>Each one answers a question I had about how this stuff actually behaves once it leaves the tutorial. All three are live — click through and try to break them.</p>
+    <p>Each one answers a question I had about how this stuff actually behaves once it leaves the tutorial. All three are live, so click through and try to break them.</p>
   </div>
 
   <!-- ===== gita ===== -->
@@ -397,8 +425,8 @@ a{color:inherit;text-decoration:none}
         <span class="live">live</span>
       </div>
       <div class="tile-body">
-        <p>You bring a real situation — a decision you're stuck on, anger you can't put down, attention that won't hold — and it returns one verse from the Gita's 700, with the original Sanskrit, the transliteration and a plain English reading beside it.</p>
-        <p>The hard part isn't generating an answer, it's proving the answer came from somewhere. A model rewrites your situation into search phrases, embeddings pull candidates out of a local vector cache, rank fusion merges the runs and a cross-encoder reranks what survives. The model that writes the final response only ever sees the one verse that passed validation — so it cannot quietly invent scripture. Every stage reports its own latency on screen, because a grounded answer nobody waits for is no answer at all.</p>
+        <p>You bring a real situation: a decision you're stuck on, anger you can't put down, attention that won't hold. It returns one verse from the Gita's 700, with the original Sanskrit, the transliteration and a plain English reading beside it.</p>
+        <p>The hard part isn't generating an answer, it's proving the answer came from somewhere. A model rewrites your situation into search phrases, embeddings pull candidates out of a local vector cache, rank fusion merges the runs and a cross-encoder reranks what survives. The model that writes the final response only ever sees the one verse that passed validation, so it cannot quietly invent scripture. Every stage reports its own latency on screen, because a grounded answer nobody waits for is no answer at all.</p>
       </div>
       <ul class="chips">
         <li>Retrieval-augmented generation</li><li>Vector search</li>
@@ -424,7 +452,7 @@ a{color:inherit;text-decoration:none}
       </div>
       <div class="tile-body">
         <p>An arcade of small browser games written with Claude as co-pilot, for the 3am ideas that don't deserve a whole project but won't go away either.</p>
-        <p>Drop is a full Tetris — ghost piece, hold queue, combos, back-to-back clears. Invaders is fifty-five aliens and endless waves. Break is ten levels of bricks, four power-ups and a combo multiplier. No installs, no accounts, playable one-handed. The repo is open, and the next game is whatever somebody files as an issue.</p>
+        <p>Drop is a full Tetris: ghost piece, hold queue, combos, back-to-back clears. Invaders is fifty-five aliens and endless waves. Break is ten levels of bricks, four power-ups and a combo multiplier. No installs, no accounts, playable one-handed. The repo is open, and the next game is whatever somebody files as an issue.</p>
       </div>
       <ul class="chips">
         <li>Real-time browser runtime</li><li>Game state &amp; physics</li>
@@ -433,7 +461,7 @@ a{color:inherit;text-decoration:none}
       <a class="tile-link" href="https://games.atla.in" target="_blank" rel="noopener">Play something</a>
     </div>
     <div class="tile-visual">
-      <!-- SLOT 2 — swap this whole div for a <video class="shot"> when you have the clip -->
+      <!-- SLOT 2 - swap this whole div for a <video class="shot"> when you have the clip -->
       <div class="mock mock-games" role="img" aria-label="Browser arcade, pieces dropping">
         <span class="grid"></span>
         <span class="well"></span>
@@ -465,7 +493,7 @@ a{color:inherit;text-decoration:none}
       <a class="tile-link" href="https://obs.atla.in" target="_blank" rel="noopener">Trigger an incident</a>
     </div>
     <div class="tile-visual">
-      <!-- SLOT 3 — swap this whole div for a <video class="shot"> when you have the clip -->
+      <!-- SLOT 3 - swap this whole div for a <video class="shot"> when you have the clip -->
       <div class="mock mock-obs" role="img" aria-label="Cloud operations console running an incident cycle">
         <div class="bar">
           <div class="state">
@@ -473,7 +501,7 @@ a{color:inherit;text-decoration:none}
             <span class="s2">incident: db error burst</span>
             <span class="s3">incident: recovering</span>
           </div>
-          <div class="clock">ap-south-1</div>
+          <div class="clock">sample data</div>
         </div>
         <div class="row">
           <div class="kpi"><em>SLO compliance</em><div class="v"><span class="a">99.4%</span><span class="b">96.1%</span><span class="c">98.8%</span></div></div>
@@ -500,7 +528,7 @@ a{color:inherit;text-decoration:none}
 <section class="contact" id="contact">
   <div class="contact-box" id="trailbox">
     <h2>Open to work.</h2>
-    <p>AI infrastructure, cloud architecture, platform engineering. Bengaluru or remote. If any of the three above is the kind of thing your team is building, I'd like to hear about it.</p>
+    <p>I'm between roles and looking for the next one: AI infrastructure, cloud architecture, platform engineering. Bengaluru or remote. If any of the three above is the kind of thing your team is building, I'd like to hear about it.</p>
     <a class="mail" href="mailto:pranavatla@gmail.com">pranavatla@gmail.com</a>
   </div>
 </section>
@@ -573,8 +601,8 @@ a{color:inherit;text-decoration:none}
 
   var box = document.getElementById('trailbox');
   if(box && !reduce && window.matchMedia('(hover:hover)').matches){
-    var chips = ['200 OK','p95 218ms','ap-south-1','deploy ok','no alarms',
-                 'cache hit','verse 2.47','SCORE 04820','SLO 99.4%'];
+    var chips = ['200 OK','ap-south-1','deploy ok','no alarms',
+                 'cache hit','verse 2.47','grounded','in budget'];
     var last = 0, n = 0;
     box.addEventListener('mousemove', function(ev){
       var now = Date.now();
