@@ -188,6 +188,9 @@ a{color:inherit;text-decoration:none}
 .tile-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:18px}
 .tile-head h3{font-family:var(--display);font-weight:500;font-size:32px;line-height:1.15;letter-spacing:-.02em;margin:0;color:var(--ink);text-wrap:balance}
 .tile-url{font-family:var(--mono);font-size:12px;color:var(--muted)}
+a.tile-url{text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--hairline)}
+a.tile-url:hover{color:var(--signal);text-decoration-color:currentColor}
+a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;border-radius:2px}
 .live{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--signal)}
 .live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal);animation:pulse 2.4s ease-out infinite}
 .tile-body{max-width:660px}
@@ -365,7 +368,7 @@ a{color:inherit;text-decoration:none}
   </div>
 
   <h1 class="hero-h1" data-reveal style="--d:.3s">
-    Learning in public,<br><span class="pixel">in production.</span>
+    Grounded in operations.<br><span class="pixel">Driven by curiosity.</span>
   </h1>
 
   <div class="hero-copy" data-reveal style="--d:.4s">
@@ -384,20 +387,20 @@ a{color:inherit;text-decoration:none}
 <!-- ============ TWO CARDS ============ -->
 <section class="cards">
   <article class="card card-dark" data-reveal style="--d:.1s">
-    <h3>From operations to building</h3>
-    <p>My experience in SAP CX and I&amp;CX cloud operations shapes the questions I bring to these projects: What is the system doing? What happens when it fails? How do I know the result is useful?</p>
+    <h3>The experience I build on</h3>
+    <p>At Accenture, my work across SAP CX and I&amp;CX connected cloud operations with service delivery, stakeholders, and capacity planning. I bring that perspective to AI: understand the system, question the output, and look beyond the demo.</p>
     <div class="card-figure">
-      <b>Build. Test. Learn.</b>
-      <small>Bringing an operations perspective to hands-on AI learning</small>
+      <b>Beyond the demo.</b>
+      <small>Service delivery experience. An operational eye for detail.</small>
     </div>
   </article>
 
   <article class="card card-light" data-reveal style="--d:.2s">
-    <h3>Three projects, three ways to learn</h3>
-    <p>Games is my space for vibe coding. Gita is my deep dive into retrieval and grounded answers. Observability brings metrics, service health, and incident response into one interactive demo.</p>
+    <h3>Curiosity, put to work</h3>
+    <p>Some ideas become a one-night vibe-coding experiment. Others become a deeper study of RAG or a way to explore infrastructure behaviour. These projects are different parts of the same habit: build something, examine how it works, and keep improving my understanding.</p>
     <div class="card-figure">
-      <b>3</b>
-      <small>public projects, each focused on a different engineering question</small>
+      <b>Always experimenting.</b>
+      <small>Quick builds, deeper dives, and lessons worth sharing.</small>
     </div>
   </article>
 </section>
@@ -414,7 +417,7 @@ a{color:inherit;text-decoration:none}
     <div class="tile-inner">
       <div class="tile-head">
         <h3>Gita: a deeper dive into RAG</h3>
-        <span class="tile-url">gita.atla.in</span>
+        <a class="tile-url" href="https://gita.atla.in/" target="_blank" rel="noopener noreferrer">gita.atla.in</a>
         <span class="live">live</span>
       </div>
       <div class="tile-body">
@@ -440,7 +443,7 @@ a{color:inherit;text-decoration:none}
     <div class="tile-inner">
       <div class="tile-head">
         <h3>Games: one night of vibe coding</h3>
-        <span class="tile-url">games.atla.in</span>
+        <a class="tile-url" href="https://games.atla.in/" target="_blank" rel="noopener noreferrer">games.atla.in</a>
         <span class="live">live</span>
       </div>
       <div class="tile-body">
@@ -472,7 +475,7 @@ a{color:inherit;text-decoration:none}
     <div class="tile-inner">
       <div class="tile-head">
         <h3>OBS: an operations perspective</h3>
-        <span class="tile-url">obs.atla.in</span>
+        <a class="tile-url" href="https://obs.atla.in/" target="_blank" rel="noopener noreferrer">obs.atla.in</a>
         <span class="live">demo</span>
       </div>
       <div class="tile-body">
