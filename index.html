@@ -413,14 +413,13 @@ a{color:inherit;text-decoration:none}
   <article class="tile" data-reveal style="--d:.1s">
     <div class="tile-inner">
       <div class="tile-head">
-        <h3>Gita: learning RAG end to end</h3>
+        <h3>Gita: a deeper dive into RAG</h3>
         <span class="tile-url">gita.atla.in</span>
         <span class="live">live</span>
       </div>
       <div class="tile-body">
-        <p>Describe a situation in your own words. The app searches 700 Bhagavad Gita verses, selects a relevant passage, and offers a reflection alongside the Sanskrit, transliteration, and English translation.</p>
-        <p>This is where I explore what makes RAG work beyond a basic vector search: Titan embeddings through Amazon Bedrock, multiple search queries, rank fusion, and a local cross-encoder reranker. The answer model receives the selected passage, and the code checks that its verse reference came from retrieval.</p>
-        <p>The learning is in the checks: evaluating retrieval against held-out questions, inspecting the selected verse, and measuring time spent at each stage. A fluent answer is not enough; relevance and source fidelity still need scrutiny.</p>
+        <p>My ongoing exploration of how AI finds relevant information and uses it to answer. Share a situation, and the app searches 700 Bhagavad Gita verses to offer a reflection, with the original passage and translation alongside it.</p>
+        <p>I'm working through the full RAG pipeline: embeddings with Amazon Bedrock, query expansion, reranking, and source validation. Testing retrieval against held-out questions and measuring each stage helps me examine the trade-offs between relevance, response time, and staying faithful to the text.</p>
       </div>
       <ul class="chips">
         <li>Amazon Bedrock</li><li>Vector retrieval</li>
@@ -440,14 +439,13 @@ a{color:inherit;text-decoration:none}
   <article class="tile" data-reveal style="--d:.1s">
     <div class="tile-inner">
       <div class="tile-head">
-        <h3>Games: vibe coding you can play</h3>
+        <h3>Games: one night of vibe coding</h3>
         <span class="tile-url">games.atla.in</span>
         <span class="live">live</span>
       </div>
       <div class="tile-body">
-        <p>Drop, Invaders, and Break turn AI-assisted coding into something you can play: falling blocks, alien waves, and a brick-breaking arcade. They run directly in the browser, with no account or installation.</p>
-        <p>I use this project to explore vibe coding with Claude: turning an idea into a working game, then refining the rules, controls, and feedback. Underneath the visuals are JavaScript game loops, canvas rendering, collision detection, scoring, and locally saved high scores.</p>
-        <p>The practical test is how it plays, not whether the code looks convincing. Responsive controls, predictable game state, and clear win-and-lose behaviour make this a useful place to examine and improve AI-generated code.</p>
+        <p>A one-night experiment in vibe coding with Claude became a small browser arcade: Drop, Invaders, and Break. No grand roadmap, just a chance to see how far an idea could go with AI-assisted coding.</p>
+        <p>The result brings together JavaScript game loops, collision detection, scoring, and keyboard and touch controls. It's a playful part of my wider experimentation: turn an idea into something usable, try it, and see what needs another pass. No account or installation needed.</p>
       </div>
       <ul class="chips">
         <li>Vibe coding</li><li>JavaScript &amp; Canvas</li>
@@ -473,14 +471,13 @@ a{color:inherit;text-decoration:none}
   <article class="tile" data-reveal style="--d:.1s">
     <div class="tile-inner">
       <div class="tile-head">
-        <h3>OBS: making system behaviour visible</h3>
+        <h3>OBS: an operations perspective</h3>
         <span class="tile-url">obs.atla.in</span>
         <span class="live">demo</span>
       </div>
       <div class="tile-body">
-        <p>An interactive cloud-operations dashboard for exploring how infrastructure signals fit together: CPU and memory, request volume, p95 latency, error rates, service health, and an incident timeline.</p>
-        <p>Traffic spikes, database errors, and recovery scenarios connect changing metrics with generated logs and service status. I built it to showcase the operational reasoning behind a dashboard: spotting degradation, connecting symptoms, and choosing what to investigate next.</p>
-        <p>This is a simulation, not telemetry from a production estate. Incident summaries and mitigation steps are scenario-based; the separate Ops Guru assistant explores retrieval from runbooks and project docs. Sample data keeps the dashboard explorable when the backend is unavailable.</p>
+        <p>A visual expression of my cloud and service operations background. This dashboard brings infrastructure metrics, service health, logs, and incident timelines together to show how a system behaves under pressure.</p>
+        <p>Simulated traffic spikes, database errors, and recovery connect the numbers to operational questions: what's degraded, what changed, and where should I look next? The telemetry and incident summaries are illustrative, not live production monitoring. A separate runbook-retrieval experiment explores how AI can support that investigation; sample data keeps the dashboard available without the backend.</p>
       </div>
       <ul class="chips">
         <li>Infrastructure metrics</li><li>Service health</li><li>Incident simulation</li>
