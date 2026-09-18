@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sai Pranav Atla | Cloud and AI Infrastructure</title>
-<meta name="description" content="Sai Pranav Atla builds practical AI infrastructure, cloud platforms, and production-minded tools in public.">
+<title>Sai Pranav Atla | Learning AI by Building</title>
+<meta name="description" content="Explore Sai Pranav Atla's hands-on work: AI-assisted browser games, Bhagavad Gita RAG, and a cloud observability demo. What I build, test, and learn.">
 <meta name="theme-color" content="#ffffff">
 <link rel="canonical" href="https://atla.in/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://atla.in/">
-<meta property="og:title" content="Sai Pranav Atla | Cloud and AI Infrastructure">
-<meta property="og:description" content="A working portfolio of AI infrastructure, cloud architecture, and production-minded tools built and operated by Sai Pranav Atla.">
+<meta property="og:title" content="Sai Pranav Atla | Learning AI by Building">
+<meta property="og:description" content="Three hands-on projects exploring vibe coding, retrieval-augmented generation, and infrastructure observability. Built to learn. Published to explore.">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Sai Pranav Atla | Cloud and AI Infrastructure">
-<meta name="twitter:description" content="A working portfolio of AI infrastructure, cloud architecture, and production-minded tools built and operated by Sai Pranav Atla.">
+<meta name="twitter:title" content="Sai Pranav Atla | Learning AI by Building">
+<meta name="twitter:description" content="Three hands-on projects exploring vibe coding, retrieval-augmented generation, and infrastructure observability. Built to learn. Published to explore.">
 
 <!--
   ============================================================
@@ -363,11 +363,12 @@ a{color:inherit;text-decoration:none}
   </h1>
 
   <div class="hero-copy" data-reveal style="--d:.4s">
-    <p>I'm Sai Pranav Atla, a cloud infrastructure architect. I design AI systems that are practical, observable, and ready to run.</p>
+    <p>I'm Sai Pranav Atla. My background is in cloud and service operations; this is where I put my AI learning into practice.</p>
+    <p>I build browser games with AI, explore how RAG connects answers to source material, and use an observability demo to make infrastructure behaviour visible. Each project gives me something concrete to test, question, and improve.</p>
   </div>
 
   <div class="hero-actions" data-reveal style="--d:.5s">
-    <a class="scroll-link" href="#work">See what's running</a>
+    <a class="scroll-link" href="#work">Explore what I'm learning</a>
   </div>
 </header>
 
@@ -377,20 +378,20 @@ a{color:inherit;text-decoration:none}
 <!-- ============ TWO CARDS ============ -->
 <section class="cards">
   <article class="card card-dark" data-reveal style="--d:.1s">
-    <h3>Ten years in production</h3>
-    <p>Incident and service management at IBM, delivery at TCS, then six years architecting on AWS. At Accenture, I led a 16-person cloud and service operations team for the SAP Industries &amp; Customer Experience portfolio.</p>
+    <h3>From operations to building</h3>
+    <p>My experience in SAP CX and I&amp;CX cloud operations shapes the questions I bring to these projects: What is the system doing? What happens when it fails? How do I know the result is useful?</p>
     <div class="card-figure">
-      <b>Top 25</b>
-      <small>Top 25 Accenture Global AI Programme, for an SLA reporting platform I built</small>
+      <b>Build. Test. Learn.</b>
+      <small>Bringing an operations perspective to hands-on AI learning</small>
     </div>
   </article>
 
   <article class="card card-light" data-reveal style="--d:.2s">
-    <h3>What I'm building now</h3>
-    <p>Three services built end to end: architecture, infrastructure, delivery pipeline, and cost. They are small by design, but they run on real cloud infrastructure and stay online long enough to teach me something.</p>
+    <h3>Three projects, three ways to learn</h3>
+    <p>Games is my space for vibe coding. Gita is my deep dive into retrieval and grounded answers. Observability brings metrics, service health, and incident response into one interactive demo.</p>
     <div class="card-figure">
       <b>3</b>
-      <small>services live in ap-south-1, built and run solo</small>
+      <small>public projects, each focused on a different engineering question</small>
     </div>
   </article>
 </section>
@@ -398,27 +399,28 @@ a{color:inherit;text-decoration:none}
 <!-- ============ PROJECTS ============ -->
 <main class="projects wrap" id="work">
   <div class="projects-intro" data-reveal style="--d:.1s">
-    <h2>Three things I built and still maintain</h2>
-    <p>Each one tests a practical question about what happens after the tutorial ends. They are live, open to explore, and built to make the underlying ideas easy to see.</p>
+    <h2>The projects behind the learning</h2>
+    <p>Not just screenshots or a list of tools. Open each project to see the idea in action, from a playable game to a retrieved verse or a simulated incident.</p>
   </div>
 
   <!-- ===== gita ===== -->
   <article class="tile" data-reveal style="--d:.1s">
     <div class="tile-inner">
       <div class="tile-head">
-        <h3>Gita Reflection</h3>
+        <h3>Gita: learning RAG end to end</h3>
         <span class="tile-url">gita.atla.in</span>
         <span class="live">live</span>
       </div>
       <div class="tile-body">
-        <p>Bring a real situation: a difficult decision, a restless mind, or a conversation you cannot resolve. The app finds one supporting verse from the Gita's 700 and shows the Sanskrit, transliteration, translation, and a plain-language reflection.</p>
-        <p>The answer is grounded by design. Retrieval, fusion, and local reranking select the verse before generation, so the final model works from evidence instead of inventing scripture.</p>
+        <p>Describe a situation in your own words. The app searches 700 Bhagavad Gita verses, selects a relevant passage, and offers a reflection alongside the Sanskrit, transliteration, and English translation.</p>
+        <p>This is where I explore what makes RAG work beyond a basic vector search: Titan embeddings through Amazon Bedrock, multiple search queries, rank fusion, and a local cross-encoder reranker. The answer model receives the selected passage, and the code checks that its verse reference came from retrieval.</p>
+        <p>The learning is in the checks: evaluating retrieval against held-out questions, inspecting the selected verse, and measuring time spent at each stage. A fluent answer is not enough; relevance and source fidelity still need scrutiny.</p>
       </div>
       <ul class="chips">
-        <li>Retrieval-augmented generation</li><li>Vector search</li>
-        <li>Reranking</li><li>Grounded output</li><li>Latency budgeting</li>
+        <li>Amazon Bedrock</li><li>Vector retrieval</li>
+        <li>Cross-encoder reranking</li><li>Retrieval evaluation</li><li>Pipeline timings</li>
       </ul>
-      <a class="tile-link" href="https://gita.atla.in" target="_blank" rel="noopener">Ask it something</a>
+      <a class="tile-link" href="https://gita.atla.in" target="_blank" rel="noopener">Try a question, inspect the verse</a>
     </div>
     <div class="tile-visual">
       <video class="shot" autoplay muted loop playsinline preload="metadata"
@@ -432,19 +434,20 @@ a{color:inherit;text-decoration:none}
   <article class="tile" data-reveal style="--d:.1s">
     <div class="tile-inner">
       <div class="tile-head">
-        <h3>Games</h3>
+        <h3>Games: vibe coding you can play</h3>
         <span class="tile-url">games.atla.in</span>
         <span class="live">live</span>
       </div>
       <div class="tile-body">
-        <p>Three small browser games built as experiments in fast, AI-assisted product development.</p>
-        <p>Drop, Invaders, and Break are quick to start, easy to play, and open to new ideas. No accounts, no install, just a few minutes of play in the browser.</p>
+        <p>Drop, Invaders, and Break turn AI-assisted coding into something you can play: falling blocks, alien waves, and a brick-breaking arcade. They run directly in the browser, with no account or installation.</p>
+        <p>I use this project to explore vibe coding with Claude: turning an idea into a working game, then refining the rules, controls, and feedback. Underneath the visuals are JavaScript game loops, canvas rendering, collision detection, scoring, and locally saved high scores.</p>
+        <p>The practical test is how it plays, not whether the code looks convincing. Responsive controls, predictable game state, and clear win-and-lose behaviour make this a useful place to examine and improve AI-generated code.</p>
       </div>
       <ul class="chips">
-        <li>Real-time browser runtime</li><li>Game state &amp; physics</li>
-        <li>AI-paired development</li><li>Automated deploys</li>
+        <li>Vibe coding</li><li>JavaScript &amp; Canvas</li>
+        <li>Game state &amp; collisions</li><li>Keyboard &amp; touch input</li>
       </ul>
-      <a class="tile-link" href="https://games.atla.in" target="_blank" rel="noopener">Play something</a>
+      <a class="tile-link" href="https://games.atla.in" target="_blank" rel="noopener">Play the arcade</a>
     </div>
     <div class="tile-visual">
       <!-- SLOT 2 - swap this whole div for a <video class="shot"> when you have the clip -->
@@ -464,19 +467,20 @@ a{color:inherit;text-decoration:none}
   <article class="tile" data-reveal style="--d:.1s">
     <div class="tile-inner">
       <div class="tile-head">
-        <h3>Observability</h3>
+        <h3>OBS: making system behaviour visible</h3>
         <span class="tile-url">obs.atla.in</span>
-        <span class="live">live</span>
+        <span class="live">demo</span>
       </div>
       <div class="tile-body">
-        <p>A cloud-operations console for watching a simulated system change under pressure: SLOs, latency, error rate, services, logs, and incidents.</p>
-        <p>Trigger a traffic spike or database error burst, follow the blast radius through the service map, then ask the assistant for a root-cause summary and mitigation plan. The data is synthetic by design; the operating questions are real.</p>
+        <p>An interactive cloud-operations dashboard for exploring how infrastructure signals fit together: CPU and memory, request volume, p95 latency, error rates, service health, and an incident timeline.</p>
+        <p>Traffic spikes, database errors, and recovery scenarios connect changing metrics with generated logs and service status. I built it to showcase the operational reasoning behind a dashboard: spotting degradation, connecting symptoms, and choosing what to investigate next.</p>
+        <p>This is a simulation, not telemetry from a production estate. Incident summaries and mitigation steps are scenario-based; the separate Ops Guru assistant explores retrieval from runbooks and project docs. Sample data keeps the dashboard explorable when the backend is unavailable.</p>
       </div>
       <ul class="chips">
-        <li>Telemetry pipelines</li><li>SLO design</li><li>Incident simulation</li>
-        <li>Root-cause analysis</li><li>Knowledge retrieval</li>
+        <li>Infrastructure metrics</li><li>Service health</li><li>Incident simulation</li>
+        <li>FastAPI</li><li>Runbook retrieval</li>
       </ul>
-      <a class="tile-link" href="https://obs.atla.in" target="_blank" rel="noopener">Trigger an incident</a>
+      <a class="tile-link" href="https://obs.atla.in" target="_blank" rel="noopener">Explore the operations demo</a>
     </div>
     <div class="tile-visual">
       <!-- SLOT 3 - swap this whole div for a <video class="shot"> when you have the clip -->
@@ -514,7 +518,7 @@ a{color:inherit;text-decoration:none}
 <section class="contact" id="contact">
   <div class="contact-box" id="trailbox">
     <h2>Open to work.</h2>
-    <p>I'm looking for my next role in AI infrastructure, cloud architecture, or platform engineering. If you're building systems that need to work beyond the demo, let's talk.</p>
+    <p>I'm interested in opportunities that connect cloud operations with AI applications and infrastructure. If these projects relate to something you're building, I'd welcome a conversation.</p>
     <a class="mail" href="mailto:pranavatla@gmail.com">pranavatla@gmail.com</a>
   </div>
 </section>
@@ -522,7 +526,7 @@ a{color:inherit;text-decoration:none}
 <!-- ============ FOOTER ============ -->
 <footer class="footer wrap">
   <div class="footer-inner">
-    <p class="footer-note">Built, deployed, and maintained from Bengaluru, India.</p>
+    <p class="footer-note">Built in Bengaluru. Shared as I learn.</p>
     <div class="footer-cols">
       <ul>
         <li><a href="#work">Work</a></li>
@@ -551,10 +555,10 @@ a{color:inherit;text-decoration:none}
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  var terms = ['Cloud architecture','Retrieval-augmented generation','Observability',
-               'Infrastructure as code','Incident response','Platform engineering',
-               'LLM applications','Vector search','CI/CD automation',
-               'Distributed systems','Cost optimisation','Site reliability'];
+  var terms = ['Vibe coding','Retrieval-augmented generation','Observability',
+               'Browser games','Incident simulation','Cloud operations',
+               'Amazon Bedrock','Vector search','Retrieval evaluation',
+               'Game mechanics','Pipeline timings','Runbook retrieval'];
   var row = document.getElementById('ticker');
   if(row){
     var html = terms.map(function(t){ return '<span>'+t+' <i>/</i></span>'; }).join('');
