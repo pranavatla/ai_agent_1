@@ -20,11 +20,11 @@
   MEDIA  -  one per tile
   ------------------------------------------------------------
   Tile 1 (gita)  : /media/gita.mp4
-  Tile 2 (games) : /media/games.jpg
+  Tile 2 (games) : /media/games.mp4
   Tile 3 (obs)   : /media/obs.jpg
 
-  The two stills are real screenshots of the live sites, framed
-  16:9. To move either to video, swap the <img class="shot"> for:
+  All tile media is framed 16:9. To move the remaining still
+  to video, swap the <img class="shot"> for:
 
       <video class="shot" autoplay muted loop playsinline
              preload="metadata" poster="/media/games.jpg">
@@ -429,8 +429,8 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
       <a class="tile-link" href="https://games.atla.in" target="_blank" rel="noopener">Play the arcade</a>
     </div>
     <div class="tile-visual">
-      <img class="shot" src="/media/games.jpg" width="1280" height="720" loading="lazy" decoding="async"
-           alt="The games.atla.in arcade: Drop, Invaders and Break, each in a neon-bordered card.">
+      <video class="shot" src="/media/games.mp4" autoplay muted loop playsinline
+             preload="metadata" poster="/media/games.jpg" aria-label="The games.atla.in arcade: Drop, Invaders and Break."></video>
     </div>
   </article>
 
