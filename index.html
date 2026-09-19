@@ -69,6 +69,13 @@
   --shadow-soft: 0 0 0 .5px rgba(0,0,0,.05), 0 4px 30px rgba(0,0,0,.08);
   --shadow-card: 0 4px 16px rgba(0,0,0,.08);
   --shadow-lift: 0 18px 50px -20px rgba(5,26,36,.35);
+
+  /* motion: the built-in easings are too weak to read as intentional */
+  --ease-out: cubic-bezier(.23,1,.32,1);
+  --ease-in-out: cubic-bezier(.77,0,.175,1);
+  --dur-press: 140ms;
+  --dur-hover: 180ms;
+  --dur-reveal: 520ms;
 }
 
 
@@ -87,9 +94,9 @@ a{color:inherit;text-decoration:none}
 .pixel{font-weight:600;color:var(--signal);letter-spacing:-.015em}
 
 /* ---------- reveal ---------- */
-@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 [data-reveal]{opacity:0}
-[data-reveal].in{animation:fadeInUp .8s ease-out forwards;animation-delay:var(--d,0s)}
+[data-reveal].in{animation:fadeInUp var(--dur-reveal) var(--ease-out) forwards;animation-delay:var(--d,0s)}
 
 /* ---------- top bar ---------- */
 .topbar{
@@ -97,26 +104,38 @@ a{color:inherit;text-decoration:none}
   max-width:1200px;margin:0 auto;padding:22px 24px 0;
 }
 .topbar .status{
+  position:relative;
   display:inline-flex;align-items:center;gap:8px;
   font-family:var(--mono);font-size:11px;color:var(--muted);
 }
-.topbar .status::before{
-  content:"";width:7px;height:7px;border-radius:50%;background:var(--signal);
-  animation:pulse 2.4s ease-out infinite;
+/* dot is static; the ring is a separate layer animated on transform+opacity,
+   so the pulse never forces a paint the way an animated box-shadow does */
+.status::before,.live::before{
+  content:"";width:7px;height:7px;border-radius:50%;background:var(--signal);flex:none;
+}
+.status::after,.live::after{
+  content:"";position:absolute;left:0;top:50%;
+  width:7px;height:7px;margin-top:-3.5px;border-radius:50%;
+  background:var(--signal);pointer-events:none;
+  animation:pulse 2.4s var(--ease-out) infinite;
 }
 @keyframes pulse{
-  0%{box-shadow:0 0 0 0 rgba(14,110,120,.45)}
-  70%{box-shadow:0 0 0 8px rgba(14,110,120,0)}
-  100%{box-shadow:0 0 0 0 rgba(14,110,120,0)}
+  0%{transform:scale(1);opacity:.4}
+  70%{transform:scale(3.4);opacity:0}
+  100%{transform:scale(3.4);opacity:0}
 }
 .socials{display:flex;justify-content:center;gap:10px;margin:0 0 20px}
 .socials a{
   width:40px;height:40px;border-radius:50%;
   display:inline-flex;align-items:center;justify-content:center;
   border:1px solid var(--hairline);color:var(--ink);
-  transition:background-color .25s,color .25s,border-color .25s,transform .25s;
+  transition:background-color var(--dur-hover) ease,color var(--dur-hover) ease,
+             border-color var(--dur-hover) ease,transform var(--dur-press) var(--ease-out);
 }
-.socials a:hover{background:var(--inverse);color:var(--on-dark);border-color:var(--inverse);transform:translateY(-2px)}
+@media(hover:hover) and (pointer:fine){
+  .socials a:hover{background:var(--inverse);color:var(--on-dark);border-color:var(--inverse);transform:translateY(-2px)}
+}
+.socials a:active{transform:scale(.94)}
 .socials svg{width:18px;height:18px;fill:currentColor;display:block}
 
 /* ---------- hero ---------- */
@@ -130,10 +149,16 @@ a{color:inherit;text-decoration:none}
 .hero-copy p{margin:0;font-size:14px;line-height:1.7;color:var(--ink)}
 .hero-actions{display:flex;justify-content:center;margin-top:26px}
 .scroll-link{
+  display:inline-block;
   font-family:var(--mono);font-size:12px;color:var(--muted);
-  border-bottom:1px solid var(--hairline);padding-bottom:3px;transition:color .25s,border-color .25s;
+  border-bottom:1px solid var(--hairline);padding-bottom:3px;
+  transition:color var(--dur-hover) ease,border-color var(--dur-hover) ease,
+             transform var(--dur-press) var(--ease-out);
 }
-.scroll-link:hover{color:var(--ink);border-color:var(--ink)}
+@media(hover:hover) and (pointer:fine){
+  .scroll-link:hover{color:var(--ink);border-color:var(--ink)}
+}
+.scroll-link:active{transform:scale(.97)}
 @media(min-width:768px){
   .logo{font-size:52px}
   .hero-h1{font-size:42px}
@@ -149,7 +174,7 @@ a{color:inherit;text-decoration:none}
           mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
 }
 @media(min-width:768px){.ticker{margin-top:76px}}
-.ticker-row{display:flex;width:max-content;animation:marquee 36s linear infinite}
+.ticker-row{display:flex;width:max-content;will-change:transform;animation:marquee 36s linear infinite}
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .ticker-row span{
   font-family:var(--display);font-size:20px;font-weight:400;letter-spacing:-.01em;
@@ -185,17 +210,27 @@ a{color:inherit;text-decoration:none}
 .tile-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:18px}
 .tile-head h3{font-family:var(--display);font-weight:500;font-size:32px;line-height:1.15;letter-spacing:-.02em;margin:0;color:var(--ink);text-wrap:balance}
 .tile-url{font-family:var(--mono);font-size:12px;color:var(--muted)}
-a.tile-url{text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--hairline)}
-a.tile-url:hover{color:var(--signal);text-decoration-color:currentColor}
+a.tile-url{
+  text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--hairline);
+  transition:color var(--dur-hover) ease,text-decoration-color var(--dur-hover) ease;
+}
+@media(hover:hover) and (pointer:fine){
+  a.tile-url:hover{color:var(--signal);text-decoration-color:currentColor}
+}
 a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;border-radius:2px}
-.live{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--signal)}
-.live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal);animation:pulse 2.4s ease-out infinite}
+.live{position:relative;display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--signal)}
 .tile-body{max-width:660px}
 .tile-body p{margin:0 0 18px;font-size:15px;line-height:1.7}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px;padding:0;list-style:none}
 .chips li{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--hairline);border-radius:999px;padding:5px 11px}
-.tile-link{display:inline-block;font-size:14px;border-bottom:1px solid var(--ink);padding-bottom:2px;transition:opacity .25s}
-.tile-link:hover{opacity:.6}
+.tile-link{
+  display:inline-block;font-size:14px;border-bottom:1px solid var(--ink);padding-bottom:2px;
+  transition:opacity var(--dur-hover) ease,transform var(--dur-press) var(--ease-out);
+}
+@media(hover:hover) and (pointer:fine){
+  .tile-link:hover{opacity:.6}
+}
+.tile-link:active{transform:scale(.97)}
 .tile-visual{margin-top:36px;border-radius:24px;overflow:hidden;box-shadow:var(--shadow-lift);background:#0a0a0a;aspect-ratio:16/9}
 .tile-visual>*{width:100%;height:100%}
 .shot{width:100%;height:100%;display:block;object-fit:cover}
@@ -225,13 +260,18 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
 .contact p{position:relative;z-index:2;margin:0 auto 32px;max-width:440px;color:var(--muted);font-size:15px}
 .contact a.mail{
   position:relative;z-index:2;display:inline-block;font-size:17px;color:var(--ink);
-  border-bottom:1px solid var(--hairline);padding-bottom:4px;transition:border-color .25s;
+  border-bottom:1px solid var(--hairline);padding-bottom:4px;
+  transition:border-color var(--dur-hover) ease,transform var(--dur-press) var(--ease-out);
 }
-.contact a.mail:hover{border-color:var(--ink)}
+@media(hover:hover) and (pointer:fine){
+  .contact a.mail:hover{border-color:var(--ink)}
+}
+.contact a.mail:active{transform:scale(.97)}
 .trail{
   position:absolute;pointer-events:none;z-index:1;font-family:var(--mono);font-size:11px;color:var(--ink);
   background:var(--surface);border:1px solid var(--hairline);border-radius:999px;padding:5px 11px;white-space:nowrap;
-  transition:opacity 1s ease-out, transform 1s ease-out;
+  will-change:transform,opacity;
+  transition:opacity 900ms var(--ease-out), transform 900ms var(--ease-out);
 }
 
 /* ---------- footer ---------- */
@@ -240,8 +280,11 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
 .footer-note{font-size:15px;max-width:280px;line-height:1.55;margin:0}
 .footer-cols{display:flex;gap:56px}
 .footer-cols ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
-.footer-cols a{font-size:15px;transition:opacity .25s}
-.footer-cols a:hover{opacity:.6}
+.footer-cols a{display:inline-block;font-size:15px;transition:opacity var(--dur-hover) ease,transform var(--dur-press) var(--ease-out)}
+@media(hover:hover) and (pointer:fine){
+  .footer-cols a:hover{opacity:.6}
+}
+.footer-cols a:active{transform:scale(.97)}
 @media(min-width:768px){.footer-inner{flex-direction:row;align-items:flex-start}}
 .copyright{
   display:flex;justify-content:space-between;align-items:center;gap:12px;
@@ -256,14 +299,22 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
   padding:10px 26px;box-shadow:var(--shadow-primary);
 }
 .dock .mark{font-family:var(--mono);font-size:12px;font-weight:500;line-height:1;color:var(--muted)}
-.dock a{font-size:14px;transition:opacity .25s}
-.dock a:hover{opacity:.6}
+.dock a{display:inline-block;font-size:14px;transition:opacity var(--dur-hover) ease,transform var(--dur-press) var(--ease-out)}
+@media(hover:hover) and (pointer:fine){
+  .dock a:hover{opacity:.6}
+}
+.dock a:active{transform:scale(.95)}
 
+/* reduced motion: gentler, not none — colour and opacity feedback stays, movement goes */
 @media(prefers-reduced-motion:reduce){
-  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none !important}
+  *{transition-property:opacity,color,background-color,border-color,text-decoration-color !important;
+    transition-duration:150ms !important}
   [data-reveal]{opacity:1}
 }
 </style>
+<noscript><style>[data-reveal]{opacity:1}</style></noscript>
 </head>
 <body>
 
@@ -274,9 +325,9 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
 
 <!-- ============ HERO ============ -->
 <header class="hero">
-  <div class="logo" data-reveal style="--d:.1s">Sai Pranav Atla</div>
+  <div class="logo" data-reveal style="--d:0s">Sai Pranav Atla</div>
 
-  <div class="socials" data-reveal style="--d:.2s">
+  <div class="socials" data-reveal style="--d:.06s">
     <a href="https://github.com/pranavatla" target="_blank" rel="noopener" aria-label="GitHub">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.7.5.6 5.6.6 11.9c0 5 3.3 9.3 7.8 10.8.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.9 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.2c0 .4.2.7.8.6a11.4 11.4 0 0 0 7.8-10.8C23.4 5.6 18.3.5 12 .5z"/></svg>
     </a>
@@ -288,16 +339,16 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
     </a>
   </div>
 
-  <h1 class="hero-h1" data-reveal style="--d:.3s">
+  <h1 class="hero-h1" data-reveal style="--d:.12s">
     <span class="headline-line">Grounded in Operations,</span><span class="headline-line">DevOps &amp; Infrastructure.</span><span class="headline-line pixel">Driven by curiosity.</span>
   </h1>
 
-  <div class="hero-copy" data-reveal style="--d:.4s">
+  <div class="hero-copy" data-reveal style="--d:.18s">
     <p>I'm Sai Pranav Atla. I lead cloud and service operations for SAP CX / I&amp;CX at Accenture, and I build and ship AI and cloud products independently on self-funded AWS infrastructure.</p>
     <p>This site is where I share what I'm learning and building &mdash; RAG systems, operations assistants, observability experiments, and more &mdash; applying an operations mindset and learning by doing.</p>
   </div>
 
-  <div class="hero-actions" data-reveal style="--d:.5s">
+  <div class="hero-actions" data-reveal style="--d:.24s">
     <a class="scroll-link" href="#work">Explore what I'm learning</a>
   </div>
 </header>
@@ -307,7 +358,7 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
 
 <!-- ============ TWO CARDS ============ -->
 <section class="cards">
-  <article class="card card-dark" data-reveal style="--d:.1s">
+  <article class="card card-dark" data-reveal style="--d:0s">
     <h3>The experience I build on</h3>
     <p>At Accenture, my work across SAP CX and I&amp;CX connected cloud operations with service delivery, stakeholders, and capacity planning. I bring that perspective to AI: understand the system, question the output, and look beyond the demo.</p>
     <div class="card-figure">
@@ -316,7 +367,7 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
     </div>
   </article>
 
-  <article class="card card-light" data-reveal style="--d:.2s">
+  <article class="card card-light" data-reveal style="--d:.07s">
     <h3>Curiosity, put to work</h3>
     <p>Some ideas become a one-night vibe-coding experiment. Others become a deeper study of RAG or a way to explore infrastructure behaviour. These projects are different parts of the same habit: build something, examine how it works, and keep improving my understanding.</p>
     <div class="card-figure">
@@ -328,13 +379,13 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
 
 <!-- ============ PROJECTS ============ -->
 <main class="projects wrap" id="work">
-  <div class="projects-intro" data-reveal style="--d:.1s">
+  <div class="projects-intro" data-reveal style="--d:0s">
     <h2>The projects behind the learning</h2>
     <p>Not just screenshots or a list of tools. Open each project to see the idea in action, from a playable game to a retrieved verse or a simulated incident.</p>
   </div>
 
   <!-- ===== gita ===== -->
-  <article class="tile" data-reveal style="--d:.1s">
+  <article class="tile" data-reveal>
     <div class="tile-inner">
       <div class="tile-head">
         <h3>Gita: a deeper dive into RAG</h3>
@@ -360,7 +411,7 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
   </article>
 
   <!-- ===== games ===== -->
-  <article class="tile" data-reveal style="--d:.1s">
+  <article class="tile" data-reveal>
     <div class="tile-inner">
       <div class="tile-head">
         <h3>Games: one night of vibe coding</h3>
@@ -384,7 +435,7 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
   </article>
 
   <!-- ===== obs ===== -->
-  <article class="tile" data-reveal style="--d:.1s">
+  <article class="tile" data-reveal>
     <div class="tile-inner">
       <div class="tile-head">
         <h3>OBS: an operations perspective</h3>
@@ -471,8 +522,14 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
     targets.forEach(function(el){ io.observe(el); });
   }
 
-  /* pause tile videos when off screen */
-  if('IntersectionObserver' in window){
+  /* looping video is movement: hold the poster frame for reduced motion,
+     otherwise play only while on screen */
+  var shots = document.querySelectorAll('video.shot');
+  if(reduce){
+    shots.forEach(function(v){
+      v.removeAttribute('autoplay'); v.removeAttribute('loop'); v.pause();
+    });
+  } else if('IntersectionObserver' in window){
     var vio = new IntersectionObserver(function(entries){
       entries.forEach(function(e){
         var v = e.target;
@@ -480,7 +537,7 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
         else { v.pause(); }
       });
     }, {threshold:.15});
-    document.querySelectorAll('video.shot').forEach(function(v){ vio.observe(v); });
+    shots.forEach(function(v){ vio.observe(v); });
   }
 
   var box = document.getElementById('trailbox');
@@ -501,9 +558,13 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
       chip.style.top  = (ev.clientY - r.top)+'px';
       chip.style.transform = 'translate(-50%,-50%) rotate('+rot+'deg) scale(1)';
       box.appendChild(chip);
+      /* two frames: one commits the starting style, the next starts the transition.
+         A single rAF can land before the commit, and the chip just blinks out. */
       requestAnimationFrame(function(){
-        chip.style.opacity = '0';
-        chip.style.transform = 'translate(-50%,-50%) rotate('+rot+'deg) scale(.7)';
+        requestAnimationFrame(function(){
+          chip.style.opacity = '0';
+          chip.style.transform = 'translate(-50%,-50%) rotate('+rot+'deg) scale(.7)';
+        });
       });
       setTimeout(function(){ chip.remove(); }, 1000);
     });
