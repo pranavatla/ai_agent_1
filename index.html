@@ -500,10 +500,10 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  var terms = ['Vibe coding','Retrieval-augmented generation','Observability',
-               'Browser games','Incident simulation','Cloud operations',
-               'Amazon Bedrock','Vector search','Retrieval evaluation',
-               'Game mechanics','Pipeline timings','Runbook retrieval'];
+  var terms = ['SAP CX','SAP I&CX','Cloud Operations','Service Delivery',
+               'Stakeholder Management','Incident Management','Capacity Planning',
+               'AWS Infrastructure','DevOps','RAG','Amazon Bedrock','Observability',
+               'CI/CD','Vector Search','Retrieval Evaluation','Runbook Retrieval'];
   var row = document.getElementById('ticker');
   if(row){
     var html = terms.map(function(t){ return '<span>'+t+' <i>/</i></span>'; }).join('');
@@ -542,8 +542,13 @@ a.tile-url:focus-visible{outline:2px solid var(--signal);outline-offset:5px;bord
 
   var box = document.getElementById('trailbox');
   if(box && !reduce && window.matchMedia('(hover:hover)').matches){
-    var chips = ['200 OK','ap-south-1','deploy ok','no alarms',
-                 'cache hit','verse 2.47','grounded','in budget'];
+    var chips = ['SAP CX','SAP I&CX','SAP Commerce Cloud','SAP C4C',
+                 'Cloud Operations','Service Delivery','Stakeholder Management',
+                 'Incident Management','Capacity Planning','Resource Modelling',
+                 'SLA Governance','KPI Governance','Vendor Collaboration',
+                 'Contract Planning','AWS Infrastructure','DevOps','CI/CD','RAG',
+                 'Amazon Bedrock','Observability','Vector Search',
+                 'Retrieval Evaluation','FastAPI','AI-Assisted Development'];
     var last = 0, n = 0;
     box.addEventListener('mousemove', function(ev){
       var now = Date.now();
