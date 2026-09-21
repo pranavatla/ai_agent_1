@@ -22,21 +22,14 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Sync frontend to S3
+      # Publish only the portfolio and its public media, never repository internals.
+      - name: Publish portfolio to S3
         run: |
-          aws s3 sync . s3://${{ vars.AWS_S3_BUCKET }} \
-            --delete \
-            --exclude ".git/*" \
-            --exclude ".github/*" \
-            --exclude "venv/*" \
-            --exclude "__pycache__/*" \
-            --exclude "chroma_db/*" \
-            --exclude "chroma_db_legacy_*/*" \
-            --exclude "docs/*" \
-            --exclude "*.py" \
-            --exclude "requirements.txt" \
-            --exclude "Procfile" \
-            --exclude "Dockerfile"
+          aws s3 cp index.html s3://${{ vars.AWS_S3_BUCKET }}/index.html \
+            --content-type "text/html; charset=utf-8" \
+            --cache-control "public, max-age=0, must-revalidate"
+          aws s3 sync media/ s3://${{ vars.AWS_S3_BUCKET }}/media/ \
+            --cache-control "public, max-age=86400"
 
       - name: Invalidate CloudFront cache
         run: |
