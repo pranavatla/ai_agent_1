@@ -2,9 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
-import { FileDown } from "lucide-react";
-import { FaLinkedinIn } from "react-icons/fa6";
-import { site } from "@/lib/site";
+import { FaGithub, FaLinkedinIn } from "react-icons/fa6";
+import { site, socials } from "@/lib/site";
 import { useMedia, useReducedMotion } from "@/lib/media";
 
 export default function Hero() {
@@ -108,23 +107,22 @@ export default function Hero() {
         transition={{ delay: 1.1, duration: 0.8 }}
       >
         <a
-          href="#resume"
+          href={site.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-medium text-white shadow-[0_10px_24px_-10px_rgba(15,23,42,0.6)] transition duration-200 ease-snappy hover:bg-deep active:scale-[0.97]"
         >
-          <FileDown aria-hidden className="size-4" />
-          Résumé
+          <FaLinkedinIn aria-hidden className="size-4" />
+          LinkedIn
         </a>
         <a
-          href={site.linkedin}
+          href={socials.find((s) => s.label === "GitHub")?.href}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-medium text-slate-800 shadow-sm transition duration-200 ease-snappy hover:border-deep/40 hover:text-deep active:scale-[0.97]"
         >
-          <FaLinkedinIn aria-hidden className="size-4 text-deep" />
-          LinkedIn
-        </a>
-        <a href={`mailto:${site.email}`} className="py-3 text-sm font-medium text-slate-700 underline decoration-slate-300 transition duration-200 hover:text-deep hover:decoration-deep">
-          {site.email}
+          <FaGithub aria-hidden className="size-4 text-deep" />
+          GitHub
         </a>
       </motion.div>
     </section>
