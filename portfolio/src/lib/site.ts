@@ -41,13 +41,6 @@ export const projects: { title: string; tag: string; href: string; image: string
     alt: "Gita Reflection answering a question with the source Bhagavad Gita verse alongside",
   },
   {
-    title: "Operations Console",
-    tag: "Observability demo · FastAPI",
-    href: "https://obs.atla.in/",
-    image: "/media/obs.jpg",
-    alt: "Operations console with service health, latency, error rates and incident timeline",
-  },
-  {
     title: "Browser Arcade",
     tag: "JavaScript Canvas · Built with Claude",
     href: "https://games.atla.in/",
@@ -62,6 +55,13 @@ export const projects: { title: string; tag: string; href: string; image: string
     image: "/media/aif-brag.jpg",
     video: "/media/aif-brag.mp4",
     alt: "Four-day AWS AI Practitioner (AIF-C01) study guide with practice-exam questions",
+  },
+  {
+    title: "Operations Console",
+    tag: "Observability demo · FastAPI",
+    href: "https://obs.atla.in/",
+    image: "/media/obs.jpg",
+    alt: "Operations console with service health, latency, error rates and incident timeline",
   },
 ];
 
