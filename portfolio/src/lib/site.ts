@@ -31,12 +31,13 @@ export const work = {
   subtitle: "Independent projects · built with AI assistance, hosted on AWS",
 };
 
-export const projects = [
+export const projects: { title: string; tag: string; href: string; image: string; video?: string; alt: string }[] = [
   {
     title: "Gita Reflection",
     tag: "RAG · Amazon Bedrock",
     href: "https://gita.atla.in/",
-    image: "/media/gita-poster.jpg",
+    image: "/media/gita-brag.jpg",
+    video: "/media/gita-brag.mp4",
     alt: "Gita Reflection answering a question with the source Bhagavad Gita verse alongside",
   },
   {
@@ -50,7 +51,8 @@ export const projects = [
     title: "Browser Arcade",
     tag: "JavaScript Canvas · Built with Claude",
     href: "https://games.atla.in/",
-    image: "/media/games.jpg",
+    image: "/media/games-brag.jpg",
+    video: "/media/games-brag.mp4",
     alt: "Drop, Invaders and Break, three browser games",
   },
 ];
