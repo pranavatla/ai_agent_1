@@ -38,10 +38,9 @@ export default function Contact() {
   return (
     <section id="contact" data-covers-galaxy className="bg-panel px-4 py-24 text-slate-900 sm:px-10 md:pr-24 lg:py-32">
       <div className="mx-auto max-w-6xl">
-        <h2 className="font-display text-sm font-bold tracking-[0.2em] text-deep uppercase">Contact</h2>
-        <div className="mt-8 grid gap-12 rounded-[2rem] bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)] sm:p-10 lg:grid-cols-2 lg:gap-16 lg:p-14">
+        <div className="grid gap-12 rounded-[2rem] bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)] sm:p-10 lg:grid-cols-2 lg:gap-16 lg:p-14">
           <div>
-            <p className="text-4xl font-bold tracking-[-0.03em] sm:text-5xl">Get in touch</p>
+            <h2 className="text-4xl font-bold tracking-[-0.03em] sm:text-5xl">Get in touch</h2>
             <p className="mt-5 max-w-md leading-relaxed text-slate-600">
               {contact.lead}
             </p>
@@ -77,7 +76,7 @@ export default function Contact() {
             </div>
             <button
               type="submit"
-              className="rounded-xl bg-slate-900 px-6 py-4 font-mono text-xs tracking-[0.2em] text-white uppercase transition hover:bg-deep focus-visible:outline-deep active:scale-[0.99] sm:col-span-2"
+              className="rounded-xl bg-slate-900 px-6 py-4 font-mono text-xs tracking-[0.2em] text-white uppercase transition duration-200 ease-snappy hover:bg-deep focus-visible:outline-deep active:scale-[0.97] sm:col-span-2"
             >
               Submit
             </button>

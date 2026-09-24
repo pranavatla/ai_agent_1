@@ -1,7 +1,7 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import { capabilities, sections, site, socials } from "@/lib/site";
 
-const heading = "font-mono text-[11px] tracking-[0.2em] text-slate-400 uppercase";
+const heading = "font-mono text-[11px] tracking-[0.2em] text-slate-500 uppercase";
 
 export default function Footer() {
   return (
@@ -65,7 +65,7 @@ export default function Footer() {
                   target={href.startsWith("http") ? "_blank" : undefined}
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="grid size-10 place-items-center rounded-xl border border-slate-200 bg-white/70 text-slate-700 shadow-sm backdrop-blur-md transition hover:border-deep/50 hover:text-deep"
+                  className="grid size-11 place-items-center rounded-xl border border-slate-200 bg-white/70 text-slate-700 shadow-sm backdrop-blur-md transition duration-200 ease-snappy hover:border-deep/50 hover:text-deep active:scale-[0.96]"
                 >
                   <Icon aria-hidden className="size-4" />
                 </a>

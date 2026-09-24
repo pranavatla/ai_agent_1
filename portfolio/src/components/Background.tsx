@@ -38,7 +38,7 @@ export default function Background() {
       <motion.div style={reduced ? undefined : { y, scale }} className="absolute inset-x-0 top-0 h-[190vh] origin-top">
         <motion.div
           className="h-full w-full"
-          animate={reduced ? undefined : { y: ["1.5%", "-2.5%"], scale: [1, 1.06] }}
+          animate={reduced ? undefined : { transform: ["translateY(1.5%) scale(1)", "translateY(-2.5%) scale(1.06)"] }}
           transition={{ duration: 26, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
         >
           <div

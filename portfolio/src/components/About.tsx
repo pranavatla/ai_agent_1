@@ -74,7 +74,7 @@ export default function About() {
               <motion.div aria-hidden style={reduced ? undefined : { x: driftX, y: driftY }} className="absolute top-[44%] left-1/2 aspect-square h-[84%] -translate-x-1/2 -translate-y-1/2">
                 <motion.div
                   className="galaxy h-full w-full rounded-full blur-[64px]"
-                  animate={reduced ? undefined : { scale: [1, 1.08] }}
+                  animate={reduced ? undefined : { transform: ["scale(1)", "scale(1.08)"] }}
                   transition={{ duration: 11, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
                 />
               </motion.div>
@@ -131,7 +131,7 @@ export default function About() {
                     target={href.startsWith("http") ? "_blank" : undefined}
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className="grid size-11 place-items-center rounded-xl border border-slate-200 bg-white/70 text-slate-700 shadow-sm backdrop-blur-md transition hover:border-deep/50 hover:text-deep"
+                    className="grid size-11 place-items-center rounded-xl border border-slate-200 bg-white/70 text-slate-700 shadow-sm backdrop-blur-md transition duration-200 ease-snappy hover:border-deep/50 hover:text-deep active:scale-[0.96]"
                   >
                     <Icon aria-hidden className="size-4" />
                   </a>
@@ -186,7 +186,7 @@ function Timeline({ reduced }: { reduced: boolean }) {
                 <h3 className="mt-3 text-xl font-bold">{job.role}</h3>
                 <p className="mt-1 text-slate-500">{job.org}</p>
                 <p className="mt-3 text-sm leading-relaxed text-slate-600">{job.blurb}</p>
-                <p className="mt-4 font-mono text-[11px] leading-relaxed tracking-[0.06em] text-slate-400">{job.stack}</p>
+                <p className="mt-4 font-mono text-[11px] leading-relaxed tracking-[0.06em] text-slate-500">{job.stack}</p>
               </motion.article>
             </li>
           );

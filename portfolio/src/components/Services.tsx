@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import { motion, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import { services } from "@/lib/site";
 import { useIsLg, useMedia, useReducedMotion } from "@/lib/media";
@@ -34,6 +33,28 @@ function Phrase({ i, idx, k }: { i: number; idx: MotionValue<number>; k: number 
   );
 }
 
+// The tile behind each phrase: the phrase's colour, its icon, and the concrete tools.
+// Also rendered by the card-flip overlay, which must match it pixel for pixel.
+export function ServiceTile({ s }: { s: (typeof services)[number] }) {
+  const Icon = s.icon;
+  return (
+    <div
+      className="flex h-full w-full flex-col justify-between bg-white p-6 text-left"
+      style={{ backgroundImage: `radial-gradient(120% 90% at 0% 0%, ${s.color}2e, transparent 62%), linear-gradient(160deg, #fff 40%, ${s.color}17)` }}
+    >
+      <span className="grid size-12 place-items-center rounded-2xl text-white shadow-[0_8px_18px_-6px_rgba(15,23,42,0.4)]" style={{ background: s.color }}>
+        <Icon aria-hidden className="size-6" strokeWidth={1.75} />
+      </span>
+      <div>
+        <p className="font-display text-[22px] leading-tight font-bold tracking-[-0.02em]" style={{ color: s.color }}>
+          {s.phrase.replace(/\.$/, "")}
+        </p>
+        <p className="mt-2 font-mono text-[11px] leading-relaxed text-slate-600">{s.tools}</p>
+      </div>
+    </div>
+  );
+}
+
 function Card({ i, idx }: { i: number; idx: MotionValue<number> }) {
   const d = useTransform(idx, (v) => i - v);
   const x = useTransform(d, [-2, -1, 0, 1, 2], [110, 65, 0, 65, 110]);
@@ -44,9 +65,10 @@ function Card({ i, idx }: { i: number; idx: MotionValue<number> }) {
       <motion.div
         style={{ x, scale, opacity }}
         data-handoff={i === COUNT - 1 ? "card" : undefined}
+        aria-hidden
         className="relative size-[270px] overflow-hidden rounded-3xl border border-black/80 shadow-[0_18px_40px_rgba(15,23,42,0.22)]"
       >
-        <Image src={services[i].image} alt="" fill sizes="310px" className="object-cover" />
+        <ServiceTile s={services[i]} />
       </motion.div>
     </li>
   );
@@ -65,6 +87,7 @@ export default function Services() {
     return (
       <section id="services" data-covers-galaxy className="light-grid px-6 py-28 text-slate-900">
         <div className={`mx-auto max-w-4xl ${LEAD} font-display tracking-[-0.02em]`}>
+          <h2 className="mb-8 font-mono text-xs font-normal tracking-[0.2em] text-slate-500 uppercase">What I do</h2>
           <p className="font-sans text-slate-900">I can</p>
           <ul className="mt-4 space-y-3">
             {services.map((s) => (
@@ -81,9 +104,9 @@ export default function Services() {
   return (
     <section id="services" ref={ref} data-covers-galaxy className="relative h-[320vh]">
       <div data-handoff-fade className="light-grid sticky top-0 flex h-svh items-center overflow-hidden text-slate-900">
-        <p className="absolute top-8 left-6 font-mono text-xs tracking-[0.2em] text-slate-500 uppercase sm:left-10">
+        <h2 className="absolute top-8 left-6 font-mono text-xs font-normal tracking-[0.2em] text-slate-500 uppercase sm:left-10">
           What I do
-        </p>
+        </h2>
         <div className="mx-auto flex w-full max-w-7xl items-center gap-8 px-6 sm:px-10 lg:pr-24">
           <div className={`flex min-w-0 flex-1 items-center gap-3 sm:gap-5 ${LEAD}`}>
             <p className="shrink-0 leading-none">I can</p>

@@ -28,7 +28,12 @@ export default function Nav() {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    // Keep the page still behind the full-screen menu.
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.documentElement.style.overflow = "";
+    };
   }, [open]);
 
   const btn = "bg-white text-slate-700 shadow-[0_6px_18px_rgba(15,23,42,0.12)] hover:text-deep";
@@ -46,12 +51,12 @@ export default function Nav() {
               href={`#${id}`}
               aria-label={label}
               aria-current={isCurrent ? "location" : undefined}
-              className={`group relative grid size-11 place-items-center rounded-full transition-colors duration-300 ${isCurrent ? current : btn}`}
+              className={`group relative grid size-11 place-items-center rounded-full transition duration-200 ease-snappy active:scale-[0.94] ${isCurrent ? current : btn}`}
             >
               <Icon aria-hidden className="size-[18px]" />
               <span
                 aria-hidden
-                className="pointer-events-none absolute right-full mr-3 translate-x-2 rounded-full bg-white px-3 py-1.5 font-mono text-[11px] tracking-[0.14em] whitespace-nowrap text-slate-800 uppercase opacity-0 shadow-[0_6px_18px_rgba(15,23,42,0.14)] transition duration-300 group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100"
+                className="pointer-events-none absolute right-full mr-3 translate-x-2 rounded-full bg-white px-3 py-1.5 font-mono text-[11px] tracking-[0.14em] whitespace-nowrap text-slate-800 uppercase opacity-0 shadow-[0_6px_18px_rgba(15,23,42,0.14)] transition duration-200 ease-snappy group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100"
               >
                 {label}
               </span>
@@ -66,7 +71,7 @@ export default function Nav() {
         aria-expanded={open}
         aria-controls="mobile-menu"
         onClick={() => setOpen((o) => !o)}
-        className={`fixed top-4 right-4 z-[60] grid size-11 place-items-center rounded-full transition-colors md:hidden ${btn}`}
+        className={`fixed top-4 right-4 z-[60] grid size-11 place-items-center rounded-full transition duration-200 ease-snappy active:scale-[0.94] md:hidden ${btn}`}
       >
         {open ? <X aria-hidden className="size-5" /> : <Menu aria-hidden className="size-5" />}
       </button>

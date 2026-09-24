@@ -14,10 +14,19 @@
   --color-panel: #f4f5f9;
   --color-deep: #1d6fd0;
   --color-violet: #6d3bd4;
+  /* Strong ease-out for interface feedback: moves immediately, settles softly. */
+  --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 html {
   scroll-behavior: smooth;
+  scrollbar-color: rgba(29, 111, 208, 0.35) transparent;
+  accent-color: var(--color-deep);
+  caret-color: var(--color-deep);
+}
+
+a {
+  text-underline-offset: 0.3em;
 }
 
 /* The fixed background sits at z -10, behind body's own box, so the base colour must live on body. */

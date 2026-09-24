@@ -1,6 +1,7 @@
 // Every piece of copy and every image on the site lives here, so it can be replaced in one edit.
 // Claims are kept to what the résumé and the live projects can back up: no invented metrics.
 import type { IconType } from "react-icons";
+import { Bot, Cloud, DatabaseZap, Siren, Users, Workflow, type LucideIcon } from "lucide-react";
 import { FaGithub, FaLinkedinIn } from "react-icons/fa6";
 import { MdAlternateEmail } from "react-icons/md";
 
@@ -16,8 +17,8 @@ export const site = {
   address: "Bengaluru, India",
   url: "https://atla.in",
   linkedin: "https://linkedin.com/in/saipranavatla/",
-  // Transparent cut-out, 896x1195; About's frame uses this aspect ratio.
-  portrait: "/media/portrait.png",
+  // Transparent cut-out (WebP with alpha), 896x1195; About's frame uses this aspect ratio.
+  portrait: "/media/portrait.webp",
 };
 
 export const socials: { label: string; href: string; icon: IconType }[] = [
@@ -54,13 +55,14 @@ export const projects = [
   },
 ];
 
-export const services = [
-  { phrase: "Run SAP on AWS.", color: "#1d6fd0", image: "https://picsum.photos/seed/service-1/600/600" },
-  { phrase: "Automate Infra.", color: "#6d3bd4", image: "https://picsum.photos/seed/service-2/600/600" },
-  { phrase: "Tame Incidents.", color: "#0f7c8a", image: "https://picsum.photos/seed/service-3/600/600" },
-  { phrase: "Build RAG Apps.", color: "#a86a12", image: "https://picsum.photos/seed/service-4/600/600" },
-  { phrase: "Ship AI Agents.", color: "#c2306b", image: "https://picsum.photos/seed/service-5/600/600" },
-  { phrase: "Lead Teams.", color: "#157a5a", image: "https://picsum.photos/seed/service-6/600/600" },
+// Each phrase pairs with a tile naming the real tools behind it (from the résumé).
+export const services: { phrase: string; color: string; icon: LucideIcon; tools: string }[] = [
+  { phrase: "Run SAP on AWS.", color: "#1d6fd0", icon: Cloud, tools: "S/4HANA · EC2 · VPC · Route 53" },
+  { phrase: "Automate Infra.", color: "#6d3bd4", icon: Workflow, tools: "Terraform · Ansible · Jenkins" },
+  { phrase: "Tame Incidents.", color: "#0f7c8a", icon: Siren, tools: "Major incidents · RCA · ITSM" },
+  { phrase: "Build RAG Apps.", color: "#a86a12", icon: DatabaseZap, tools: "Bedrock · ChromaDB · Embeddings" },
+  { phrase: "Ship AI Agents.", color: "#c2306b", icon: Bot, tools: "Multi-agent workflows · MCP" },
+  { phrase: "Lead Teams.", color: "#157a5a", icon: Users, tools: "25+ engineers · SLA/KPI governance" },
 ];
 
 export const about = {
