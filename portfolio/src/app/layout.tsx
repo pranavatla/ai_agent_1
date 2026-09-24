@@ -11,14 +11,14 @@ const mono = Space_Mono({ variable: "--font-spacemono", subsets: ["latin"], weig
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: `${site.name} — Cloud, platform & AI automation`,
+  title: `${site.name} — Cloud operations, service delivery & AI`,
   description: site.description,
   alternates: { canonical: "/" },
   icons: { icon: "/media/atla-mark.svg" },
   openGraph: {
     type: "website",
     url: "/",
-    title: `${site.name} — Cloud, platform & AI automation`,
+    title: `${site.name} — Cloud operations, service delivery & AI`,
     description: site.description,
     images: "/media/portfolio-social.png",
   },

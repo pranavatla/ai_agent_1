@@ -117,7 +117,7 @@ export default function About() {
                 rel="noopener noreferrer"
                 className="mt-6 inline-block font-mono text-xs tracking-[0.2em] text-deep uppercase underline underline-offset-8 hover:text-violet"
               >
-                Read more
+                View LinkedIn
               </a>
             </div>
           </div>

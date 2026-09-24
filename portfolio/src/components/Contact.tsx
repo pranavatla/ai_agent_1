@@ -32,7 +32,7 @@ export default function Contact() {
     // No backend yet: hand the message to the visitor's mail client.
     // To use a real endpoint, replace the next line with: await fetch("/api/contact", { method: "POST", body: f })
     window.location.href = `mailto:${site.email}?subject=${encodeURIComponent(`Hello from ${f.get("name")}`)}&body=${encodeURIComponent(body)}`;
-    setStatus("Opening your mail app…");
+    setStatus("Opening your email app — review and send your message there.");
   };
 
   return (
@@ -51,12 +51,12 @@ export default function Contact() {
               <Detail icon={Phone} title="Phone">
                 <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="hover:text-deep">{site.phone}</a>
               </Detail>
-              <Detail icon={MapPin} title="Address" wide>
+              <Detail icon={MapPin} title="Location" wide>
                 {site.address}
               </Detail>
             </div>
             <div id="resume" className="mt-10 scroll-mt-24">
-              <h3 className={label}>Résumé, by role</h3>
+              <h3 className={label}>Choose a résumé</h3>
               <ul className="mt-3 flex flex-wrap gap-2">
                 {resumes.map((r) => (
                   <li key={r.href}>
@@ -95,7 +95,7 @@ export default function Contact() {
               type="submit"
               className="rounded-xl bg-slate-900 px-6 py-4 font-mono text-xs tracking-[0.2em] text-white uppercase transition duration-200 ease-snappy hover:bg-deep focus-visible:outline-deep active:scale-[0.97] sm:col-span-2"
             >
-              Submit
+              Open email draft
             </button>
             <p role="status" aria-live="polite" className="font-mono text-xs text-slate-500 sm:col-span-2">
               {status}

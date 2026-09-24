@@ -8,10 +8,10 @@ import { MdAlternateEmail } from "react-icons/md";
 export const site = {
   brand: "Atla",
   name: "Sai Pranav Atla",
-  tagline: "10+ years keeping enterprise cloud running. Now building the AI automation that helps run it.",
-  handle: "Cloud & DevOps · Operations · Applied AI · Open to roles",
+  tagline: "10+ years in enterprise operations. Bringing that experience to cloud automation and applied AI.",
+  handle: "Cloud operations · Service delivery · Applied AI · Open to opportunities",
   description:
-    "Sai Pranav Atla: cloud infrastructure specialist with 10+ years across IBM, TCS and Accenture. SAP on AWS, platform operations, incident leadership and AI automation. Based in Bengaluru, open to cloud, DevOps and AI engineering roles.",
+    "Sai Pranav Atla’s portfolio: 10+ years in enterprise operations across IBM, TCS and Accenture, with experience in SAP CX/I&CX, service delivery and independent cloud and AI projects. Based in Bengaluru.",
   email: "pranavatla@gmail.com",
   phone: "+91 96322 98045",
   address: "Bengaluru, India",
@@ -28,7 +28,7 @@ export const socials: { label: string; href: string; icon: IconType }[] = [
 ];
 
 export const work = {
-  subtitle: "Live projects · designed, built and run on my own AWS",
+  subtitle: "Independent projects · built with AI assistance, hosted on AWS",
 };
 
 export const projects = [
@@ -41,14 +41,14 @@ export const projects = [
   },
   {
     title: "Operations Console",
-    tag: "Observability · FastAPI",
+    tag: "Observability demo · FastAPI",
     href: "https://obs.atla.in/",
     image: "/media/obs.jpg",
     alt: "Operations console with service health, latency, error rates and incident timeline",
   },
   {
     title: "Browser Arcade",
-    tag: "JS Canvas · Built with Claude",
+    tag: "JavaScript Canvas · Built with Claude",
     href: "https://games.atla.in/",
     image: "/media/games.jpg",
     alt: "Drop, Invaders and Break, three browser games",
@@ -57,58 +57,58 @@ export const projects = [
 
 // Each phrase pairs with a tile naming the real tools behind it (from the résumé).
 export const services: { phrase: string; color: string; icon: LucideIcon; tools: string }[] = [
-  { phrase: "Run SAP on AWS.", color: "#1d6fd0", icon: Cloud, tools: "S/4HANA · EC2 · VPC · Route 53" },
-  { phrase: "Automate Infra.", color: "#6d3bd4", icon: Workflow, tools: "Terraform · Ansible · Jenkins · GitHub Actions" },
-  { phrase: "Tame Incidents.", color: "#0f7c8a", icon: Siren, tools: "Major incidents · RCA · ITIL 4" },
-  { phrase: "Build RAG Apps.", color: "#a86a12", icon: DatabaseZap, tools: "Bedrock · ChromaDB · Embeddings" },
-  { phrase: "Ship AI Agents.", color: "#c2306b", icon: Bot, tools: "Multi-agent workflows · MCP" },
-  { phrase: "Lead Teams.", color: "#157a5a", icon: Users, tools: "25+ engineers · SLA/KPI governance" },
+  { phrase: "Run cloud ops.", color: "#1d6fd0", icon: Cloud, tools: "SAP CX / I&CX · AWS · Service health" },
+  { phrase: "Automate infra.", color: "#6d3bd4", icon: Workflow, tools: "Terraform · Ansible · Jenkins · GitHub Actions" },
+  { phrase: "Lead incidents.", color: "#0f7c8a", icon: Siren, tools: "Major incidents · RCA · ITIL 4" },
+  { phrase: "Build RAG apps.", color: "#a86a12", icon: DatabaseZap, tools: "Bedrock · ChromaDB · Embeddings" },
+  { phrase: "Build AI tools.", color: "#c2306b", icon: Bot, tools: "Python · FastAPI · AI workflows" },
+  { phrase: "Lead teams.", color: "#157a5a", icon: Users, tools: "16-member team · SLA/KPI governance" },
 ];
 
 export const about = {
   statement: ["systems", "that", "hold."],
-  bio: "For 10+ years I’ve kept enterprise services running, from severity-1 bridges at IBM to SAP’s own Customer Experience platforms at Accenture, where I lead a 16-member operations team, work across cross-functional groups of 25+ engineers and hold 100% SLA compliance. Outside work I build on my own AWS account and ship every project end to end.",
+  bio: "My work connects technology, teams and the people who rely on a service. Across IBM, TCS and Accenture, I’ve led critical incident response and supported SAP cloud operations. At Accenture, I lead a 16-member team across SAP CX and I&CX. Outside work, I use AI as a building partner to explore cloud automation, retrieval and observability on my own AWS infrastructure.",
 };
 
 export const experience = [
   {
-    period: "2021 — Now",
-    role: "Cloud Infrastructure Specialist, Platform & AI Automation",
+    period: "Jan 2021 — Present",
+    role: "Operations Lead — SAP CX & I&CX",
     org: "Accenture · client: SAP",
-    blurb: "Single point of contact between SAP and Accenture for the SAP CX and I&CX portfolio. Lead a 16-member operations team at 100% SLA compliance, ran the zero-downtime transition from NTT Data, and built the automated SLA/KPI signalling platform behind the SAP Hero Award and a place in Accenture’s Top 25 Global AI Programs.",
-    stack: "AWS · SAP S/4HANA · Commerce Cloud · C4C · Terraform · Jenkins",
+    blurb: "Lead a 16-member operations team and serve as the point of contact between SAP and Accenture for the CX and I&CX portfolio. My work spans SLA/KPI governance, capacity planning and scope assessment, with 100% SLA compliance across the supported services. Delivered automated operational reporting recognised with the SAP Hero Award and selection into Accenture’s Top 25 Global AI Programs.",
+    stack: "SAP CX / I&CX · Commerce Cloud · C4C · SLA/KPI governance",
   },
   {
-    period: "2018 — 2021",
+    period: "Nov 2019 — Jan 2021",
     role: "Subject Matter Expert, Cloud Operations",
     org: "Tata Consultancy Services · client: SAP",
-    blurb: "Owned incident response for the SAP Customer Experience estate: cut resolution time 40% with triage automation and standard escalation paths, rebuilt the knowledge base to cut repeat issues 30%, and lifted operational efficiency 25%. Nine SAP Best Performer of the Month awards.",
+    blurb: "Managed incident response for SAP Customer Experience services. Triage automation and standard escalation paths reduced resolution time by 40%; a rebuilt knowledge base reduced repeat-issue resolution time by 30%. Process and tooling improvements increased operational efficiency by 25%. Received nine SAP Best Performer of the Month awards.",
     stack: "ITSM · Confluence · GitHub · Capacity planning",
   },
   {
-    period: "2015 — 2018",
+    period: "Aug 2015 — Sep 2018",
     role: "Major Incident Manager",
     org: "IBM",
-    blurb: "Incident commander for severity-1 events on enterprise platforms: cross-team resolution, real-time executive communication and post-incident review. Brought agile practice into incident and problem management, reducing mean time to resolution.",
+    blurb: "Coordinated the response to severity-1 incidents on enterprise platforms, bringing technical teams together under pressure and keeping customers and executives informed. Led post-incident reviews and introduced improvements to incident and problem management to reduce resolution time.",
     stack: "Incident & problem management · ITSM",
   },
   {
     period: "Ongoing · Independent",
     role: "AI & cloud projects",
     org: "atla.in",
-    blurb: "Gita Reflection: RAG over 700 verses on Amazon Bedrock, with a leakage test proving answers come from the retrieved source. An operations console with incident simulation. This site: Next.js on S3 and CloudFront, deployed by GitHub Actions with OIDC. Also publish free AWS certification study material.",
+    blurb: "Build and host projects on my own AWS infrastructure: Gita Reflection explores retrieval across 700 verses, the Operations Console demonstrates incident simulation, and the Browser Arcade experiments with AI-assisted coding. I test retrieval grounding and automate deployments, including this Next.js portfolio on S3 and CloudFront.",
     stack: "Bedrock · Python · FastAPI · Next.js · GitHub Actions",
   },
 ];
 
-export const timeline = { subtitle: "10+ years in cloud and service operations" };
+export const timeline = { subtitle: "10+ years across incident, cloud and service operations" };
 
 // Everything here is on every current résumé.
 export const recognition = {
   awards: [
-    { name: "SAP Hero Award, Innovator", by: "SAP" },
+    { name: "SAP Hero Award — Innovator", by: "SAP" },
     { name: "Top 25 Global AI Programs", by: "Accenture" },
-    { name: "ACE, Accenture Celebrates Excellence", by: "Accenture" },
+    { name: "ACE — Accenture Celebrates Excellence", by: "Accenture" },
     { name: "9× Best Performer of the Month", by: "SAP" },
     { name: "Delivery Excellence Award 2019", by: "TCS" },
   ],
@@ -120,7 +120,7 @@ export const recognition = {
     { name: "HashiCorp Certified: Terraform Associate", meta: "HashiCorp" },
     { name: "ITIL 4 Foundation", meta: "AXELOS" },
   ],
-  education: "B.Tech, Computer Science & Engineering · CMR Institute of Technology, Bangalore · 2015",
+  education: "B.Tech in Computer Science & Engineering · CMR Institute of Technology, Bengaluru · 2015",
 };
 
 // One résumé per role family; the file names say which is which.
@@ -132,10 +132,10 @@ export const resumes = [
 ];
 
 export const contact = {
-  lead: "Open to Cloud & DevOps, Operations Management and Applied AI roles in Bengaluru, and always up for a good conversation about running reliable systems. The fastest way to reach me is email.",
+  lead: "I’m open to opportunities in cloud operations, service delivery, DevOps and applied AI, as well as project collaborations. Based in Bengaluru. If my experience fits what you’re working on, I’d welcome a conversation — email is the easiest way to reach me.",
 };
 
-export const capabilities = ["Cloud & platform operations", "SAP on AWS", "AI automation & RAG", "Incident & service leadership"];
+export const capabilities = ["Cloud & platform operations", "SAP CX & I&CX operations", "AI automation & RAG", "Incident & service leadership"];
 
 export const sections = [
   { id: "home", label: "Home" },
