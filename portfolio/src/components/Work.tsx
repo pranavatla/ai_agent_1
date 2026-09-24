@@ -7,11 +7,11 @@ import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { projects, work } from "@/lib/site";
 import { useReducedMotion } from "@/lib/media";
 
-// Three projects on a ring, 120deg apart. Tiles are 16:9; the radius keeps each tile narrower
-// than the chord to its neighbour (2R·sin60 ≈ 1.73R), so they never intersect.
+// Four projects on a ring, 90deg apart. Tiles are 16:9; the radius keeps each tile narrower
+// than the chord to its neighbour (2R·sin45 ≈ 1.41R), so they never intersect.
 const STEP = 360 / projects.length;
 // Each project holds the front for a band of scroll, with a quick turn between (like the Services roller).
-const DWELL = 0.12;
+const DWELL = 0.1;
 const input: number[] = [];
 const output: number[] = [];
 projects.forEach((_, i) => {
@@ -84,14 +84,14 @@ export default function Work() {
   }
 
   return (
-    <section id="work" ref={ref} className="relative h-[300vh]">
+    <section id="work" ref={ref} className="relative h-[380vh]">
       {/* The clip lives on the sticky stage: overflow on the section would stop it pinning. */}
       <div className="sticky top-0 flex h-svh flex-col items-center justify-center gap-12 overflow-hidden">
         <Heading />
         <div className="relative h-[190px] w-full [perspective:1800px] md:h-[270px] lg:h-[360px]">
           <motion.div
             style={{ rotateY, transformStyle: "preserve-3d" }}
-            className="absolute inset-0 [--r:190px] md:[--r:280px] lg:[--r:380px]"
+            className="absolute inset-0 [--r:215px] md:[--r:310px] lg:[--r:420px]"
           >
             {projects.map((p, i) => (
               <a

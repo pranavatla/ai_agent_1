@@ -55,6 +55,14 @@ export const projects: { title: string; tag: string; href: string; image: string
     video: "/media/games-brag.mp4",
     alt: "Drop, Invaders and Break, three browser games",
   },
+  {
+    title: "AIF-C01 Study Guide",
+    tag: "AWS AI Practitioner · Study guide",
+    href: "https://aif.atla.in/",
+    image: "/media/aif-brag.jpg",
+    video: "/media/aif-brag.mp4",
+    alt: "Four-day AWS AI Practitioner (AIF-C01) study guide with practice-exam questions",
+  },
 ];
 
 // Each phrase pairs with a tile naming the real tools behind it (from the résumé).
