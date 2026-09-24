@@ -45,8 +45,9 @@ export default function Handoff() {
 
     const frame = () => {
       raf = 0;
-      // 0 as About's top enters the fold, 1 as it reaches the top: the 100vh where Services scrolls away.
-      const p = clamp(1 - about.getBoundingClientRect().top / window.innerHeight);
+      // 0 when Services' top reaches the top of the viewport, 1 when About's does: the scroll over which
+      // Services leaves. Measured by Services' own height, which is shorter than the viewport.
+      const p = clamp(1 - about.getBoundingClientRect().top / fade.offsetHeight);
       dst.style.visibility = p < 1 ? "hidden" : "";
       // Dissolve Services once the card is past edge-on, so the portrait lands on the starfield.
       fade.style.opacity = String(1 - clamp((p - 0.15) / 0.25));

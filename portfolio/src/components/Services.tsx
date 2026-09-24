@@ -6,7 +6,7 @@ import { services } from "@/lib/site";
 import { useIsLg, useMedia, useReducedMotion } from "@/lib/media";
 
 const COUNT = services.length;
-const HOLD_MS = 1500;
+const HOLD_MS = 1000;
 // Circular distance from the active item, in [-COUNT/2, COUNT/2). The index only ever counts up;
 // an item leaving the top re-enters at the bottom while it is invisible, so the cycle never rewinds.
 const wrap = (d: number) => ((((d + COUNT / 2) % COUNT) + COUNT) % COUNT) - COUNT / 2;
@@ -113,7 +113,7 @@ export default function Services() {
     else lastMove.current = performance.now();
   };
 
-  // Advance every 1.5s while the section is on screen, pausing while the card flips into About.
+  // Advance every second while the section is on screen, pausing while the card flips into About.
   useEffect(() => {
     if (reduced) return;
     let visible = false;
@@ -153,7 +153,7 @@ export default function Services() {
 
   return (
     <section id="services" ref={ref} data-covers-galaxy className="relative">
-      <div ref={stage} data-handoff-fade className="light-grid flex h-svh min-h-[560px] items-center overflow-hidden text-slate-900">
+      <div ref={stage} data-handoff-fade className="light-grid flex h-[70svh] min-h-[520px] items-center overflow-hidden text-slate-900">
         <h2 className="sr-only">What I do</h2>
         <div className="mx-auto flex w-full max-w-7xl items-center gap-8 px-6 sm:px-10 lg:pr-24">
           <div className={`flex min-w-0 flex-1 items-center gap-3 sm:gap-5 ${LEAD}`}>
