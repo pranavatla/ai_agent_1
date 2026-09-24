@@ -211,7 +211,7 @@ function Timeline({ reduced }: { reduced: boolean }) {
             {recognition.certifications.map((c) => (
               <li key={c.name} className="flex items-baseline justify-between gap-6 py-3.5">
                 <span className="font-medium text-slate-800">{c.name}</span>
-                {c.code && <span className="shrink-0 font-mono text-[11px] tracking-[0.14em] text-slate-500 uppercase">{c.code}</span>}
+                <span className="shrink-0 font-mono text-[11px] tracking-[0.14em] text-slate-500 uppercase">{c.meta}</span>
               </li>
             ))}
           </ul>

@@ -59,7 +59,7 @@ export const projects = [
 export const services: { phrase: string; color: string; icon: LucideIcon; tools: string }[] = [
   { phrase: "Run SAP on AWS.", color: "#1d6fd0", icon: Cloud, tools: "S/4HANA · EC2 · VPC · Route 53" },
   { phrase: "Automate Infra.", color: "#6d3bd4", icon: Workflow, tools: "Terraform · Ansible · Jenkins · GitHub Actions" },
-  { phrase: "Tame Incidents.", color: "#0f7c8a", icon: Siren, tools: "Major incidents · RCA · ITSM" },
+  { phrase: "Tame Incidents.", color: "#0f7c8a", icon: Siren, tools: "Major incidents · RCA · ITIL 4" },
   { phrase: "Build RAG Apps.", color: "#a86a12", icon: DatabaseZap, tools: "Bedrock · ChromaDB · Embeddings" },
   { phrase: "Ship AI Agents.", color: "#c2306b", icon: Bot, tools: "Multi-agent workflows · MCP" },
   { phrase: "Lead Teams.", color: "#157a5a", icon: Users, tools: "25+ engineers · SLA/KPI governance" },
@@ -112,10 +112,13 @@ export const recognition = {
     { name: "9× Best Performer of the Month", by: "SAP" },
     { name: "Delivery Excellence Award 2019", by: "TCS" },
   ],
+  // Confirmed by Sai Pranav and his résumés. Years omitted until each issue date is confirmed.
   certifications: [
-    { name: "AWS Certified AI Practitioner", code: "AIF-C01" },
-    { name: "HashiCorp Certified: Terraform Associate", code: "" },
-    { name: "AWS Certified Cloud Practitioner", code: "CLF-C02" },
+    { name: "AWS Certified AI Practitioner", meta: "AWS · AIF-C01" },
+    { name: "AWS Certified Cloud Practitioner", meta: "AWS · CLF-C02" },
+    { name: "Microsoft Certified: Azure Fundamentals", meta: "Microsoft · AZ-900" },
+    { name: "HashiCorp Certified: Terraform Associate", meta: "HashiCorp" },
+    { name: "ITIL 4 Foundation", meta: "AXELOS" },
   ],
   education: "B.Tech, Computer Science & Engineering · CMR Institute of Technology, Bangalore · 2015",
 };

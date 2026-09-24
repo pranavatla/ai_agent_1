@@ -59,7 +59,7 @@ Confirmed outcomes (on every résumé):
 
 Recognition: SAP Hero Award (Innovator); Accenture Top 25 Global AI Programs; ACE (Accenture Celebrates Excellence); 9× SAP Best Performer of the Month; TCS Delivery Excellence Award 2019.
 
-Certifications: AWS Certified AI Practitioner (AIF-C01); HashiCorp Certified: Terraform Associate; AWS Certified Cloud Practitioner (CLF-C02). Years not given.
+Certifications (confirmed by Sai Pranav): AWS Certified AI Practitioner (AIF-C01); AWS Certified Cloud Practitioner (CLF-C02); Microsoft Certified: Azure Fundamentals (AZ-900); HashiCorp Certified: Terraform Associate; ITIL 4 Foundation. LinkedIn lists "several others" behind its login wall; its public snippet shows issue dates Jul 2019, Jul 2021, Nov 2021 and Jul 2022 without saying which certificate each belongs to. "AWS SysOps" appears only in his LinkedIn headline, unconfirmed as a certification.
 
 Education: B.Tech, Computer Science & Engineering, CMR Institute of Technology, Bangalore, 2015.
 
@@ -71,7 +71,7 @@ Not live, do not link: AtlaOps (`ops.atla.in` does not respond); the real-time m
 
 **Pending or unresolved: do not fabricate.**
 
-- Certification years.
+- Certification years, and any further certifications listed on LinkedIn.
 - Relocation: the Operations Leader résumé says "open to Mumbai"; an earlier profile said not willing to relocate. The site says Bengaluru only.
 
 ## Product Principles
