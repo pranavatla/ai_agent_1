@@ -1,26 +1,12 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { FileDown, Mail, MapPin, Phone } from "lucide-react";
+import { EnvelopeSimple, FileArrowDown, MapPin, Phone } from "@phosphor-icons/react";
 import { contact, resumes, site } from "@/lib/site";
 
 const field =
-  "mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 transition focus:border-deep focus:bg-white focus:ring-2 focus:ring-deep/20 focus:outline-none";
-const label = "font-mono text-[11px] tracking-[0.16em] text-slate-500 uppercase";
-
-function Detail({ icon: Icon, title, children, wide }: { icon: typeof Mail; title: string; children: React.ReactNode; wide?: boolean }) {
-  return (
-    <div className={`flex items-start gap-4 ${wide ? "sm:col-span-2" : ""}`}>
-      <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-deep/10 text-deep">
-        <Icon aria-hidden className="size-5" />
-      </span>
-      <div className="min-w-0">
-        <p className={label}>{title}</p>
-        <div className="mt-1 text-[15px] font-medium break-words text-slate-900">{children}</div>
-      </div>
-    </div>
-  );
-}
+  "mt-2 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-slate-900 placeholder:text-slate-400 transition focus:border-deep focus:bg-white focus:ring-2 focus:ring-deep/20 focus:outline-none text-sm";
+const label = "font-mono text-xs font-medium tracking-wider text-slate-500 uppercase";
 
 export default function Contact() {
   const [status, setStatus] = useState("");
@@ -28,78 +14,127 @@ export default function Contact() {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
-    const body = `${f.get("message")}\n\n— ${f.get("name")}\n${f.get("email")}${f.get("phone") ? `\n${f.get("phone")}` : ""}`;
-    // No backend yet: hand the message to the visitor's mail client.
-    // To use a real endpoint, replace the next line with: await fetch("/api/contact", { method: "POST", body: f })
-    window.location.href = `mailto:${site.email}?subject=${encodeURIComponent(`Hello from ${f.get("name")}`)}&body=${encodeURIComponent(body)}`;
-    setStatus("Opening your email app — review and send your message there.");
+    const body = `${f.get("message")}\n\nFrom: ${f.get("name")}\nEmail: ${f.get("email")}${
+      f.get("phone") ? `\nPhone: ${f.get("phone")}` : ""
+    }`;
+    window.location.href = `mailto:${site.email}?subject=${encodeURIComponent(
+      `Hello from ${f.get("name")}`
+    )}&body=${encodeURIComponent(body)}`;
+    setStatus("Opening your email app. Review and send your message there.");
   };
 
   return (
-    <section id="contact" data-covers-galaxy className="bg-panel px-4 py-24 text-slate-900 sm:px-10 md:pr-24 lg:py-32">
+    <section id="contact" className="scroll-mt-20 bg-slate-50/60 px-6 py-24 sm:px-10 border-t border-slate-200/70">
       <div className="mx-auto max-w-6xl">
-        <div className="grid gap-12 rounded-[2rem] bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)] sm:p-10 lg:grid-cols-2 lg:gap-16 lg:p-14">
-          <div>
-            <h2 className="text-4xl font-bold tracking-[-0.03em] sm:text-5xl">Get in touch</h2>
-            <p className="mt-5 max-w-md leading-relaxed text-slate-600">
-              {contact.lead}
-            </p>
-            <div className="mt-10 grid gap-x-4 gap-y-6 sm:grid-cols-[1.35fr_1fr]">
-              <Detail icon={Mail} title="Email">
-                <a href={`mailto:${site.email}`} className="hover:text-deep">{site.email}</a>
-              </Detail>
-              <Detail icon={Phone} title="Phone">
-                <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="hover:text-deep">{site.phone}</a>
-              </Detail>
-              <Detail icon={MapPin} title="Location" wide>
-                {site.address}
-              </Detail>
-            </div>
-            <div id="resume" className="mt-10 scroll-mt-24">
-              <h3 className={label}>Choose a résumé</h3>
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {resumes.map((r) => (
-                  <li key={r.href}>
-                    <a
-                      href={r.href}
-                      download
-                      className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 transition duration-200 ease-snappy hover:border-deep/40 hover:bg-white hover:text-deep active:scale-[0.97]"
-                    >
-                      <FileDown aria-hidden className="size-4 text-deep" />
-                      {r.label}
+        <div className="grid gap-12 rounded-2xl border border-slate-200/90 bg-white p-8 shadow-xs sm:p-12 lg:grid-cols-2 lg:gap-16">
+          {/* Left Column: Direct Contact & Résumé Downloads */}
+          <div className="flex flex-col justify-between">
+            <div>
+              <span className="font-mono text-xs font-medium tracking-[0.2em] text-deep uppercase">
+                Contact
+              </span>
+              <h2 className="font-display mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+                Get in touch
+              </h2>
+              <p className="mt-4 leading-relaxed text-slate-600">
+                {contact.lead}
+              </p>
+
+              <div className="mt-8 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="grid size-10 place-items-center rounded-xl bg-deep/10 text-deep">
+                    <EnvelopeSimple size={18} />
+                  </div>
+                  <div>
+                    <p className="font-mono text-[11px] text-slate-500 uppercase">Email</p>
+                    <a href={`mailto:${site.email}`} className="text-sm font-semibold text-slate-900 hover:text-deep transition">
+                      {site.email}
                     </a>
-                  </li>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="grid size-10 place-items-center rounded-xl bg-deep/10 text-deep">
+                    <Phone size={18} />
+                  </div>
+                  <div>
+                    <p className="font-mono text-[11px] text-slate-500 uppercase">Phone</p>
+                    <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="text-sm font-semibold text-slate-900 hover:text-deep transition">
+                      {site.phone}
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="grid size-10 place-items-center rounded-xl bg-deep/10 text-deep">
+                    <MapPin size={18} />
+                  </div>
+                  <div>
+                    <p className="font-mono text-[11px] text-slate-500 uppercase">Location</p>
+                    <p className="text-sm font-semibold text-slate-900">{site.address}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Targeted Résumé Downloads */}
+            <div id="resume" className="mt-10 scroll-mt-24 border-t border-slate-100 pt-8">
+              <h3 className={label}>Tailored Résumés</h3>
+              <p className="mt-1 text-xs text-slate-500">Download specific role profiles in PDF format:</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {resumes.map((r) => (
+                  <a
+                    key={r.href}
+                    href={r.href}
+                    download
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-semibold text-slate-800 transition hover:border-deep/40 hover:bg-white hover:text-deep active:scale-95"
+                  >
+                    <FileArrowDown size={14} className="text-deep" />
+                    <span>{r.label}</span>
+                  </a>
                 ))}
-              </ul>
+              </div>
             </div>
           </div>
 
-          <form onSubmit={onSubmit} className="grid gap-5 sm:grid-cols-2">
-            <div>
-              <label htmlFor="c-name" className={label}>Name</label>
-              <input id="c-name" name="name" type="text" autoComplete="name" required className={field} />
+          {/* Right Column: Contact Message Form */}
+          <form onSubmit={onSubmit} className="flex flex-col justify-between rounded-xl bg-slate-50/70 p-6 sm:p-8 border border-slate-200/80">
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="c-name" className={label}>Name</label>
+                <input id="c-name" name="name" type="text" autoComplete="name" required className={field} />
+              </div>
+
+              <div>
+                <label htmlFor="c-email" className={label}>Email</label>
+                <input id="c-email" name="email" type="email" autoComplete="email" required className={field} />
+              </div>
+
+              <div>
+                <label htmlFor="c-phone" className={label}>Phone (optional)</label>
+                <input id="c-phone" name="phone" type="tel" autoComplete="tel" className={field} />
+              </div>
+
+              <div>
+                <label htmlFor="c-message" className={label}>Message</label>
+                <textarea id="c-message" name="message" rows={4} required className={`${field} resize-y`} />
+              </div>
             </div>
-            <div>
-              <label htmlFor="c-email" className={label}>Email</label>
-              <input id="c-email" name="email" type="email" autoComplete="email" required className={field} />
+
+            <div className="mt-6">
+              <button
+                type="submit"
+                className="w-full rounded-xl bg-slate-900 py-3.5 px-6 font-display text-sm font-semibold text-white shadow-xs transition hover:bg-deep active:scale-[0.98]"
+              >
+                Send Message via Email
+              </button>
+
+              {status && (
+                <p role="status" aria-live="polite" className="mt-3 text-center font-mono text-xs text-slate-600">
+                  {status}
+                </p>
+              )}
             </div>
-            <div className="sm:col-span-2">
-              <label htmlFor="c-phone" className={label}>Phone <span className="normal-case tracking-normal">(optional)</span></label>
-              <input id="c-phone" name="phone" type="tel" autoComplete="tel" className={field} />
-            </div>
-            <div className="sm:col-span-2">
-              <label htmlFor="c-message" className={label}>Message</label>
-              <textarea id="c-message" name="message" rows={5} required className={`${field} resize-y`} />
-            </div>
-            <button
-              type="submit"
-              className="rounded-xl bg-slate-900 px-6 py-4 font-mono text-xs tracking-[0.2em] text-white uppercase transition duration-200 ease-snappy hover:bg-deep focus-visible:outline-deep active:scale-[0.97] sm:col-span-2"
-            >
-              Open email draft
-            </button>
-            <p role="status" aria-live="polite" className="font-mono text-xs text-slate-500 sm:col-span-2">
-              {status}
-            </p>
           </form>
         </div>
       </div>

@@ -1,9 +1,17 @@
-// Every piece of copy and every image on the site lives here, so it can be replaced in one edit.
-// Claims are kept to what the résumé and the live projects can back up: no invented metrics.
-import type { IconType } from "react-icons";
-import { Bot, Cloud, DatabaseZap, Siren, Users, Workflow, type LucideIcon } from "lucide-react";
-import { FaGithub, FaLinkedinIn } from "react-icons/fa6";
-import { MdAlternateEmail } from "react-icons/md";
+import type { ComponentType } from "react";
+import {
+  Cloud,
+  Database,
+  EnvelopeSimple,
+  GitBranch,
+  GithubLogo,
+  LinkedinLogo,
+  Robot,
+  Siren,
+  UsersThree,
+} from "@phosphor-icons/react/dist/ssr";
+
+export type IconComponent = ComponentType<{ className?: string; size?: number | string; weight?: "thin" | "light" | "regular" | "bold" | "fill" | "duotone" }>;
 
 export const site = {
   brand: "Atla",
@@ -17,14 +25,13 @@ export const site = {
   address: "Bengaluru, India",
   url: "https://atla.in",
   linkedin: "https://linkedin.com/in/saipranavatla/",
-  // Transparent cut-out (WebP with alpha), 896x1195; About's frame uses this aspect ratio.
   portrait: "/media/portrait.webp",
 };
 
-export const socials: { label: string; href: string; icon: IconType }[] = [
-  { label: "GitHub", href: "https://github.com/pranavatla", icon: FaGithub },
-  { label: "LinkedIn", href: site.linkedin, icon: FaLinkedinIn },
-  { label: "Email", href: `mailto:${site.email}`, icon: MdAlternateEmail },
+export const socials: { label: string; href: string; icon: IconComponent }[] = [
+  { label: "GitHub", href: "https://github.com/pranavatla", icon: GithubLogo },
+  { label: "LinkedIn", href: site.linkedin, icon: LinkedinLogo },
+  { label: "Email", href: `mailto:${site.email}`, icon: EnvelopeSimple },
 ];
 
 export const work = {
@@ -55,14 +62,13 @@ export const projects = [
   },
 ];
 
-// Each phrase pairs with a tile naming the real tools behind it (from the résumé).
-export const services: { phrase: string; color: string; icon: LucideIcon; tools: string }[] = [
-  { phrase: "Run cloud ops.", color: "#1d6fd0", icon: Cloud, tools: "SAP CX / I&CX · AWS · Service health" },
-  { phrase: "Automate infra.", color: "#6d3bd4", icon: Workflow, tools: "Terraform · Ansible · Jenkins · GitHub Actions" },
-  { phrase: "Lead incidents.", color: "#0f7c8a", icon: Siren, tools: "Major incidents · RCA · ITIL 4" },
-  { phrase: "Build RAG apps.", color: "#a86a12", icon: DatabaseZap, tools: "Bedrock · ChromaDB · Embeddings" },
-  { phrase: "Build AI tools.", color: "#c2306b", icon: Bot, tools: "Python · FastAPI · AI workflows" },
-  { phrase: "Lead teams.", color: "#157a5a", icon: Users, tools: "16-member team · SLA/KPI governance" },
+export const services: { phrase: string; icon: IconComponent; tools: string }[] = [
+  { phrase: "Run cloud ops.", icon: Cloud, tools: "SAP CX / I&CX · AWS · Service health" },
+  { phrase: "Automate infra.", icon: GitBranch, tools: "Terraform · Ansible · Jenkins · GitHub Actions" },
+  { phrase: "Lead incidents.", icon: Siren, tools: "Major incidents · RCA · ITIL 4" },
+  { phrase: "Build RAG apps.", icon: Database, tools: "Bedrock · ChromaDB · Embeddings" },
+  { phrase: "Build AI tools.", icon: Robot, tools: "Python · FastAPI · AI workflows" },
+  { phrase: "Lead teams.", icon: UsersThree, tools: "16-member team · SLA/KPI governance" },
 ];
 
 export const about = {
@@ -72,21 +78,21 @@ export const about = {
 
 export const experience = [
   {
-    period: "Jan 2021 — Present",
-    role: "Operations Lead — SAP CX & I&CX",
+    period: "Jan 2021 - Present",
+    role: "Operations Lead: SAP CX & I&CX",
     org: "Accenture · client: SAP",
     blurb: "Lead a 16-member operations team and serve as the point of contact between SAP and Accenture for the CX and I&CX portfolio. My work spans SLA/KPI governance, capacity planning and scope assessment, with 100% SLA compliance across the supported services. Delivered automated operational reporting recognised with the SAP Hero Award and selection into Accenture’s Top 25 Global AI Programs.",
     stack: "SAP CX / I&CX · Commerce Cloud · C4C · SLA/KPI governance",
   },
   {
-    period: "Nov 2019 — Jan 2021",
+    period: "Sep 2018 - Jan 2021",
     role: "Subject Matter Expert, Cloud Operations",
     org: "Tata Consultancy Services · client: SAP",
     blurb: "Managed incident response for SAP Customer Experience services. Triage automation and standard escalation paths reduced resolution time by 40%; a rebuilt knowledge base reduced repeat-issue resolution time by 30%. Process and tooling improvements increased operational efficiency by 25%. Received nine SAP Best Performer of the Month awards.",
     stack: "ITSM · Confluence · GitHub · Capacity planning",
   },
   {
-    period: "Aug 2015 — Sep 2018",
+    period: "Aug 2015 - Sep 2018",
     role: "Major Incident Manager",
     org: "IBM",
     blurb: "Coordinated the response to severity-1 incidents on enterprise platforms, bringing technical teams together under pressure and keeping customers and executives informed. Led post-incident reviews and introduced improvements to incident and problem management to reduce resolution time.",
@@ -103,16 +109,14 @@ export const experience = [
 
 export const timeline = { subtitle: "10+ years across incident, cloud and service operations" };
 
-// Everything here is on every current résumé.
 export const recognition = {
   awards: [
-    { name: "SAP Hero Award — Innovator", by: "SAP" },
+    { name: "SAP Hero Award (Innovator)", by: "SAP" },
     { name: "Top 25 Global AI Programs", by: "Accenture" },
-    { name: "ACE — Accenture Celebrates Excellence", by: "Accenture" },
+    { name: "ACE (Accenture Celebrates Excellence)", by: "Accenture" },
     { name: "9× Best Performer of the Month", by: "SAP" },
     { name: "Delivery Excellence Award 2019", by: "TCS" },
   ],
-  // Confirmed by Sai Pranav and his résumés. Years omitted until each issue date is confirmed.
   certifications: [
     { name: "AWS Certified AI Practitioner", meta: "AWS · AIF-C01" },
     { name: "AWS Certified Cloud Practitioner", meta: "AWS · CLF-C02" },
@@ -123,7 +127,6 @@ export const recognition = {
   education: "B.Tech in Computer Science & Engineering · CMR Institute of Technology, Bengaluru · 2015",
 };
 
-// One résumé per role family; the file names say which is which.
 export const resumes = [
   { label: "Cloud & DevOps", href: "/resume/Sai_Pranav_Atla_Resume_DevOps_Cloud.pdf" },
   { label: "Operations & Program Management", href: "/resume/Sai_Pranav_Atla_Resume_Operations_Program_Manager.pdf" },
@@ -132,15 +135,15 @@ export const resumes = [
 ];
 
 export const contact = {
-  lead: "I’m open to opportunities in cloud operations, service delivery, DevOps and applied AI, as well as project collaborations. Based in Bengaluru. If my experience fits what you’re working on, I’d welcome a conversation — email is the easiest way to reach me.",
+  lead: "I’m open to opportunities in cloud operations, service delivery, DevOps and applied AI, as well as project collaborations. Based in Bengaluru. If my experience fits what you’re working on, I’d welcome a conversation: email is the easiest way to reach me.",
 };
 
 export const capabilities = ["Cloud & platform operations", "SAP CX & I&CX operations", "AI automation & RAG", "Incident & service leadership"];
 
 export const sections = [
-  { id: "home", label: "Home" },
   { id: "work", label: "Work" },
   { id: "services", label: "Services" },
   { id: "about", label: "About" },
+  { id: "experience", label: "Experience" },
   { id: "contact", label: "Contact" },
 ] as const;

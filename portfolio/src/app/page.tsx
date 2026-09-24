@@ -6,7 +6,6 @@ import Services from "@/components/Services";
 import About from "@/components/About";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import Handoff from "@/components/Handoff";
 
 export default function Home() {
   return (
@@ -21,7 +20,6 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
-      <Handoff />
     </>
   );
 }
