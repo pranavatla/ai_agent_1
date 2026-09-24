@@ -110,9 +110,9 @@ export default function Hero() {
           href={site.linkedin}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-medium text-white shadow-[0_10px_24px_-10px_rgba(15,23,42,0.6)] transition duration-200 ease-snappy hover:bg-deep active:scale-[0.97]"
+          className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-medium text-slate-800 shadow-sm transition duration-200 ease-snappy hover:border-deep/40 hover:text-deep active:scale-[0.97]"
         >
-          <FaLinkedinIn aria-hidden className="size-4" />
+          <FaLinkedinIn aria-hidden className="size-4 text-deep" />
           LinkedIn
         </a>
         <a
