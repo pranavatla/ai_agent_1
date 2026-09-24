@@ -1,7 +1,7 @@
-import { FileDown, Mail, MapPin, Phone } from "lucide-react";
+import { EnvelopeSimple, FileArrowDown, MapPin, Phone } from "@phosphor-icons/react/dist/ssr";
 import { capabilities, sections, site, socials } from "@/lib/site";
 
-const heading = "font-mono text-[11px] tracking-[0.2em] text-slate-500 uppercase";
+const heading = "text-sm font-semibold text-slate-900";
 
 export default function Footer() {
   return (
@@ -17,7 +17,7 @@ export default function Footer() {
           <ul className="mt-5 space-y-3 text-sm">
             {sections.map((s) => (
               <li key={s.id}>
-                <a href={`#${s.id}`} className="text-slate-700 transition hover:text-deep">{s.label}</a>
+                <a href={`#${s.id}`} className="hit text-slate-700 transition hover:text-deep">{s.label}</a>
               </li>
             ))}
           </ul>
@@ -32,20 +32,20 @@ export default function Footer() {
           <p className={heading}>Contact</p>
           <ul className="mt-5 space-y-3 text-sm text-slate-700">
             <li className="flex items-center gap-3">
-              <Mail aria-hidden className="size-4 shrink-0 text-deep" />
-              <a href={`mailto:${site.email}`} className="break-all transition hover:text-deep">{site.email}</a>
+              <EnvelopeSimple aria-hidden className="size-4 shrink-0 text-deep" />
+              <a href={`mailto:${site.email}`} className="hit break-all transition hover:text-deep">{site.email}</a>
             </li>
             <li className="flex items-center gap-3">
               <Phone aria-hidden className="size-4 shrink-0 text-deep" />
-              <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="transition hover:text-deep">{site.phone}</a>
+              <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="hit transition hover:text-deep">{site.phone}</a>
             </li>
             <li className="flex items-center gap-3">
               <MapPin aria-hidden className="size-4 shrink-0 text-deep" />
               {site.address}
             </li>
             <li className="flex items-center gap-3">
-              <FileDown aria-hidden className="size-4 shrink-0 text-deep" />
-              <a href="#resume" className="transition hover:text-deep">Résumés</a>
+              <FileArrowDown aria-hidden className="size-4 shrink-0 text-deep" />
+              <a href="#resume" className="hit transition hover:text-deep">Résumés</a>
             </li>
           </ul>
         </div>
@@ -62,21 +62,21 @@ export default function Footer() {
         </p>
         <div className="absolute inset-x-0 bottom-6 z-10 mx-auto flex max-w-6xl px-6 sm:px-10 items-end justify-between gap-4">
           <ul className="flex gap-2">
-            {socials.map(({ label, href, icon: Icon }) => (
+            {socials.filter((s) => s.label !== "Email").map(({ label, href, icon: Icon }) => (
               <li key={label}>
                 <a
                   href={href}
                   target={href.startsWith("http") ? "_blank" : undefined}
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="grid size-11 place-items-center rounded-xl border border-slate-200 bg-white/70 text-slate-700 shadow-sm backdrop-blur-md transition duration-200 ease-snappy hover:border-deep/50 hover:text-deep active:scale-[0.96]"
+                  className="grid size-11 place-items-center rounded-xl border border-slate-200 bg-surface/70 text-slate-700 shadow-sm backdrop-blur-md transition duration-200 ease-snappy hover:border-deep/50 hover:text-deep active:scale-[0.96]"
                 >
                   <Icon aria-hidden className="size-4" />
                 </a>
               </li>
             ))}
           </ul>
-          <p className="text-right font-mono text-[11px] tracking-[0.14em] text-slate-500 uppercase">
+          <p className="text-right font-mono text-xs text-slate-500">
             © {new Date().getFullYear()} {site.name}
           </p>
         </div>

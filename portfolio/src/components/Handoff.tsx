@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { scroll } from "motion";
 import { services, site } from "@/lib/site";
 import { useIsLg, useReducedMotion } from "@/lib/media";
 import { ServiceTile } from "./Services";
@@ -72,11 +73,12 @@ export default function Handoff() {
     };
 
     frame();
-    window.addEventListener("scroll", schedule, { passive: true });
+    // Motion's frame-batched scroll observer, not a raw window scroll listener.
+    const stopScroll = scroll(() => schedule());
     window.addEventListener("resize", schedule);
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", schedule);
+      stopScroll();
       window.removeEventListener("resize", schedule);
       src.style.visibility = "";
       dst.style.visibility = "";
@@ -90,7 +92,7 @@ export default function Handoff() {
     <div ref={overlay} aria-hidden className="pointer-events-none fixed inset-0 z-40 [perspective:1600px]" style={{ display: "none" }}>
       <div ref={box} className="absolute">
         <div ref={flipper} className="relative h-full w-full [transform-style:preserve-3d]">
-          <div ref={(el) => { if (el) faces.current[0] = el; }} className={`${face} border border-black/80`}>
+          <div ref={(el) => { if (el) faces.current[0] = el; }} className={`${face} border border-slate-900/80`}>
             <div ref={tile} className="origin-top-left">
               <ServiceTile s={services[services.length - 1]} />
             </div>

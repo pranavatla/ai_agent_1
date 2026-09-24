@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, useMotionValue, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
-import { about, experience, recognition, site, socials, timeline } from "@/lib/site";
+import { about, experience, recognition, site, timeline } from "@/lib/site";
 import { useIsLg, useReducedMotion } from "@/lib/media";
 
 const words = about.bio.split(" ");
@@ -14,8 +14,9 @@ const [SWEEP_FROM, SWEEP_TO] = [0.18, 0.72];
 function Word({ w, i, progress }: { w: string; i: number; progress: MotionValue<number> }) {
   const a = SWEEP_FROM + i * STEP * (SWEEP_TO - SWEEP_FROM);
   const b = a + 2.2 * STEP * (SWEEP_TO - SWEEP_FROM);
-  const color = useTransform(progress, [a, b], ["rgba(15,23,42,0.16)", "rgba(15,23,42,0.9)"]);
-  return <motion.span style={{ color }}>{w} </motion.span>;
+  // Opacity rather than a fixed colour, so the sweep works on both the light and dark themes.
+  const opacity = useTransform(progress, [a, b], [0.16, 0.92]);
+  return <motion.span style={{ opacity }}>{w} </motion.span>;
 }
 
 const rise = (delay = 0) => ({
@@ -61,11 +62,10 @@ export default function About() {
       {/* Part A: pinned hero. The clip is on the sticky frame, never on this scrolling wrapper. */}
       <div ref={stage} className={pin ? "h-[220vh]" : ""}>
         <div className={`relative flex flex-col overflow-hidden px-6 py-8 sm:px-10 ${pin ? "sticky top-0 h-svh lg:pr-24" : "min-h-svh"}`}>
-          <div className="relative z-10 flex items-center justify-between">
+          <div className="relative z-10 flex items-center">
             <motion.p {...rise()} className="font-display text-xl font-bold tracking-[0.08em] uppercase">
               {site.brand}
             </motion.p>
-            <p className="hidden font-mono text-xs tracking-[0.2em] text-slate-500 uppercase md:block">About</p>
           </div>
 
           {/* On lg the middle band leaves the flow so the portrait spans the whole frame. */}
@@ -99,7 +99,7 @@ export default function About() {
                 <motion.span
                   key={line}
                   {...rise(0.12 * i)}
-                  className={`block ${i === about.statement.length - 1 ? "bg-gradient-to-r from-deep to-violet bg-clip-text text-transparent" : ""}`}
+                  className={`block ${i === about.statement.length - 1 ? "text-deep" : ""}`}
                 >
                   {line}
                 </motion.span>
@@ -111,34 +111,11 @@ export default function About() {
                   ? about.bio
                   : words.map((w, i) => <Word key={i} w={w} i={i} progress={progress} />)}
               </p>
-              <a
-                href={site.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 inline-block font-mono text-xs tracking-[0.2em] text-deep uppercase underline underline-offset-8 hover:text-violet"
-              >
-                View LinkedIn
-              </a>
             </div>
           </div>
 
-          <div className={`relative z-10 mt-10 flex items-end justify-between ${pin ? "" : "order-3"}`}>
-            <motion.ul {...rise(0.1)} className="flex gap-2">
-              {socials.map(({ label, href, icon: Icon }) => (
-                <li key={label}>
-                  <a
-                    href={href}
-                    target={href.startsWith("http") ? "_blank" : undefined}
-                    rel="noopener noreferrer"
-                    aria-label={label}
-                    className="grid size-11 place-items-center rounded-xl border border-slate-200 bg-white/70 text-slate-700 shadow-sm backdrop-blur-md transition duration-200 ease-snappy hover:border-deep/50 hover:text-deep active:scale-[0.96]"
-                  >
-                    <Icon aria-hidden className="size-4" />
-                  </a>
-                </li>
-              ))}
-            </motion.ul>
-            <motion.p {...rise(0.2)} className="font-mono text-xs tracking-[0.2em] text-slate-500 uppercase">
+          <div className={`relative z-10 mt-10 flex items-end justify-end ${pin ? "" : "order-3"}`}>
+            <motion.p {...rise(0.2)} className="font-mono text-xs text-slate-500">
               {site.address}
             </motion.p>
           </div>
@@ -157,14 +134,14 @@ function Timeline({ reduced }: { reduced: boolean }) {
 
   return (
     <div className="mx-auto max-w-5xl px-6 pt-24 pb-32 sm:px-10">
-      <h2 className="font-display text-3xl font-bold tracking-[0.12em] uppercase sm:text-4xl">Experience</h2>
-      <p className="mt-3 font-mono text-xs tracking-[0.2em] text-slate-500 uppercase">{timeline.subtitle}</p>
+      <h2 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">Experience</h2>
+      <p className="mt-3 text-base text-slate-600">{timeline.subtitle}</p>
       <ol ref={ref} className="relative mt-16">
         <span aria-hidden className="absolute top-0 bottom-0 left-4 w-px bg-slate-200 lg:left-1/2" />
         <motion.span
           aria-hidden
           style={{ scaleY: reduced ? 1 : scaleY }}
-          className="absolute top-0 bottom-0 left-4 w-px origin-top bg-gradient-to-b from-deep to-violet lg:left-1/2"
+          className="absolute top-0 bottom-0 left-4 w-px origin-top bg-deep lg:left-1/2"
         />
         {experience.map((job, i) => {
           const right = i % 2 === 1;
@@ -180,9 +157,9 @@ function Timeline({ reduced }: { reduced: boolean }) {
                 viewport={{ once: true, amount: 0.4 }}
                 transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={{ y: -4 }}
-                className="rounded-2xl border border-slate-200 bg-white/75 p-6 shadow-[0_10px_30px_rgba(15,23,42,0.06)] backdrop-blur-md transition-colors hover:border-deep/40"
+                className="rounded-2xl border border-slate-200 bg-surface/75 p-6 shadow-[0_10px_30px_rgba(15,23,42,0.06)] backdrop-blur-md transition-colors hover:border-deep/40"
               >
-                <p className="font-mono text-xs tracking-[0.18em] text-deep uppercase">{job.period}</p>
+                <p className="font-mono text-xs text-deep">{job.period}</p>
                 <h3 className="mt-3 text-xl font-bold">{job.role}</h3>
                 <p className="mt-1 text-slate-500">{job.org}</p>
                 <p className="mt-3 text-sm leading-relaxed text-slate-600">{job.blurb}</p>
@@ -200,7 +177,7 @@ function Timeline({ reduced }: { reduced: boolean }) {
             {recognition.awards.map((a) => (
               <li key={a.name} className="flex items-baseline justify-between gap-6 py-3.5">
                 <span className="font-medium text-slate-800">{a.name}</span>
-                <span className="shrink-0 font-mono text-[11px] tracking-[0.14em] text-slate-500 uppercase">{a.by}</span>
+                <span className="shrink-0 font-mono text-xs text-slate-500">{a.by}</span>
               </li>
             ))}
           </ul>
@@ -211,7 +188,7 @@ function Timeline({ reduced }: { reduced: boolean }) {
             {recognition.certifications.map((c) => (
               <li key={c.name} className="flex items-baseline justify-between gap-6 py-3.5">
                 <span className="font-medium text-slate-800">{c.name}</span>
-                <span className="shrink-0 font-mono text-[11px] tracking-[0.14em] text-slate-500 uppercase">{c.meta}</span>
+                <span className="shrink-0 font-mono text-xs text-slate-500">{c.meta}</span>
               </li>
             ))}
           </ul>

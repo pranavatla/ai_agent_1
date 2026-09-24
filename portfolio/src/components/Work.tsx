@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { projects, work } from "@/lib/site";
 import { useReducedMotion } from "@/lib/media";
 
@@ -15,8 +15,8 @@ const ring = Array.from({ length: CARDS }, (_, i) => projects[i % projects.lengt
 function Heading() {
   return (
     <div className="text-center">
-      <h2 className="font-display text-4xl font-bold tracking-[0.12em] uppercase sm:text-5xl">Work</h2>
-      <p className="mt-3 font-mono text-xs tracking-[0.2em] text-slate-500 uppercase">{work.subtitle}</p>
+      <h2 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">Work</h2>
+      <p className="mt-3 text-base text-slate-600">{work.subtitle}</p>
     </div>
   );
 }
@@ -24,12 +24,12 @@ function Heading() {
 function Face({ p, back }: { p: (typeof projects)[number]; back?: boolean }) {
   return (
     <div
-      className="absolute inset-0 overflow-hidden rounded-2xl border border-slate-200 bg-white text-white shadow-[0_12px_30px_rgba(15,23,42,0.12)] [backface-visibility:hidden]"
+      className="absolute inset-0 overflow-hidden rounded-2xl border border-slate-200 bg-surface text-white shadow-[0_12px_30px_rgba(15,23,42,0.12)] [backface-visibility:hidden]"
       style={back ? { transform: "rotateY(180deg)", filter: "grayscale(0.5)", opacity: 0.45 } : undefined}
     >
       <Image src={p.image} alt={back ? "" : p.alt} fill sizes="(min-width: 1024px) 600px, 320px" className="object-cover" />
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 to-transparent p-3 pt-10 text-left md:p-4">
-        <p className="font-mono text-[10px] tracking-[0.16em] text-sky-300 uppercase">{p.tag}</p>
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0b1220]/85 to-transparent p-3 pt-10 text-left md:p-4">
+        <p className="font-mono text-[11px] text-sky-300">{p.tag}</p>
         <p className="font-display mt-1 text-sm font-bold tracking-[-0.02em]">{p.title}</p>
       </div>
     </div>

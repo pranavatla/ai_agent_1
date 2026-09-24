@@ -4,9 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import { useReducedMotion } from "@/lib/media";
 
-const BAND =
-  "radial-gradient(ellipse 120% 70% at 50% 5%, #f7f8fc 0%, #f7f8fc 44%, #eef3ff 48%, #dce7ff 53%, #cbd7ff 59%, #d8cbf6 62%, #edc9e2 66%, #f8dcc6 74%, #fbece3 83%, #f7f8fc 93%)";
-
 export default function Background() {
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll();
@@ -43,7 +40,7 @@ export default function Background() {
         >
           <div
             className="h-full w-full transition-opacity duration-700"
-            style={{ background: BAND, opacity: covered ? 0 : 1 }}
+            style={{ background: "var(--band)", opacity: covered ? 0 : 1 }}
           />
         </motion.div>
       </motion.div>
@@ -68,7 +65,10 @@ function Stars() {
     let h = 0;
     let raf = 0;
 
+    const scheme = window.matchMedia("(prefers-color-scheme: dark)");
+    let dark = scheme.matches;
     const build = () => {
+      dark = scheme.matches;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       w = window.innerWidth;
       h = window.innerHeight;
@@ -81,7 +81,8 @@ function Stars() {
         const cls = Math.random();
         const [lo, hi, sat] = cls < 0.72 ? [210, 240, 70] : cls < 0.92 ? [34, 48, 80] : [330, 350, 60];
         const hue = lo + Math.random() * (hi - lo);
-        const light = 48 + Math.random() * 18;
+        // Darker stars on the light ground, bright ones on the dark ground.
+        const light = dark ? 76 + Math.random() * 23 : 48 + Math.random() * 18;
         const x = Math.random() * w;
         const y = Math.random() * h;
         return {
@@ -168,11 +169,13 @@ function Stars() {
 
     build();
     window.addEventListener("resize", build);
+    scheme.addEventListener("change", build);
     window.addEventListener("pointermove", onMove, { passive: true });
     document.documentElement.addEventListener("pointerleave", onLeave);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", build);
+      scheme.removeEventListener("change", build);
       window.removeEventListener("pointermove", onMove);
       document.documentElement.removeEventListener("pointerleave", onLeave);
     };

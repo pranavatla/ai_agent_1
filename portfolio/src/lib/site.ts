@@ -1,15 +1,15 @@
 // Every piece of copy and every image on the site lives here, so it can be replaced in one edit.
 // Claims are kept to what the résumé and the live projects can back up: no invented metrics.
-import type { IconType } from "react-icons";
-import { Bot, Cloud, DatabaseZap, Siren, Users, Workflow, type LucideIcon } from "lucide-react";
-import { FaGithub, FaLinkedinIn } from "react-icons/fa6";
-import { MdAlternateEmail } from "react-icons/md";
+// One icon family site-wide: Phosphor (the SSR entry works in server and client components).
+import type { Icon } from "@phosphor-icons/react";
+import { Cloud, Database, EnvelopeSimple, FlowArrow, GithubLogo, LinkedinLogo, Robot, Siren, UsersThree } from "@phosphor-icons/react/dist/ssr";
 
 export const site = {
   brand: "Atla",
   name: "Sai Pranav Atla",
   tagline: "10+ years in enterprise operations. Bringing that experience to cloud automation and applied AI.",
-  handle: "Cloud operations · Service delivery · Applied AI · Open to opportunities",
+  // Rendered as separate items with spacing, not joined by separators.
+  handle: ["Cloud operations", "Service delivery", "Applied AI", "Open to opportunities"],
   description:
     "Sai Pranav Atla’s portfolio: 10+ years in enterprise operations across IBM, TCS and Accenture, with experience in SAP CX/I&CX, service delivery and independent cloud and AI projects. Based in Bengaluru.",
   email: "pranavatla@gmail.com",
@@ -21,10 +21,10 @@ export const site = {
   portrait: "/media/portrait.webp",
 };
 
-export const socials: { label: string; href: string; icon: IconType }[] = [
-  { label: "GitHub", href: "https://github.com/pranavatla", icon: FaGithub },
-  { label: "LinkedIn", href: site.linkedin, icon: FaLinkedinIn },
-  { label: "Email", href: `mailto:${site.email}`, icon: MdAlternateEmail },
+export const socials: { label: string; href: string; icon: Icon }[] = [
+  { label: "GitHub", href: "https://github.com/pranavatla", icon: GithubLogo },
+  { label: "LinkedIn", href: site.linkedin, icon: LinkedinLogo },
+  { label: "Email", href: `mailto:${site.email}`, icon: EnvelopeSimple },
 ];
 
 export const work = {
@@ -56,13 +56,13 @@ export const projects = [
 ];
 
 // Each phrase pairs with a tile naming the real tools behind it (from the résumé).
-export const services: { phrase: string; color: string; icon: LucideIcon; tools: string }[] = [
-  { phrase: "Run cloud ops.", color: "#1d6fd0", icon: Cloud, tools: "SAP CX / I&CX · AWS · Service health" },
-  { phrase: "Automate infra.", color: "#6d3bd4", icon: Workflow, tools: "Terraform · Ansible · Jenkins · GitHub Actions" },
-  { phrase: "Lead incidents.", color: "#0f7c8a", icon: Siren, tools: "Major incidents · RCA · ITIL 4" },
-  { phrase: "Build RAG apps.", color: "#a86a12", icon: DatabaseZap, tools: "Bedrock · ChromaDB · Embeddings" },
-  { phrase: "Build AI tools.", color: "#c2306b", icon: Bot, tools: "Python · FastAPI · AI workflows" },
-  { phrase: "Lead teams.", color: "#157a5a", icon: Users, tools: "16-member team · SLA/KPI governance" },
+export const services: { phrase: string; icon: Icon; tools: string }[] = [
+  { phrase: "Run cloud ops.", icon: Cloud, tools: "SAP CX / I&CX, AWS, Service health" },
+  { phrase: "Automate infra.", icon: FlowArrow, tools: "Terraform, Ansible, Jenkins, GitHub Actions" },
+  { phrase: "Lead incidents.", icon: Siren, tools: "Major incidents, RCA, ITIL 4" },
+  { phrase: "Build RAG apps.", icon: Database, tools: "Bedrock, ChromaDB, Embeddings" },
+  { phrase: "Build AI tools.", icon: Robot, tools: "Python, FastAPI, AI workflows" },
+  { phrase: "Lead teams.", icon: UsersThree, tools: "16-member team, SLA/KPI governance" },
 ];
 
 export const about = {
@@ -76,28 +76,28 @@ export const experience = [
     role: "Operations Lead: SAP CX & I&CX",
     org: "Accenture · client: SAP",
     blurb: "Lead a 16-member operations team and serve as the point of contact between SAP and Accenture for the CX and I&CX portfolio. My work spans SLA/KPI governance, capacity planning and scope assessment, with 100% SLA compliance across the supported services. Delivered automated operational reporting recognised with the SAP Hero Award and selection into Accenture’s Top 25 Global AI Programs.",
-    stack: "SAP CX / I&CX · Commerce Cloud · C4C · SLA/KPI governance",
+    stack: "SAP CX / I&CX, Commerce Cloud, C4C, SLA/KPI governance",
   },
   {
     period: "Sep 2018 - Jan 2021",
     role: "Subject Matter Expert, Cloud Operations",
     org: "Tata Consultancy Services · client: SAP",
     blurb: "Managed incident response for SAP Customer Experience services. Triage automation and standard escalation paths reduced resolution time by 40%; a rebuilt knowledge base reduced repeat-issue resolution time by 30%. Process and tooling improvements increased operational efficiency by 25%. Received nine SAP Best Performer of the Month awards.",
-    stack: "ITSM · Confluence · GitHub · Capacity planning",
+    stack: "ITSM, Confluence, GitHub, Capacity planning",
   },
   {
     period: "Aug 2015 - Sep 2018",
     role: "Major Incident Manager",
     org: "IBM",
     blurb: "Coordinated the response to severity-1 incidents on enterprise platforms, bringing technical teams together under pressure and keeping customers and executives informed. Led post-incident reviews and introduced improvements to incident and problem management to reduce resolution time.",
-    stack: "Incident & problem management · ITSM",
+    stack: "Incident & problem management, ITSM",
   },
   {
     period: "Ongoing · Independent",
     role: "AI & cloud projects",
     org: "atla.in",
     blurb: "Build and host projects on my own AWS infrastructure: Gita Reflection explores retrieval across 700 verses, the Operations Console demonstrates incident simulation, and the Browser Arcade experiments with AI-assisted coding. I test retrieval grounding and automate deployments, including this Next.js portfolio on S3 and CloudFront.",
-    stack: "Bedrock · Python · FastAPI · Next.js · GitHub Actions",
+    stack: "Bedrock, Python, FastAPI, Next.js, GitHub Actions",
   },
 ];
 
@@ -120,7 +120,7 @@ export const recognition = {
     { name: "HashiCorp Certified: Terraform Associate", meta: "HashiCorp" },
     { name: "ITIL 4 Foundation", meta: "AXELOS" },
   ],
-  education: "B.Tech in Computer Science & Engineering · CMR Institute of Technology, Bengaluru · 2015",
+  education: "B.Tech in Computer Science & Engineering, CMR Institute of Technology, Bengaluru (2015)",
 };
 
 // One résumé per role family; the file names say which is which.

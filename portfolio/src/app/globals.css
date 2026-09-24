@@ -1,7 +1,40 @@
 @import "tailwindcss";
 
+/* Theme tokens. Light by default; dark follows the visitor's system setting. */
 :root {
+  color-scheme: light dark;
   --font-display: var(--font-manrope), ui-sans-serif, sans-serif;
+  --ground: #f7f8fc;
+  --ink: #0f172a;
+  --panel: #f4f5f9;
+  --surface: #ffffff;
+  --deep: #1d6fd0; /* the single accent, used everywhere */
+  --grid-line: rgba(15, 23, 42, 0.07);
+  --band: radial-gradient(ellipse 120% 70% at 50% 5%, #f7f8fc 0%, #f7f8fc 44%, #eef3ff 48%, #dce7ff 53%, #cbd7ff 59%, #d8cbf6 62%, #edc9e2 66%, #f8dcc6 74%, #fbece3 83%, #f7f8fc 93%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #0b0f1a;
+    --ink: #e8edf5;
+    --panel: #0e1422;
+    --surface: #141b2b;
+    --deep: #4b8ee8;
+    --grid-line: rgba(226, 232, 240, 0.06);
+    --band: radial-gradient(ellipse 120% 70% at 50% 5%, #0b0f1a 0%, #0b0f1a 44%, #0d1330 48%, #13204f 53%, #223066 59%, #3d3170 62%, #6e5476 66%, #8c7560 74%, #2a2230 83%, #0b0f1a 93%);
+    /* The slate scale flips, so every text/border/fill utility keeps its role (ink on ground) in dark mode. */
+    --color-slate-50: #0d1321;
+    --color-slate-100: #151c2c;
+    --color-slate-200: #253045;
+    --color-slate-300: #3a4660;
+    --color-slate-400: #64748b;
+    --color-slate-500: #94a3b8;
+    --color-slate-600: #b4c0d0;
+    --color-slate-700: #cbd5e1;
+    --color-slate-800: #e2e8f0;
+    --color-slate-900: #eef2f7;
+    --color-slate-950: #f8fafc;
+  }
 }
 
 @theme inline {
@@ -9,20 +42,20 @@
   --font-mono: var(--font-spacemono), ui-monospace, monospace;
   --font-display: var(--font-manrope), ui-sans-serif, sans-serif;
   --font-heading: var(--font-manrope), ui-sans-serif, sans-serif;
-  --color-ground: #f7f8fc;
-  --color-ink: #0f172a;
-  --color-panel: #f4f5f9;
-  --color-deep: #1d6fd0;
-  --color-violet: #6d3bd4;
+  --color-ground: var(--ground);
+  --color-ink: var(--ink);
+  --color-panel: var(--panel);
+  --color-surface: var(--surface);
+  --color-deep: var(--deep);
   /* Strong ease-out for interface feedback: moves immediately, settles softly. */
   --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 html {
   scroll-behavior: smooth;
-  scrollbar-color: rgba(29, 111, 208, 0.35) transparent;
-  accent-color: var(--color-deep);
-  caret-color: var(--color-deep);
+  scrollbar-color: color-mix(in srgb, var(--deep) 35%, transparent) transparent;
+  accent-color: var(--deep);
+  caret-color: var(--deep);
 }
 
 a {
@@ -31,18 +64,18 @@ a {
 
 /* The fixed background sits at z -10, behind body's own box, so the base colour must live on body. */
 body {
-  background: var(--color-ground);
-  color: var(--color-ink);
+  background: var(--ground);
+  color: var(--ink);
   font-family: var(--font-sans);
   overflow-x: clip;
 }
 
 ::selection {
-  background: rgba(29, 111, 208, 0.18);
+  background: color-mix(in srgb, var(--deep) 20%, transparent);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-deep);
+  outline: 2px solid var(--deep);
   outline-offset: 3px;
 }
 
@@ -59,12 +92,29 @@ body {
     transparent 100%
   );
 }
+@media (prefers-color-scheme: dark) {
+  .galaxy {
+    opacity: 0.55;
+  }
+}
 
+/* Services panel: a faint square grid that dissolves under a central bloom, so type stays crisp. */
 .light-grid {
   background:
-    radial-gradient(ellipse 58% 52% at 50% 50%, #fff 0%, rgba(255, 255, 255, 0.92) 45%, rgba(255, 255, 255, 0) 78%),
-    linear-gradient(rgba(15, 23, 42, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.07) 1px, transparent 1px),
-    #f4f5f9;
+    radial-gradient(ellipse 58% 52% at 50% 50%, var(--surface) 0%, color-mix(in srgb, var(--surface) 92%, transparent) 45%, transparent 78%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+    var(--panel);
   background-size: auto, 56px 56px, 56px 56px, auto;
+}
+
+/* Small inline text links keep their look but get a larger tap target (32px: fills the gap between
+   stacked footer links without overlapping, above the WCAG 2.2 AA 24px minimum). */
+.hit {
+  position: relative;
+}
+.hit::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
 }

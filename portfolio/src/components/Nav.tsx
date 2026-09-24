@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Briefcase, House, LayoutGrid, Mail, Menu, User, X } from "lucide-react";
+import { Briefcase, EnvelopeSimple, House, List, SquaresFour, User, X } from "@phosphor-icons/react/dist/ssr";
 import { sections } from "@/lib/site";
 import { useReducedMotion } from "@/lib/media";
 
-const icons = { home: House, work: Briefcase, services: LayoutGrid, about: User, contact: Mail };
+const icons = { home: House, work: Briefcase, services: SquaresFour, about: User, contact: EnvelopeSimple };
 const MIDLINE = { rootMargin: "-50% 0px -50% 0px" };
 
 export default function Nav() {
@@ -38,7 +38,7 @@ export default function Nav() {
     };
   }, [open]);
 
-  const btn = "bg-white text-slate-700 shadow-[0_6px_18px_rgba(15,23,42,0.12)] hover:text-deep";
+  const btn = "bg-surface text-slate-700 shadow-[0_6px_18px_rgba(15,23,42,0.12)] hover:text-deep";
   const current = "bg-deep text-white shadow-[0_6px_18px_rgba(29,111,208,0.4)]";
 
   return (
@@ -58,7 +58,7 @@ export default function Nav() {
               <Icon aria-hidden className="size-[18px]" />
               <span
                 aria-hidden
-                className="pointer-events-none absolute right-full mr-3 translate-x-2 rounded-full bg-white px-3 py-1.5 font-mono text-[11px] tracking-[0.14em] whitespace-nowrap text-slate-800 uppercase opacity-0 shadow-[0_6px_18px_rgba(15,23,42,0.14)] transition duration-200 ease-snappy group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100"
+                className="pointer-events-none absolute right-full mr-3 translate-x-2 rounded-full bg-surface px-3 py-1.5 text-xs font-medium whitespace-nowrap text-slate-800 opacity-0 shadow-[0_6px_18px_rgba(15,23,42,0.14)] transition duration-200 ease-snappy group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100"
               >
                 {label}
               </span>
@@ -75,7 +75,7 @@ export default function Nav() {
         onClick={() => setOpen((o) => !o)}
         className={`fixed top-4 right-4 z-[60] grid size-11 place-items-center rounded-full transition duration-200 ease-snappy active:scale-[0.94] md:hidden ${btn}`}
       >
-        {open ? <X aria-hidden className="size-5" /> : <Menu aria-hidden className="size-5" />}
+        {open ? <X aria-hidden className="size-5" /> : <List aria-hidden className="size-5" />}
       </button>
 
       <AnimatePresence>
@@ -99,7 +99,7 @@ export default function Nav() {
                 initial={reduced ? { opacity: 0 } : { opacity: 0, y: 18 }}
                 animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
                 transition={reduced ? { duration: 0.15 } : { delay: 0.05 * i + 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="font-display py-2 text-4xl font-bold tracking-[-0.02em] text-slate-700 uppercase aria-[current]:text-deep"
+                className="font-display py-2 text-4xl font-extrabold tracking-tight text-slate-700 aria-[current]:text-deep"
               >
                 {label}
               </motion.a>
