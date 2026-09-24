@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Mail, MapPin, Phone } from "lucide-react";
-import { contact, site } from "@/lib/site";
+import { FileDown, Mail, MapPin, Phone } from "lucide-react";
+import { contact, resumes, site } from "@/lib/site";
 
 const field =
   "mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 transition focus:border-deep focus:bg-white focus:ring-2 focus:ring-deep/20 focus:outline-none";
@@ -54,6 +54,23 @@ export default function Contact() {
               <Detail icon={MapPin} title="Address" wide>
                 {site.address}
               </Detail>
+            </div>
+            <div id="resume" className="mt-10 scroll-mt-24">
+              <h3 className={label}>Résumé, by role</h3>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {resumes.map((r) => (
+                  <li key={r.href}>
+                    <a
+                      href={r.href}
+                      download
+                      className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 transition duration-200 ease-snappy hover:border-deep/40 hover:bg-white hover:text-deep active:scale-[0.97]"
+                    >
+                      <FileDown aria-hidden className="size-4 text-deep" />
+                      {r.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
 

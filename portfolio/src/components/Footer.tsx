@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone } from "lucide-react";
+import { FileDown, Mail, MapPin, Phone } from "lucide-react";
 import { capabilities, sections, site, socials } from "@/lib/site";
 
 const heading = "font-mono text-[11px] tracking-[0.2em] text-slate-500 uppercase";
@@ -42,6 +42,10 @@ export default function Footer() {
             <li className="flex items-center gap-3">
               <MapPin aria-hidden className="size-4 shrink-0 text-deep" />
               {site.address}
+            </li>
+            <li className="flex items-center gap-3">
+              <FileDown aria-hidden className="size-4 shrink-0 text-deep" />
+              <a href="#resume" className="transition hover:text-deep">Résumés</a>
             </li>
           </ul>
         </div>

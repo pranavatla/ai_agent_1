@@ -8,7 +8,7 @@ web
 
 ## Users
 
-Recruiters and hiring managers filling **Cloud & DevOps**, **Operations Management** and **Applied AI** roles, primarily in Bengaluru (Sai Pranav is not open to relocation). They arrive from LinkedIn, a résumé, or a direct link, skim in a minute or two, and decide whether to reach out.
+Recruiters and hiring managers filling **Cloud & DevOps**, **Operations Management** and **Applied AI** roles, primarily in Bengaluru. They arrive from LinkedIn, a résumé, or a direct link, skim in a minute or two, and decide whether to reach out.
 
 Success: the visitor contacts Sai Pranav by email, phone or LinkedIn, or shortlists him for a conversation.
 
@@ -18,7 +18,7 @@ atla.in is Sai Pranav Atla's personal portfolio. It shows a recruiter, quickly a
 
 ## Positioning
 
-An operations leader who ships. Most operations managers don't build; most AI builders haven't run major incidents or SAP platforms at enterprise scale. Sai Pranav has done both: major-incident management at IBM, cloud operations at TCS, platform and AI automation at Accenture leading 25+ engineers, and live AI projects on his own AWS account.
+An operations leader who ships. Most operations managers don't build; most AI builders haven't run major incidents or SAP platforms at enterprise scale. Sai Pranav has done both: major-incident management at IBM, cloud operations at TCS, platform and service operations for SAP itself at Accenture (leading a 16-member team across cross-functional groups of 25+ engineers), and live AI projects on his own AWS account.
 
 ## Operating Context
 
@@ -41,23 +41,38 @@ An operations leader who ships. Most operations managers don't build; most AI bu
 
 ## Evidence on Hand
 
-Confirmed career facts:
+Source of truth: the five tailored résumés in `~/Downloads` (Sep 2026). Four are published in `public/resume/`.
 
 | Period | Role | Organisation |
 | --- | --- | --- |
-| Aug 2015 – 2018 | Major Incident Manager | IBM |
-| Sep 2018 – Jan 2021 | Subject Matter Expert, Cloud Operations | Tata Consultancy Services |
-| Jan 2021 – now | Cloud Infrastructure Specialist, Platform & AI Automation | Accenture (leads cross-functional teams of 25+ engineers) |
+| Aug 2015 – Sep 2018 | Major Incident Manager | IBM |
+| Sep 2018 – Jan 2021 | Subject Matter Expert, Cloud / Service Operations | Tata Consultancy Services (client: SAP) |
+| Jan 2021 – now | Cloud Infrastructure Specialist, Platform & AI Automation | Accenture (client: SAP CX, then I&CX from 2023) |
 
-- Skills (from résumé): AWS (EC2, S3, IAM, VPC, CloudFront, Route 53, SQS, DynamoDB), SAP S/4HANA on AWS, Terraform, Ansible, Jenkins, Docker, Kubernetes, Python, FastAPI, RAG (ChromaDB), agentic and multi-agent workflows with MCP, major incident and problem management, RCA, SLA/KPI governance, ITSM.
-- Live projects: Gita Reflection (RAG over 700 verses on Amazon Bedrock), an Operations Console (FastAPI; telemetry is simulated, not production), and a Browser Arcade (built with Claude). Screens in `public/media/`.
+**Open conflict:** Sai Pranav confirmed TCS started **Sep 2018**; every résumé PDF says **Nov 2019**. The site uses Sep 2018. The PDFs need re-exporting to match.
 
-**Pending: do not fabricate or placeholder these until supplied.**
+Confirmed outcomes (on every résumé):
 
-- Résumé PDF (to be linked for download).
-- Quantified outcomes Sai Pranav can defend (e.g. MTTR, cost, uptime).
-- Certifications (names and years).
-- Exact IBM end month (2018 confirmed, month not).
+- TCS: resolution time −40% (triage automation, standard escalation paths); repeat issues −30% (knowledge-base rebuild); operational efficiency +25%; resourcing optimised 20%.
+- Accenture: 100% SLA compliance under SAP's KPI frameworks; zero-downtime transition from NTT Data to Accenture; 16-member operations team; single point of contact between SAP and Accenture.
+- Automated SLA/KPI signalling platform replacing manual reporting.
+
+Recognition: SAP Hero Award (Innovator); Accenture Top 25 Global AI Programs; ACE (Accenture Celebrates Excellence); 9× SAP Best Performer of the Month; TCS Delivery Excellence Award 2019.
+
+Certifications: AWS Certified AI Practitioner (AIF-C01); HashiCorp Certified: Terraform Associate; AWS Certified Cloud Practitioner (CLF-C02). Years not given.
+
+Education: B.Tech, Computer Science & Engineering, CMR Institute of Technology, Bangalore, 2015.
+
+Skills: AWS (EC2, S3, IAM, VPC, CloudFront, Route 53), SAP S/4HANA on AWS, SAP Commerce Cloud, C4C, Terraform, Ansible, Jenkins, GitHub Actions (OIDC), Docker, Kubernetes (working knowledge), Python, FastAPI, RAG, multi-agent workflows and MCP connectors, ITSM, RCA, SLA/KPI governance.
+
+Live projects: Gita Reflection (`gita.atla.in`, RAG on Amazon Bedrock with a leakage test), Operations Console (`obs.atla.in`, simulated telemetry), Browser Arcade (`games.atla.in`). Screens in `public/media/`.
+
+Not live, do not link: AtlaOps (`ops.atla.in` does not respond); the real-time market-data platform and 25-page RAG guide have no public URL yet.
+
+**Pending or unresolved: do not fabricate.**
+
+- Certification years.
+- Relocation: the Operations Leader résumé says "open to Mumbai"; an earlier profile said not willing to relocate. The site says Bengaluru only.
 
 ## Product Principles
 

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, useMotionValue, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
-import { about, experience, site, socials, timeline } from "@/lib/site";
+import { about, experience, recognition, site, socials, timeline } from "@/lib/site";
 import { useIsLg, useReducedMotion } from "@/lib/media";
 
 const words = about.bio.split(" ");
@@ -192,6 +192,33 @@ function Timeline({ reduced }: { reduced: boolean }) {
           );
         })}
       </ol>
+
+      <div className="mt-28 grid gap-14 border-t border-slate-200 pt-14 lg:grid-cols-2 lg:gap-16">
+        <div>
+          <h3 className="font-display text-xl font-bold tracking-[-0.01em]">Recognition</h3>
+          <ul className="mt-5 divide-y divide-slate-200">
+            {recognition.awards.map((a) => (
+              <li key={a.name} className="flex items-baseline justify-between gap-6 py-3.5">
+                <span className="font-medium text-slate-800">{a.name}</span>
+                <span className="shrink-0 font-mono text-[11px] tracking-[0.14em] text-slate-500 uppercase">{a.by}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 className="font-display text-xl font-bold tracking-[-0.01em]">Certifications</h3>
+          <ul className="mt-5 divide-y divide-slate-200">
+            {recognition.certifications.map((c) => (
+              <li key={c.name} className="flex items-baseline justify-between gap-6 py-3.5">
+                <span className="font-medium text-slate-800">{c.name}</span>
+                {c.code && <span className="shrink-0 font-mono text-[11px] tracking-[0.14em] text-slate-500 uppercase">{c.code}</span>}
+              </li>
+            ))}
+          </ul>
+          <h3 className="font-display mt-12 text-xl font-bold tracking-[-0.01em]">Education</h3>
+          <p className="mt-4 text-slate-700">{recognition.education}</p>
+        </div>
+      </div>
     </div>
   );
 }

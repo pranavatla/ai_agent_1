@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
+import { FileDown } from "lucide-react";
 import { site } from "@/lib/site";
 import { useMedia, useReducedMotion } from "@/lib/media";
 
@@ -99,6 +100,23 @@ export default function Hero() {
       >
         {site.tagline}
       </motion.p>
+      <motion.div
+        className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-3"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.1, duration: 0.8 }}
+      >
+        <a
+          href="#resume"
+          className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-medium text-white shadow-[0_10px_24px_-10px_rgba(15,23,42,0.6)] transition duration-200 ease-snappy hover:bg-deep active:scale-[0.97]"
+        >
+          <FileDown aria-hidden className="size-4" />
+          Résumé
+        </a>
+        <a href={`mailto:${site.email}`} className="py-3 text-sm font-medium text-slate-700 underline decoration-slate-300 transition duration-200 hover:text-deep hover:decoration-deep">
+          {site.email}
+        </a>
+      </motion.div>
     </section>
   );
 }
