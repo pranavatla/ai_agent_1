@@ -2,37 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { FileArrowDown, List, X } from "@phosphor-icons/react";
-import { sections, site } from "@/lib/site";
+import { Briefcase, House, LayoutGrid, Mail, Menu, User, X } from "lucide-react";
+import { sections } from "@/lib/site";
 import { useReducedMotion } from "@/lib/media";
 
-const MIDLINE = { rootMargin: "-30% 0px -60% 0px" };
+const icons = { home: House, work: Briefcase, services: LayoutGrid, about: User, contact: Mail };
+const MIDLINE = { rootMargin: "-50% 0px -50% 0px" };
 
 export default function Nav() {
   const reduced = useReducedMotion();
-  const [active, setActive] = useState<string>("work");
+  const [active, setActive] = useState("home");
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
+  // Active link. The footer maps to Contact, or the rail goes stale at the very bottom.
   useEffect(() => {
     const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) setActive(e.target.id);
-      }
+      for (const e of entries) if (e.isIntersecting) setActive(e.target.id === "footer" ? "contact" : e.target.id);
     }, MIDLINE);
-
-    sections.forEach(({ id }) => {
+    [...sections.map((s) => s.id), "footer"].forEach((id) => {
       const el = document.getElementById(id);
       if (el) io.observe(el);
     });
-
     return () => io.disconnect();
   }, []);
 
@@ -40,6 +30,7 @@ export default function Nav() {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
+    // Keep the page still behind the full-screen menu.
     document.documentElement.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", onKey);
@@ -47,106 +38,73 @@ export default function Nav() {
     };
   }, [open]);
 
+  const btn = "bg-white text-slate-700 shadow-[0_6px_18px_rgba(15,23,42,0.12)] hover:text-deep";
+  const current = "bg-deep text-white shadow-[0_6px_18px_rgba(29,111,208,0.4)]";
+
   return (
     <>
-      <header
-        className={`fixed top-0 inset-x-0 z-50 h-16 transition-all duration-200 ${
-          scrolled
-            ? "border-b border-slate-200/80 bg-white/85 shadow-xs backdrop-blur-md"
-            : "border-b border-transparent bg-transparent"
-        }`}
-      >
-        <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-6 sm:px-10">
-          <a
-            href="#home"
-            className="font-display text-lg font-bold tracking-tight text-slate-900 transition hover:text-deep"
-          >
-            {site.brand}
-            <span className="text-deep font-mono text-sm ml-1">.in</span>
-          </a>
-
-          {/* Desktop single-line navigation */}
-          <nav aria-label="Main navigation" className="hidden items-center gap-1 md:flex">
-            {sections.map(({ id, label }) => {
-              const isCurrent = active === id;
-              return (
-                <a
-                  key={id}
-                  href={`#${id}`}
-                  className={`rounded-lg px-3.5 py-1.5 text-sm font-medium transition duration-150 ${
-                    isCurrent
-                      ? "text-deep font-semibold"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/60"
-                  }`}
-                >
-                  {label}
-                </a>
-              );
-            })}
-          </nav>
-
-          <div className="hidden items-center gap-3 md:flex">
+      <nav aria-label="Sections" className="fixed top-1/2 right-5 z-50 hidden -translate-y-1/2 flex-col gap-3 md:flex">
+        {sections.map(({ id, label }) => {
+          const Icon = icons[id];
+          const isCurrent = active === id;
+          return (
             <a
-              href="#resume"
-              className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-medium text-white shadow-xs transition duration-150 hover:bg-deep active:scale-[0.97]"
+              key={id}
+              href={`#${id}`}
+              aria-label={label}
+              aria-current={isCurrent ? "location" : undefined}
+              className={`group relative grid size-11 place-items-center rounded-full transition duration-200 ease-snappy active:scale-[0.94] ${isCurrent ? current : btn}`}
             >
-              <FileArrowDown size={15} />
-              <span>Résumé</span>
+              <Icon aria-hidden className="size-[18px]" />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute right-full mr-3 translate-x-2 rounded-full bg-white px-3 py-1.5 font-mono text-[11px] tracking-[0.14em] whitespace-nowrap text-slate-800 uppercase opacity-0 shadow-[0_6px_18px_rgba(15,23,42,0.14)] transition duration-200 ease-snappy group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100"
+              >
+                {label}
+              </span>
             </a>
-          </div>
+          );
+        })}
+      </nav>
 
-          {/* Mobile hamburger button */}
-          <button
-            type="button"
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            aria-controls="mobile-nav"
-            onClick={() => setOpen((o) => !o)}
-            className="grid size-10 place-items-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-xs transition hover:text-deep active:scale-95 md:hidden"
-          >
-            {open ? <X size={20} /> : <List size={20} />}
-          </button>
-        </div>
-      </header>
+      <button
+        type="button"
+        aria-label={open ? "Close menu" : "Open menu"}
+        aria-expanded={open}
+        aria-controls="mobile-menu"
+        onClick={() => setOpen((o) => !o)}
+        className={`fixed top-4 right-4 z-[60] grid size-11 place-items-center rounded-full transition duration-200 ease-snappy active:scale-[0.94] md:hidden ${btn}`}
+      >
+        {open ? <X aria-hidden className="size-5" /> : <Menu aria-hidden className="size-5" />}
+      </button>
 
-      {/* Mobile drawer */}
       <AnimatePresence>
         {open && (
-          <motion.div
-            id="mobile-nav"
-            aria-label="Mobile navigation"
-            initial={reduced ? { opacity: 0 } : { opacity: 0, y: -8 }}
-            animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
-            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 flex flex-col justify-between bg-white/95 px-6 pt-24 pb-8 backdrop-blur-xl md:hidden"
+          <motion.nav
+            id="mobile-menu"
+            aria-label="Sections"
+            className="fixed inset-0 z-[55] flex flex-col justify-center gap-2 bg-ground/95 px-8 backdrop-blur-xl md:hidden"
+            style={{ transformOrigin: "calc(100% - 2.25rem) 2.25rem" }} // anchored to the hamburger button that opened it
+            initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+            animate={reduced ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+            exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.98 }}
+            transition={reduced ? { duration: 0.15 } : { type: "spring", bounce: 0.1, duration: 0.35 }}
           >
-            <nav className="flex flex-col gap-2">
-              {sections.map(({ id, label }) => (
-                <a
-                  key={id}
-                  href={`#${id}`}
-                  onClick={() => setOpen(false)}
-                  className={`py-3 text-2xl font-bold tracking-tight transition ${
-                    active === id ? "text-deep" : "text-slate-800 hover:text-deep"
-                  }`}
-                >
-                  {label}
-                </a>
-              ))}
-            </nav>
-
-            <div className="border-t border-slate-200 pt-6">
-              <a
-                href="#resume"
+            {sections.map(({ id, label }, i) => (
+              <motion.a
+                key={id}
+                href={`#${id}`}
                 onClick={() => setOpen(false)}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 text-sm font-semibold text-white shadow-xs transition hover:bg-deep active:scale-[0.98]"
+                aria-current={active === id ? "location" : undefined}
+                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 18 }}
+                animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                transition={reduced ? { duration: 0.15 } : { delay: 0.05 * i + 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="font-display py-2 text-4xl font-bold tracking-[-0.02em] text-slate-700 uppercase aria-[current]:text-deep"
               >
-                <FileArrowDown size={18} />
-                <span>View Résumés</span>
-              </a>
-            </div>
-          </motion.div>
+                {label}
+              </motion.a>
+            ))}
+          </motion.nav>
         )}
       </AnimatePresence>
     </>

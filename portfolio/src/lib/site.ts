@@ -1,17 +1,9 @@
-import type { ComponentType } from "react";
-import {
-  Cloud,
-  Database,
-  EnvelopeSimple,
-  GitBranch,
-  GithubLogo,
-  LinkedinLogo,
-  Robot,
-  Siren,
-  UsersThree,
-} from "@phosphor-icons/react/dist/ssr";
-
-export type IconComponent = ComponentType<{ className?: string; size?: number | string; weight?: "thin" | "light" | "regular" | "bold" | "fill" | "duotone" }>;
+// Every piece of copy and every image on the site lives here, so it can be replaced in one edit.
+// Claims are kept to what the résumé and the live projects can back up: no invented metrics.
+import type { IconType } from "react-icons";
+import { Bot, Cloud, DatabaseZap, Siren, Users, Workflow, type LucideIcon } from "lucide-react";
+import { FaGithub, FaLinkedinIn } from "react-icons/fa6";
+import { MdAlternateEmail } from "react-icons/md";
 
 export const site = {
   brand: "Atla",
@@ -25,13 +17,14 @@ export const site = {
   address: "Bengaluru, India",
   url: "https://atla.in",
   linkedin: "https://linkedin.com/in/saipranavatla/",
+  // Transparent cut-out (WebP with alpha), 896x1195; About's frame uses this aspect ratio.
   portrait: "/media/portrait.webp",
 };
 
-export const socials: { label: string; href: string; icon: IconComponent }[] = [
-  { label: "GitHub", href: "https://github.com/pranavatla", icon: GithubLogo },
-  { label: "LinkedIn", href: site.linkedin, icon: LinkedinLogo },
-  { label: "Email", href: `mailto:${site.email}`, icon: EnvelopeSimple },
+export const socials: { label: string; href: string; icon: IconType }[] = [
+  { label: "GitHub", href: "https://github.com/pranavatla", icon: FaGithub },
+  { label: "LinkedIn", href: site.linkedin, icon: FaLinkedinIn },
+  { label: "Email", href: `mailto:${site.email}`, icon: MdAlternateEmail },
 ];
 
 export const work = {
@@ -62,13 +55,14 @@ export const projects = [
   },
 ];
 
-export const services: { phrase: string; icon: IconComponent; tools: string }[] = [
-  { phrase: "Run cloud ops.", icon: Cloud, tools: "SAP CX / I&CX · AWS · Service health" },
-  { phrase: "Automate infra.", icon: GitBranch, tools: "Terraform · Ansible · Jenkins · GitHub Actions" },
-  { phrase: "Lead incidents.", icon: Siren, tools: "Major incidents · RCA · ITIL 4" },
-  { phrase: "Build RAG apps.", icon: Database, tools: "Bedrock · ChromaDB · Embeddings" },
-  { phrase: "Build AI tools.", icon: Robot, tools: "Python · FastAPI · AI workflows" },
-  { phrase: "Lead teams.", icon: UsersThree, tools: "16-member team · SLA/KPI governance" },
+// Each phrase pairs with a tile naming the real tools behind it (from the résumé).
+export const services: { phrase: string; color: string; icon: LucideIcon; tools: string }[] = [
+  { phrase: "Run cloud ops.", color: "#1d6fd0", icon: Cloud, tools: "SAP CX / I&CX · AWS · Service health" },
+  { phrase: "Automate infra.", color: "#6d3bd4", icon: Workflow, tools: "Terraform · Ansible · Jenkins · GitHub Actions" },
+  { phrase: "Lead incidents.", color: "#0f7c8a", icon: Siren, tools: "Major incidents · RCA · ITIL 4" },
+  { phrase: "Build RAG apps.", color: "#a86a12", icon: DatabaseZap, tools: "Bedrock · ChromaDB · Embeddings" },
+  { phrase: "Build AI tools.", color: "#c2306b", icon: Bot, tools: "Python · FastAPI · AI workflows" },
+  { phrase: "Lead teams.", color: "#157a5a", icon: Users, tools: "16-member team · SLA/KPI governance" },
 ];
 
 export const about = {
@@ -109,6 +103,7 @@ export const experience = [
 
 export const timeline = { subtitle: "10+ years across incident, cloud and service operations" };
 
+// Everything here is on every current résumé.
 export const recognition = {
   awards: [
     { name: "SAP Hero Award (Innovator)", by: "SAP" },
@@ -117,6 +112,7 @@ export const recognition = {
     { name: "9× Best Performer of the Month", by: "SAP" },
     { name: "Delivery Excellence Award 2019", by: "TCS" },
   ],
+  // Confirmed by Sai Pranav and his résumés. Years omitted until each issue date is confirmed.
   certifications: [
     { name: "AWS Certified AI Practitioner", meta: "AWS · AIF-C01" },
     { name: "AWS Certified Cloud Practitioner", meta: "AWS · CLF-C02" },
@@ -127,6 +123,7 @@ export const recognition = {
   education: "B.Tech in Computer Science & Engineering · CMR Institute of Technology, Bengaluru · 2015",
 };
 
+// One résumé per role family; the file names say which is which.
 export const resumes = [
   { label: "Cloud & DevOps", href: "/resume/Sai_Pranav_Atla_Resume_DevOps_Cloud.pdf" },
   { label: "Operations & Program Management", href: "/resume/Sai_Pranav_Atla_Resume_Operations_Program_Manager.pdf" },
@@ -141,9 +138,9 @@ export const contact = {
 export const capabilities = ["Cloud & platform operations", "SAP CX & I&CX operations", "AI automation & RAG", "Incident & service leadership"];
 
 export const sections = [
+  { id: "home", label: "Home" },
   { id: "work", label: "Work" },
   { id: "services", label: "Services" },
   { id: "about", label: "About" },
-  { id: "experience", label: "Experience" },
   { id: "contact", label: "Contact" },
 ] as const;

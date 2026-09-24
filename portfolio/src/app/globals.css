@@ -9,10 +9,11 @@
   --font-mono: var(--font-spacemono), ui-monospace, monospace;
   --font-display: var(--font-manrope), ui-sans-serif, sans-serif;
   --font-heading: var(--font-manrope), ui-sans-serif, sans-serif;
-  --color-ground: #f8fafc;
+  --color-ground: #f7f8fc;
   --color-ink: #0f172a;
-  --color-panel: #ffffff;
+  --color-panel: #f4f5f9;
   --color-deep: #1d6fd0;
+  --color-violet: #6d3bd4;
   /* Strong ease-out for interface feedback: moves immediately, settles softly. */
   --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
 }
@@ -28,6 +29,7 @@ a {
   text-underline-offset: 0.3em;
 }
 
+/* The fixed background sits at z -10, behind body's own box, so the base colour must live on body. */
 body {
   background: var(--color-ground);
   color: var(--color-ink);
@@ -44,9 +46,25 @@ body {
   outline-offset: 3px;
 }
 
-.subtle-grid {
-  background-image:
-    linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
+/* Shared pastel galaxy: warm core through blush and lavender, ending transparent so it never floods past its edge. */
+.galaxy {
+  background: radial-gradient(
+    closest-side,
+    #ffffff 0%,
+    #fff0dc 14%,
+    #f8d3b4 30%,
+    #eab8d2 48%,
+    #bfaaf5 66%,
+    rgba(150, 165, 255, 0.35) 84%,
+    transparent 100%
+  );
+}
+
+.light-grid {
+  background:
+    radial-gradient(ellipse 58% 52% at 50% 50%, #fff 0%, rgba(255, 255, 255, 0.92) 45%, rgba(255, 255, 255, 0) 78%),
+    linear-gradient(rgba(15, 23, 42, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.07) 1px, transparent 1px),
+    #f4f5f9;
+  background-size: auto, 56px 56px, 56px 56px, auto;
 }
