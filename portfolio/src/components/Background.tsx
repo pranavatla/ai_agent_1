@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import { useReducedMotion } from "@/lib/media";
+import { isDark, subscribeTheme } from "@/lib/theme";
 
 export default function Background() {
   const reduced = useReducedMotion();
@@ -65,10 +66,9 @@ function Stars() {
     let h = 0;
     let raf = 0;
 
-    const scheme = window.matchMedia("(prefers-color-scheme: dark)");
-    let dark = scheme.matches;
+    let dark = isDark();
     const build = () => {
-      dark = scheme.matches;
+      dark = isDark();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       w = window.innerWidth;
       h = window.innerHeight;
@@ -169,13 +169,13 @@ function Stars() {
 
     build();
     window.addEventListener("resize", build);
-    scheme.addEventListener("change", build);
+    const stopTheme = subscribeTheme(build);
     window.addEventListener("pointermove", onMove, { passive: true });
     document.documentElement.addEventListener("pointerleave", onLeave);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", build);
-      scheme.removeEventListener("change", build);
+      stopTheme();
       window.removeEventListener("pointermove", onMove);
       document.documentElement.removeEventListener("pointerleave", onLeave);
     };

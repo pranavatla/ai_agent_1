@@ -2,12 +2,32 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Briefcase, EnvelopeSimple, House, List, SquaresFour, User, X } from "@phosphor-icons/react/dist/ssr";
+import { Briefcase, EnvelopeSimple, House, List, Moon, SquaresFour, Sun, User, X } from "@phosphor-icons/react/dist/ssr";
 import { sections } from "@/lib/site";
 import { useReducedMotion } from "@/lib/media";
+import { setTheme, useDark } from "@/lib/theme";
 
 const icons = { home: House, work: Briefcase, services: SquaresFour, about: User, contact: EnvelopeSimple };
 const MIDLINE = { rootMargin: "-50% 0px -50% 0px" };
+const pill =
+  "pointer-events-none absolute right-full mr-3 translate-x-2 rounded-full bg-surface px-3 py-1.5 text-xs font-medium whitespace-nowrap text-slate-800 opacity-0 shadow-[0_6px_18px_rgba(15,23,42,0.14)] transition duration-200 ease-snappy group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100";
+
+// Light/dark switch. Shows where it will take you: a moon on the light theme, a sun on the dark one.
+function ThemeToggle({ className, withLabel }: { className: string; withLabel?: boolean }) {
+  const dark = useDark();
+  const label = dark ? "Switch to light theme" : "Switch to dark theme";
+  const Icon = dark ? Sun : Moon;
+  return (
+    <button type="button" aria-label={label} onClick={() => setTheme(dark ? "light" : "dark")} className={`group ${className}`}>
+      <Icon aria-hidden className="size-[18px]" />
+      {withLabel && (
+        <span aria-hidden className={pill}>
+          {dark ? "Light theme" : "Dark theme"}
+        </span>
+      )}
+    </button>
+  );
+}
 
 export default function Nav() {
   const reduced = useReducedMotion();
@@ -43,7 +63,9 @@ export default function Nav() {
 
   return (
     <>
-      <nav aria-label="Sections" className="fixed top-1/2 right-5 z-50 hidden -translate-y-1/2 flex-col gap-3 md:flex">
+      {/* Desktop rail: section links, then a short divider and the theme switch. */}
+      <div className="fixed top-1/2 right-5 z-50 hidden -translate-y-1/2 flex-col items-center gap-3 md:flex">
+      <nav aria-label="Sections" className="flex flex-col gap-3">
         {sections.map(({ id, label }) => {
           const Icon = icons[id];
           const isCurrent = active === id;
@@ -56,16 +78,19 @@ export default function Nav() {
               className={`group relative grid size-11 place-items-center rounded-full transition duration-200 ease-snappy active:scale-[0.94] ${isCurrent ? current : btn}`}
             >
               <Icon aria-hidden className="size-[18px]" />
-              <span
-                aria-hidden
-                className="pointer-events-none absolute right-full mr-3 translate-x-2 rounded-full bg-surface px-3 py-1.5 text-xs font-medium whitespace-nowrap text-slate-800 opacity-0 shadow-[0_6px_18px_rgba(15,23,42,0.14)] transition duration-200 ease-snappy group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100"
-              >
+              <span aria-hidden className={pill}>
                 {label}
               </span>
             </a>
           );
         })}
       </nav>
+        <span aria-hidden className="h-px w-5 bg-slate-300" />
+        <ThemeToggle withLabel className={`relative grid size-11 place-items-center rounded-full transition duration-200 ease-snappy active:scale-[0.94] ${btn}`} />
+      </div>
+
+      {/* Phones: the theme switch sits beside the menu button. */}
+      <ThemeToggle className={`fixed top-4 right-[4.25rem] z-[60] grid size-11 place-items-center rounded-full transition duration-200 ease-snappy active:scale-[0.94] md:hidden ${btn}`} />
 
       <button
         type="button"

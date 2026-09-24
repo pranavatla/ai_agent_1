@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-/* Theme tokens. Light by default; dark follows the visitor's system setting. */
+/* Theme tokens. Light by default; <html data-theme="dark"> switches them (set from the saved choice or the system). */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --font-display: var(--font-manrope), ui-sans-serif, sans-serif;
   --ground: #f7f8fc;
   --ink: #0f172a;
@@ -13,28 +13,27 @@
   --band: radial-gradient(ellipse 120% 70% at 50% 5%, #f7f8fc 0%, #f7f8fc 44%, #eef3ff 48%, #dce7ff 53%, #cbd7ff 59%, #d8cbf6 62%, #edc9e2 66%, #f8dcc6 74%, #fbece3 83%, #f7f8fc 93%);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ground: #0b0f1a;
-    --ink: #e8edf5;
-    --panel: #0e1422;
-    --surface: #141b2b;
-    --deep: #4b8ee8;
-    --grid-line: rgba(226, 232, 240, 0.06);
-    --band: radial-gradient(ellipse 120% 70% at 50% 5%, #0b0f1a 0%, #0b0f1a 44%, #0d1330 48%, #13204f 53%, #223066 59%, #3d3170 62%, #6e5476 66%, #8c7560 74%, #2a2230 83%, #0b0f1a 93%);
-    /* The slate scale flips, so every text/border/fill utility keeps its role (ink on ground) in dark mode. */
-    --color-slate-50: #0d1321;
-    --color-slate-100: #151c2c;
-    --color-slate-200: #253045;
-    --color-slate-300: #3a4660;
-    --color-slate-400: #64748b;
-    --color-slate-500: #94a3b8;
-    --color-slate-600: #b4c0d0;
-    --color-slate-700: #cbd5e1;
-    --color-slate-800: #e2e8f0;
-    --color-slate-900: #eef2f7;
-    --color-slate-950: #f8fafc;
-  }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #0b0f1a;
+  --ink: #e8edf5;
+  --panel: #0e1422;
+  --surface: #141b2b;
+  --deep: #4b8ee8;
+  --grid-line: rgba(226, 232, 240, 0.06);
+  --band: radial-gradient(ellipse 120% 70% at 50% 5%, #0b0f1a 0%, #0b0f1a 44%, #0d1330 48%, #13204f 53%, #223066 59%, #3d3170 62%, #6e5476 66%, #8c7560 74%, #2a2230 83%, #0b0f1a 93%);
+  /* The slate scale flips, so every text/border/fill utility keeps its role (ink on ground) in dark mode. */
+  --color-slate-50: #0d1321;
+  --color-slate-100: #151c2c;
+  --color-slate-200: #253045;
+  --color-slate-300: #3a4660;
+  --color-slate-400: #64748b;
+  --color-slate-500: #94a3b8;
+  --color-slate-600: #b4c0d0;
+  --color-slate-700: #cbd5e1;
+  --color-slate-800: #e2e8f0;
+  --color-slate-900: #eef2f7;
+  --color-slate-950: #f8fafc;
 }
 
 @theme inline {
@@ -92,10 +91,8 @@ body {
     transparent 100%
   );
 }
-@media (prefers-color-scheme: dark) {
-  .galaxy {
-    opacity: 0.55;
-  }
+:root[data-theme="dark"] .galaxy {
+  opacity: 0.55;
 }
 
 /* Services panel: a faint square grid that dissolves under a central bloom, so type stays crisp. */
