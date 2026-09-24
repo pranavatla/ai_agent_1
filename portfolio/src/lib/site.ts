@@ -79,14 +79,14 @@ export const experience = [
     stack: "AWS · SAP S/4HANA · Terraform · Ansible · Jenkins · Kubernetes",
   },
   {
-    period: "2019 — 2020",
+    period: "2018 — 2021",
     role: "Subject Matter Expert, Cloud Operations",
     org: "Tata Consultancy Services",
     blurb: "Go-to expert for cloud operations on enterprise accounts: major incident and problem management, root-cause analysis, and transition and transformation delivery.",
     stack: "ITSM · RCA · Cloud operations",
   },
   {
-    period: "2015 — 2019",
+    period: "2015 — 2018",
     role: "Major Incident Manager",
     org: "IBM",
     blurb: "Ran major-incident bridges end to end: restoring service fast, coordinating resolver teams, leading RCA and keeping stakeholders informed under SLA pressure.",
