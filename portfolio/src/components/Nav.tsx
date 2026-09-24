@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Briefcase, House, LayoutGrid, Mail, Menu, User, X } from "lucide-react";
 import { sections } from "@/lib/site";
+import { useReducedMotion } from "@/lib/media";
 
 const icons = { home: House, work: Briefcase, services: LayoutGrid, about: User, contact: Mail };
 const MIDLINE = { rootMargin: "-50% 0px -50% 0px" };
 
 export default function Nav() {
+  const reduced = useReducedMotion();
   const [active, setActive] = useState("home");
   const [open, setOpen] = useState(false);
 
@@ -82,9 +84,11 @@ export default function Nav() {
             id="mobile-menu"
             aria-label="Sections"
             className="fixed inset-0 z-[55] flex flex-col justify-center gap-2 bg-ground/95 px-8 backdrop-blur-xl md:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            style={{ transformOrigin: "calc(100% - 2.25rem) 2.25rem" }} // anchored to the hamburger button that opened it
+            initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+            animate={reduced ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+            exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.98 }}
+            transition={reduced ? { duration: 0.15 } : { type: "spring", bounce: 0.1, duration: 0.35 }}
           >
             {sections.map(({ id, label }, i) => (
               <motion.a
@@ -92,9 +96,9 @@ export default function Nav() {
                 href={`#${id}`}
                 onClick={() => setOpen(false)}
                 aria-current={active === id ? "location" : undefined}
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.06 * i + 0.05, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 18 }}
+                animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                transition={reduced ? { duration: 0.15 } : { delay: 0.05 * i + 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="font-display py-2 text-4xl font-bold tracking-[-0.02em] text-slate-700 uppercase aria-[current]:text-deep"
               >
                 {label}
