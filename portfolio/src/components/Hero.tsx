@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { FileDown } from "lucide-react";
+import { FaLinkedinIn } from "react-icons/fa6";
 import { site } from "@/lib/site";
 import { useMedia, useReducedMotion } from "@/lib/media";
 
@@ -112,6 +113,15 @@ export default function Hero() {
         >
           <FileDown aria-hidden className="size-4" />
           Résumé
+        </a>
+        <a
+          href={site.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-medium text-slate-800 shadow-sm transition duration-200 ease-snappy hover:border-deep/40 hover:text-deep active:scale-[0.97]"
+        >
+          <FaLinkedinIn aria-hidden className="size-4 text-deep" />
+          LinkedIn
         </a>
         <a href={`mailto:${site.email}`} className="py-3 text-sm font-medium text-slate-700 underline decoration-slate-300 transition duration-200 hover:text-deep hover:decoration-deep">
           {site.email}
