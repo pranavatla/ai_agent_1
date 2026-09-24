@@ -95,6 +95,14 @@ body {
   opacity: 0.55;
 }
 
+/* Services: each phrase and its tile share a colour (--c). The dark theme lightens it for contrast. */
+.svc {
+  --svc: var(--c);
+}
+:root[data-theme="dark"] .svc {
+  --svc: color-mix(in srgb, var(--c) 62%, white);
+}
+
 /* Services panel: a faint square grid that dissolves under a central bloom, so type stays crisp. */
 .light-grid {
   background:

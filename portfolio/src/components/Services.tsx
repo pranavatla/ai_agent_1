@@ -27,26 +27,29 @@ function Phrase({ i, idx, k }: { i: number; idx: MotionValue<number>; k: number 
   const x = useTransform(d, [-2, -1, 0, 1, 2], [0, 35 * k, 85 * k, 35 * k, 0]);
   const s = services[i];
   return (
-    <motion.li style={{ opacity, scale, x }} className="flex h-[1.2em] origin-left items-center whitespace-nowrap text-deep">
+    <motion.li style={{ opacity, scale, x, ...tone(s.color) }} className="svc flex h-[1.2em] origin-left items-center whitespace-nowrap text-[var(--svc)]">
       {s.phrase}
     </motion.li>
   );
 }
 
-// The tile behind each phrase: its icon and the concrete tools, in the page's single accent.
+// Sets --c for the .svc class, which lightens the colour on the dark theme (see globals.css).
+const tone = (c: string) => ({ "--c": c }) as React.CSSProperties;
+
+// The tile behind each phrase: its colour, its icon and the concrete tools.
 // Also rendered by the card-flip overlay, which must match it pixel for pixel.
 export function ServiceTile({ s }: { s: (typeof services)[number] }) {
   const Icon = s.icon;
   return (
     <div
-      className="flex h-full w-full flex-col justify-between bg-surface p-6 text-left"
-      style={{ backgroundImage: "radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--deep) 18%, transparent), transparent 62%), linear-gradient(160deg, var(--surface) 40%, color-mix(in srgb, var(--deep) 9%, var(--surface)))" }}
+      className="svc flex h-full w-full flex-col justify-between bg-surface p-6 text-left"
+      style={{ ...tone(s.color), backgroundImage: "radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--svc) 18%, transparent), transparent 62%), linear-gradient(160deg, var(--surface) 40%, color-mix(in srgb, var(--svc) 9%, var(--surface)))" }}
     >
-      <span className="grid size-12 place-items-center rounded-2xl bg-deep text-white shadow-[0_8px_18px_-6px_rgba(15,23,42,0.4)]">
+      <span className="grid size-12 place-items-center rounded-2xl bg-[var(--c)] text-white shadow-[0_8px_18px_-6px_rgba(15,23,42,0.4)]">
         <Icon aria-hidden className="size-6" />
       </span>
       <div>
-        <p className="font-display text-[22px] leading-tight font-bold tracking-[-0.02em] text-deep">
+        <p className="font-display text-[22px] leading-tight font-bold tracking-[-0.02em] text-[var(--svc)]">
           {s.phrase.replace(/\.$/, "")}
         </p>
         <p className="mt-2 font-mono text-[11px] leading-relaxed text-slate-600">{s.tools}</p>
@@ -91,7 +94,7 @@ export default function Services() {
           <p className="font-sans text-slate-900">I can</p>
           <ul className="mt-4 space-y-3">
             {services.map((s) => (
-              <li key={s.phrase} className="text-deep">
+              <li key={s.phrase} className="svc text-[var(--svc)]" style={tone(s.color)}>
                 {s.phrase}
               </li>
             ))}

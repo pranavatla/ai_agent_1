@@ -66,13 +66,14 @@ export const projects: { title: string; tag: string; href: string; image: string
 ];
 
 // Each phrase pairs with a tile naming the real tools behind it (from the résumé).
-export const services: { phrase: string; icon: Icon; tools: string }[] = [
-  { phrase: "Run cloud ops.", icon: Cloud, tools: "SAP CX / I&CX, AWS, Service health" },
-  { phrase: "Automate infra.", icon: FlowArrow, tools: "Terraform, Ansible, Jenkins, GitHub Actions" },
-  { phrase: "Lead incidents.", icon: Siren, tools: "Major incidents, RCA, ITIL 4" },
-  { phrase: "Build RAG apps.", icon: Database, tools: "Bedrock, ChromaDB, Embeddings" },
-  { phrase: "Build AI tools.", icon: Robot, tools: "Python, FastAPI, AI workflows" },
-  { phrase: "Lead teams.", icon: UsersThree, tools: "16-member team, SLA/KPI governance" },
+// Each phrase has its own colour, shared with its tile on the right.
+export const services: { phrase: string; color: string; icon: Icon; tools: string }[] = [
+  { phrase: "Run cloud ops.", color: "#1d6fd0", icon: Cloud, tools: "SAP CX / I&CX, AWS, Service health" },
+  { phrase: "Automate infra.", color: "#6d3bd4", icon: FlowArrow, tools: "Terraform, Ansible, Jenkins, GitHub Actions" },
+  { phrase: "Lead incidents.", color: "#0f7c8a", icon: Siren, tools: "Major incidents, RCA, ITIL 4" },
+  { phrase: "Build RAG apps.", color: "#a86a12", icon: Database, tools: "Bedrock, ChromaDB, Embeddings" },
+  { phrase: "Build AI tools.", color: "#c2306b", icon: Robot, tools: "Python, FastAPI, AI workflows" },
+  { phrase: "Lead teams.", color: "#157a5a", icon: UsersThree, tools: "16-member team, SLA/KPI governance" },
 ];
 
 export const about = {
