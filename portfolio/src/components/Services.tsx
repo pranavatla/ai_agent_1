@@ -1,33 +1,28 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from "motion/react";
 import { services } from "@/lib/site";
 import { useIsLg, useMedia, useReducedMotion } from "@/lib/media";
 
 const COUNT = services.length;
-const DWELL = 0.055;
-
-// Stepped mapping: each index is held across a small band of scroll, with a quick hand-off between.
-const input: number[] = [];
-const output: number[] = [];
-services.forEach((_, i) => {
-  const c = i / (COUNT - 1);
-  input.push(Math.max(0, c - DWELL), Math.min(1, c + DWELL));
-  output.push(i, i);
-});
+const HOLD_MS = 2500;
+// Circular distance from the active item, in [-COUNT/2, COUNT/2). The index only ever counts up;
+// an item leaving the top re-enters at the bottom while it is invisible, so the cycle never rewinds.
+const wrap = (d: number) => ((((d + COUNT / 2) % COUNT) + COUNT) % COUNT) - COUNT / 2;
 
 const LEAD = "font-sans text-[20px] font-bold sm:text-3xl md:text-4xl lg:text-[40px] xl:text-5xl";
 
 function Phrase({ i, idx, k }: { i: number; idx: MotionValue<number>; k: number }) {
-  const d = useTransform(idx, (v) => i - v);
-  const opacity = useTransform(d, [-2, -1, 0, 1, 2], [0.08, 0.3, 1, 0.3, 0.08]);
+  const d = useTransform(idx, (v) => wrap(i - v));
+  const y = useTransform(d, (v) => `${v * 1.2}em`);
+  const opacity = useTransform(d, [-3, -2.6, -2, -1, 0, 1, 2, 2.6, 3], [0, 0, 0.08, 0.3, 1, 0.3, 0.08, 0, 0]);
   const scale = useTransform(d, [-1, 0, 1], [0.9, 1, 0.9]);
   // Every offset stays positive, or phrases slide back under the lead.
   const x = useTransform(d, [-2, -1, 0, 1, 2], [0, 35 * k, 85 * k, 35 * k, 0]);
   const s = services[i];
   return (
-    <motion.li style={{ opacity, scale, x, ...tone(s.color) }} className="svc flex h-[1.2em] origin-left items-center whitespace-nowrap text-[var(--svc)]">
+    <motion.li style={{ y, opacity, scale, x, ...tone(s.color) }} className="svc absolute inset-x-0 top-0 flex h-[1.2em] origin-left items-center whitespace-nowrap text-[var(--svc)]">
       {s.phrase}
     </motion.li>
   );
@@ -37,7 +32,7 @@ function Phrase({ i, idx, k }: { i: number; idx: MotionValue<number>; k: number 
 const tone = (c: string) => ({ "--c": c }) as React.CSSProperties;
 
 // The tile behind each phrase: its colour, its icon and the concrete tools.
-// Also rendered by the card-flip overlay, which must match it pixel for pixel.
+// The card-flip overlay copies this tile, so it must stay self-contained (inline --c, no context).
 export function ServiceTile({ s }: { s: (typeof services)[number] }) {
   const Icon = s.icon;
   return (
@@ -58,16 +53,19 @@ export function ServiceTile({ s }: { s: (typeof services)[number] }) {
   );
 }
 
-function Card({ i, idx }: { i: number; idx: MotionValue<number> }) {
-  const d = useTransform(idx, (v) => i - v);
+function Card({ i, idx, active }: { i: number; idx: MotionValue<number>; active: boolean }) {
+  const d = useTransform(idx, (v) => wrap(i - v));
+  const y = useTransform(d, (v) => v * 320);
   const x = useTransform(d, [-2, -1, 0, 1, 2], [110, 65, 0, 65, 110]);
   const scale = useTransform(d, [-2, -1, 0, 1, 2], [0.4, 0.52, 1.12, 0.52, 0.4]);
-  const opacity = useTransform(d, [-2, -1, 0, 1, 2], [0.25, 0.8, 1, 0.8, 0.25]);
+  const opacity = useTransform(d, [-3, -2.6, -2, -1, 0, 1, 2, 2.6, 3], [0, 0, 0.25, 0.8, 1, 0.8, 0.25, 0, 0]);
   return (
-    <li className="grid h-[320px] place-items-center">
+    <li className="absolute inset-x-0 top-0 grid h-[320px] place-items-center">
       <motion.div
-        style={{ x, scale, opacity }}
-        data-handoff={i === COUNT - 1 ? "card" : undefined}
+        style={{ x, y, scale, opacity }}
+        // Every tile can hand off to the About portrait; the one in front at the time does.
+        data-handoff="card"
+        data-active={active || undefined}
         aria-hidden
         className="relative size-[270px] overflow-hidden rounded-3xl border border-slate-900/80 shadow-[0_18px_40px_rgba(15,23,42,0.22)]"
       >
@@ -82,9 +80,28 @@ export default function Services() {
   const lg = useIsLg();
   const md = useMedia("(min-width: 768px)");
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const idx = useSpring(useTransform(scrollYProgress, input, output), { stiffness: 260, damping: 32 });
-  const y = useTransform(idx, (v) => `${-(v / COUNT) * 100}%`);
+  const stage = useRef<HTMLDivElement>(null);
+  const target = useMotionValue(0);
+  const idx = useSpring(target, { stiffness: 140, damping: 22 });
+  const [step, setStep] = useState(0);
+
+  // Advance every 2.5s while the section is on screen, pausing while the card flips into About.
+  useEffect(() => {
+    if (reduced) return;
+    let visible = false;
+    const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting), { threshold: 0.4 });
+    if (ref.current) io.observe(ref.current);
+    const timer = setInterval(() => {
+      if (!visible || stage.current?.dataset.flying) return;
+      target.set(target.get() + 1);
+      setStep((n) => n + 1);
+    }, HOLD_MS);
+    return () => {
+      io.disconnect();
+      clearInterval(timer);
+    };
+  }, [reduced, target]);
+  const active = ((step % COUNT) + COUNT) % COUNT;
 
   if (reduced) {
     return (
@@ -105,27 +122,27 @@ export default function Services() {
   }
 
   return (
-    <section id="services" ref={ref} data-covers-galaxy className="relative h-[320vh]">
-      <div data-handoff-fade className="light-grid sticky top-0 flex h-svh items-center overflow-hidden text-slate-900">
+    <section id="services" ref={ref} data-covers-galaxy className="relative">
+      <div ref={stage} data-handoff-fade className="light-grid flex h-svh min-h-[560px] items-center overflow-hidden text-slate-900">
         <h2 className="sr-only">What I do</h2>
         <div className="mx-auto flex w-full max-w-7xl items-center gap-8 px-6 sm:px-10 lg:pr-24">
           <div className={`flex min-w-0 flex-1 items-center gap-3 sm:gap-5 ${LEAD}`}>
             <p className="shrink-0 leading-none">I can</p>
             <div className="font-display relative h-[1.2em] flex-1 tracking-[-0.02em]">
-              <motion.ul style={{ y }} className="absolute inset-x-0 top-0">
+              <ul aria-live="off" className="absolute inset-x-0 top-0">
                 {services.map((s, i) => (
                   <Phrase key={s.phrase} i={i} idx={idx} k={lg ? 1 : md ? 0.7 : 0.4} />
                 ))}
-              </motion.ul>
+              </ul>
             </div>
           </div>
           {lg && (
             <div className="relative h-[320px] w-[340px] shrink-0">
-              <motion.ul style={{ y }} className="absolute inset-x-0 top-0">
+              <ul className="absolute inset-x-0 top-0">
                 {services.map((s, i) => (
-                  <Card key={s.phrase} i={i} idx={idx} />
+                  <Card key={s.phrase} i={i} idx={idx} active={i === active} />
                 ))}
-              </motion.ul>
+              </ul>
             </div>
           )}
         </div>

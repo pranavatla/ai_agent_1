@@ -52,6 +52,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* A two-finger horizontal swipe turns the Work ring instead of triggering browser back navigation. */
+  overscroll-behavior-x: none;
   scrollbar-color: color-mix(in srgb, var(--deep) 35%, transparent) transparent;
   accent-color: var(--deep);
   caret-color: var(--deep);
