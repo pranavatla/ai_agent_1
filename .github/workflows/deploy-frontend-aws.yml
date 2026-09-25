@@ -53,3 +53,23 @@ jobs:
           aws cloudfront create-invalidation \
             --distribution-id ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
             --paths "/*"
+
+      # Draws a deploy marker on the obs.atla.in Grafana dashboard. Optional: skipped
+      # when the token is not configured, and a Grafana outage never fails the deploy.
+      - name: Mark deploy in Grafana
+        continue-on-error: true
+        env:
+          GRAFANA_URL: ${{ vars.GRAFANA_URL }}
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_ANNOTATIONS_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$GRAFANA_URL" ] || [ -z "$GRAFANA_TOKEN" ]; then
+            echo "Grafana not configured; skipping deploy marker."
+            exit 0
+          fi
+          TEXT="atla.in deployed ${GITHUB_SHA::7}: $(git log -1 --format=%s) (<a href=\"$RUN_URL\">run</a>)"
+          jq -n --arg text "$TEXT" '{tags: ["atla.in", "deploy"], text: $text}' \
+            | curl -fsS -X POST "$GRAFANA_URL/api/annotations" \
+                -H "Authorization: Bearer $GRAFANA_TOKEN" \
+                -H "Content-Type: application/json" \
+                --data @-
