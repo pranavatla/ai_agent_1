@@ -3,6 +3,7 @@ import { Manrope, Space_Grotesk, Space_Mono } from "next/font/google";
 import { MotionConfig } from "motion/react";
 import { site } from "@/lib/site";
 import { THEME_SCRIPT } from "@/lib/theme-script";
+import Rum from "@/components/Rum";
 import "./globals.css";
 
 // Variable names must match the tokens globals.css reads, or every font silently falls back.
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body>
         <MotionConfig reducedMotion="user">{children}</MotionConfig>
+        <Rum />
       </body>
     </html>
   );
