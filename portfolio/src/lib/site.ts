@@ -61,6 +61,7 @@ export const projects: { title: string; tag: string; href: string; image: string
     tag: "Observability demo · FastAPI",
     href: "https://obs.atla.in/",
     image: "/media/obs.jpg",
+    video: "/media/obs-brag.mp4",
     alt: "Operations console with service health, latency, error rates and incident timeline",
   },
 ];
