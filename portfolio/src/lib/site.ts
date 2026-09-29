@@ -81,15 +81,15 @@ export const services: { phrase: string; color: string; icon: Icon; tools: strin
 
 export const about = {
   statement: ["systems", "that", "hold."],
-  bio: "My work connects technology, teams and the people who rely on a service. Across IBM, TCS and Accenture, I’ve led critical incident response and supported SAP cloud operations. At Accenture, I lead a 16-member team across SAP CX and I&CX. Outside work, I use AI as a building partner to explore cloud automation, retrieval and observability on my own AWS infrastructure.",
+  bio: "My work connects technology, teams and the people who rely on a service. Across IBM, TCS and Accenture, I’ve led critical incident response and supported SAP cloud operations. At Accenture, I led a 16-member team across SAP CX and I&CX until April 2026. Outside work, I use AI as a building partner to explore cloud automation, retrieval and observability on my own AWS infrastructure.",
 };
 
 export const experience = [
   {
-    period: "Jan 2021 - Present",
+    period: "Jan 2021 - Apr 2026",
     role: "Operations Lead: SAP CX & I&CX",
     org: "Accenture · client: SAP",
-    blurb: "Lead a 16-member operations team and serve as the point of contact between SAP and Accenture for the CX and I&CX portfolio. My work spans SLA/KPI governance, capacity planning and scope assessment, with 100% SLA compliance across the supported services. Delivered automated operational reporting recognised with the SAP Hero Award and selection into Accenture’s Top 25 Global AI Programs.",
+    blurb: "Led a 16-member operations team and served as the point of contact between SAP and Accenture for the CX and I&CX portfolio. My work spanned SLA/KPI governance, capacity planning and scope assessment, with 100% SLA compliance across the supported services. Delivered automated operational reporting recognised with the SAP Hero Award and selection into Accenture’s Top 25 Global AI Programs.",
     stack: "SAP CX / I&CX, Commerce Cloud, C4C, SLA/KPI governance",
   },
   {
