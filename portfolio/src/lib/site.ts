@@ -16,6 +16,8 @@ export const site = {
   phone: "+91 96322 98045",
   address: "Bengaluru, India",
   url: "https://atla.in",
+  // Public Lambda Function URL for the chat widget (no secret: the gateway key stays in the Lambda).
+  chatUrl: "https://vi4tzxl3vftteec2xphilvtxqy0kbzbd.lambda-url.ap-south-1.on.aws/",
   linkedin: "https://linkedin.com/in/saipranavatla/",
   // Transparent cut-out (WebP with alpha), 896x1195; About's frame uses this aspect ratio.
   portrait: "/media/portrait.webp",
