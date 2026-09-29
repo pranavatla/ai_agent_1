@@ -95,7 +95,7 @@ export default function ChatWidget() {
           id="atla-chat"
           role="dialog"
           aria-label="Ask about Pranav"
-          className="fixed right-5 bottom-24 z-50 flex max-h-[min(34rem,calc(100dvh-8rem))] w-[min(24rem,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-surface text-slate-900 shadow-[0_24px_60px_rgba(15,23,42,0.18)]"
+          className="fixed right-5 bottom-24 z-50 md:right-24 flex max-h-[min(34rem,calc(100dvh-8rem))] w-[min(24rem,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-surface text-slate-900 shadow-[0_24px_60px_rgba(15,23,42,0.18)]"
         >
           <header className="border-b border-slate-200 px-5 py-4">
             <p className="font-semibold">Ask about Pranav</p>
