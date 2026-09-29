@@ -87,7 +87,7 @@ export const about = {
 export const experience = [
   {
     period: "Jan 2021 - Apr 2026",
-    role: "Operations Lead: SAP CX & I&CX",
+    role: "Cloud & Platform Infrastructure Specialist",
     org: "Accenture · client: SAP",
     blurb: "Led a 16-member operations team and served as the point of contact between SAP and Accenture for the CX and I&CX portfolio. My work spanned SLA/KPI governance, capacity planning and scope assessment, with 100% SLA compliance across the supported services. Delivered automated operational reporting recognised with the SAP Hero Award and selection into Accenture’s Top 25 Global AI Programs.",
     stack: "SAP CX / I&CX, Commerce Cloud, C4C, SLA/KPI governance",
