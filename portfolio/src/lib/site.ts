@@ -68,7 +68,7 @@ export const projects: { title: string; tag: string; href: string; image: string
   },
   {
     title: "Observability Deck",
-    tag: "Live observability · CloudWatch & uptime",
+    tag: "Live observability · Tokens, traffic & uptime",
     href: "https://obs.atla.in/",
     image: "/media/obs.jpg",
     video: "/media/obs-brag.mp4",
