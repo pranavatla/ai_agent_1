@@ -67,12 +67,12 @@ export const projects: { title: string; tag: string; href: string; image: string
     alt: "Four-day AWS AI Practitioner (AIF-C01) study guide with practice-exam questions",
   },
   {
-    title: "Operations Console",
-    tag: "Observability demo · FastAPI",
+    title: "Observability Deck",
+    tag: "Live observability · CloudWatch & uptime",
     href: "https://obs.atla.in/",
     image: "/media/obs.jpg",
     video: "/media/obs-brag.mp4",
-    alt: "Operations console with service health, latency, error rates and incident timeline",
+    alt: "Observability deck showing live site health, traffic, latency, errors, security and AI usage",
   },
 ];
 
@@ -118,7 +118,7 @@ export const experience = [
     period: "Ongoing · Independent",
     role: "AI & cloud projects",
     org: "atla.in",
-    blurb: "Build and host projects on my own AWS infrastructure: Gita Reflection explores retrieval across 700 verses, the Operations Console demonstrates incident simulation, and the Browser Arcade experiments with AI-assisted coding. I test retrieval grounding and automate deployments, including this Next.js portfolio on S3 and CloudFront.",
+    blurb: "Build and host projects on my own AWS infrastructure: Gita Reflection explores retrieval across 700 verses, the Observability Deck brings together live site health, traffic, latency, security and AI usage, and the Browser Arcade experiments with AI-assisted coding. I test retrieval grounding and automate deployments, including this Next.js portfolio on S3 and CloudFront.",
     stack: "Bedrock, Python, FastAPI, Next.js, GitHub Actions",
   },
 ];
