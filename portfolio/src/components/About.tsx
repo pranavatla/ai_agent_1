@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
+import Portrait from "./Portrait";
 import { motion, useMotionValue, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import { about, experience, recognition, site, timeline } from "@/lib/site";
 import { useIsLg, useReducedMotion } from "@/lib/media";
@@ -32,6 +32,7 @@ export default function About() {
   const stage = useRef<HTMLDivElement>(null);
   const bio = useRef<HTMLParagraphElement>(null);
   const pinned = useScroll({ target: stage, offset: ["start start", "end end"] }).scrollYProgress;
+  const portraitScroll = useScroll({ target: stage, offset: ["start end", "end start"] }).scrollYProgress;
   const flowing = useScroll({ target: bio, offset: ["start 0.9", "end 0.45"] }).scrollYProgress;
 
   // Pointer parallax: the portrait leans toward the cursor, the galaxy drifts the other way.
@@ -87,14 +88,14 @@ export default function About() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.8 }}
                 >
-                  <Image src={site.portrait} alt={`Portrait of ${site.name}`} fill sizes="(min-width: 1024px) 80vh, 70vw" className="object-cover" />
+                  <Portrait progress={pin ? pinned : portraitScroll} reduced={reduced} />
                 </motion.div>
               </motion.div>
             </div>
           </div>
 
-          <div className={`relative z-10 flex flex-1 flex-col gap-10 lg:flex-row lg:items-center lg:justify-between ${pin ? "" : "order-1 mt-10"}`}>
-            <h2 className="font-sans text-6xl leading-[1.05] font-bold tracking-[-0.03em] sm:text-7xl lg:order-2 lg:text-right xl:text-8xl">
+          <div className={`pointer-events-none relative z-10 flex flex-1 flex-col gap-10 lg:flex-row lg:items-center lg:justify-between ${pin ? "" : "order-1 mt-10"}`}>
+            <h2 className="pointer-events-auto font-sans text-6xl leading-[1.05] font-bold tracking-[-0.03em] sm:text-7xl lg:order-2 lg:text-right xl:text-8xl">
               {about.statement.map((line, i) => (
                 <motion.span
                   key={line}
@@ -105,7 +106,7 @@ export default function About() {
                 </motion.span>
               ))}
             </h2>
-            <div className="max-w-[20rem] lg:order-1">
+            <div className="pointer-events-auto max-w-[20rem] lg:order-1">
               <p ref={bio} className="text-lg leading-relaxed">
                 {reduced
                   ? about.bio
