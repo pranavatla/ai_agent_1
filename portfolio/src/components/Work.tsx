@@ -7,8 +7,7 @@ import { ArrowUpRight, CaretLeft, CaretRight } from "@phosphor-icons/react/dist/
 import { projects, work } from "@/lib/site";
 import { useReducedMotion } from "@/lib/media";
 
-// Four projects on a ring, 90deg apart. Tiles are 16:9; the radius keeps each tile narrower
-// than the chord to its neighbour (2R·sin45 ≈ 1.41R), so they never intersect.
+// Projects are evenly spaced around the ring; tiles are 16:9.
 const N = projects.length;
 const STEP = 360 / N;
 const STILL_MS = 3000; // how long a tile without a video (or whose video can't play) stays in front

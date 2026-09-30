@@ -43,6 +43,14 @@ export const projects: { title: string; tag: string; href: string; image: string
     alt: "Gita Reflection answering a question with the source Bhagavad Gita verse alongside",
   },
   {
+    title: "Gate · LLM Gateway",
+    tag: "Multi-provider AI · Budgets, policy & failover",
+    href: "https://gate.atla.in/",
+    image: "/media/gate-brag.jpg",
+    video: "/media/gate-brag.mp4",
+    alt: "Gate, one API for Anthropic, OpenAI, Gemini and Amazon Bedrock with tenant controls, budgets and audit logging",
+  },
+  {
     title: "Browser Arcade",
     tag: "JavaScript Canvas · Built with Claude",
     href: "https://games.atla.in/",
