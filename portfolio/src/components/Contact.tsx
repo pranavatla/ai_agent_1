@@ -5,7 +5,7 @@ import { EnvelopeSimple, FileArrowDown, MapPin, Phone } from "@phosphor-icons/re
 import { contact, resumes, site } from "@/lib/site";
 
 const field =
-  "mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 transition focus:border-deep focus:bg-surface focus:ring-2 focus:ring-deep/20 focus:outline-none";
+  "mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-500 transition focus:border-deep focus:bg-surface focus:ring-2 focus:ring-deep/20 focus:outline-none";
 const label = "text-sm font-medium text-slate-700";
 
 function Detail({ icon: Icon, title, children, wide }: { icon: typeof Phone; title: string; children: React.ReactNode; wide?: boolean }) {
@@ -93,7 +93,7 @@ export default function Contact() {
             </div>
             <button
               type="submit"
-              className="rounded-full bg-ink px-6 py-4 text-sm font-semibold text-ground transition duration-200 ease-snappy hover:bg-deep hover:text-white focus-visible:outline-deep active:scale-[0.97] sm:col-span-2"
+              className="rounded-full bg-ink px-6 py-4 text-sm font-semibold text-ground transition duration-200 ease-snappy hover:bg-deep hover:text-ground focus-visible:outline-deep active:scale-[0.97] sm:col-span-2"
             >
               Open email draft
             </button>

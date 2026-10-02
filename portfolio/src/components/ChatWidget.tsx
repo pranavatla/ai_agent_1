@@ -85,7 +85,7 @@ export default function ChatWidget() {
         aria-expanded={open}
         aria-controls="atla-chat"
         aria-label={open ? "Close the assistant" : "Ask the assistant about Pranav"}
-        className="fixed right-5 bottom-5 z-50 grid size-14 place-items-center rounded-full bg-deep text-white shadow-[0_12px_30px_rgba(15,23,42,0.25)] transition hover:scale-105 active:scale-95"
+        className="fixed right-5 bottom-5 z-50 grid size-14 place-items-center rounded-full bg-deep text-ground shadow-[0_12px_30px_rgba(15,23,42,0.25)] transition hover:scale-105 active:scale-95"
       >
         {open ? <X aria-hidden className="size-6" /> : <ChatCircleDots aria-hidden className="size-7" />}
       </button>
@@ -121,7 +121,7 @@ export default function ChatWidget() {
             {turns.map((t, i) => (
               <p
                 key={i}
-                className={`rounded-2xl px-4 py-2.5 whitespace-pre-wrap ${t.role === "user" ? "ml-8 bg-deep text-white" : "mr-8 bg-slate-100"}`}
+                className={`rounded-2xl px-4 py-2.5 whitespace-pre-wrap ${t.role === "user" ? "ml-8 bg-deep text-ground" : "mr-8 bg-slate-100"}`}
               >
                 {t.content}
               </p>
@@ -142,13 +142,13 @@ export default function ChatWidget() {
               maxLength={MAX_CHARS}
               placeholder="Type a question…"
               aria-label="Your question"
-              className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-deep focus:ring-2 focus:ring-deep/20 focus:outline-none"
+              className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm placeholder:text-slate-500 focus:border-deep focus:ring-2 focus:ring-deep/20 focus:outline-none"
             />
             <button
               type="submit"
               disabled={busy || !draft.trim()}
               aria-label="Send"
-              className="grid size-10 place-items-center rounded-full bg-deep text-white transition disabled:opacity-40"
+              className="grid size-10 place-items-center rounded-full bg-deep text-ground transition disabled:opacity-40"
             >
               <PaperPlaneRight aria-hidden className="size-5" />
             </button>

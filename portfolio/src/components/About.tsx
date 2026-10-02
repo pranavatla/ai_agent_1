@@ -15,7 +15,7 @@ function Word({ w, i, progress }: { w: string; i: number; progress: MotionValue<
   const a = SWEEP_FROM + i * STEP * (SWEEP_TO - SWEEP_FROM);
   const b = a + 2.2 * STEP * (SWEEP_TO - SWEEP_FROM);
   // Opacity rather than a fixed colour, so the sweep works on both the light and dark themes.
-  const opacity = useTransform(progress, [a, b], [0.16, 0.92]);
+  const opacity = useTransform(progress, [a, b], [0.72, 1]);
   return <motion.span style={{ opacity }}>{w} </motion.span>;
 }
 

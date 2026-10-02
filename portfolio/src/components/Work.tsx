@@ -37,7 +37,7 @@ function Face({ p, slot, back }: { p: (typeof projects)[number]; slot?: number; 
           poster={p.image}
           muted
           playsInline
-          preload="metadata"
+          preload="none"
           aria-label={p.alt}
           className="absolute inset-0 h-full w-full object-cover"
         />

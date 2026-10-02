@@ -125,3 +125,13 @@ body {
   position: absolute;
   inset: -6px;
 }
+
+/* Match the existing component-level reduced-motion behavior for native links and CSS feedback. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
