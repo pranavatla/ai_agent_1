@@ -148,7 +148,7 @@ export default function ChatWidget() {
               type="submit"
               disabled={busy || !draft.trim()}
               aria-label="Send"
-              className="grid size-10 place-items-center rounded-xl bg-deep text-white transition disabled:opacity-40"
+              className="grid size-10 place-items-center rounded-full bg-deep text-white transition disabled:opacity-40"
             >
               <PaperPlaneRight aria-hidden className="size-5" />
             </button>

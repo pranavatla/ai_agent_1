@@ -69,7 +69,7 @@ export default function Footer() {
                   target={href.startsWith("http") ? "_blank" : undefined}
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="grid size-11 place-items-center rounded-xl border border-slate-200 bg-surface/70 text-slate-700 shadow-sm backdrop-blur-md transition duration-200 ease-snappy hover:border-deep/50 hover:text-deep active:scale-[0.96]"
+                  className="grid size-11 place-items-center rounded-full border border-slate-200 bg-surface/70 text-slate-700 shadow-sm backdrop-blur-md transition duration-200 ease-snappy hover:border-deep/50 hover:text-deep active:scale-[0.96]"
                 >
                   <Icon aria-hidden className="size-4" />
                 </a>

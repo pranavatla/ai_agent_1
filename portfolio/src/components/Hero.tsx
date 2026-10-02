@@ -1,12 +1,14 @@
 "use client";
 
 import { motion } from "motion/react";
-import { GithubLogo, LinkedinLogo } from "@phosphor-icons/react/dist/ssr";
-import { site, socials } from "@/lib/site";
+import { EnvelopeSimple, LinkedinLogo } from "@phosphor-icons/react/dist/ssr";
+import { site } from "@/lib/site";
 import { useReducedMotion } from "@/lib/media";
 
 const button =
   "inline-flex items-center gap-2 rounded-full border border-slate-200 bg-surface px-6 py-3 text-sm font-medium text-slate-800 shadow-sm transition duration-200 ease-snappy hover:border-deep/40 hover:text-deep active:scale-[0.97]";
+const primary =
+  "inline-flex items-center gap-2 rounded-full bg-deep px-6 py-3 text-sm font-semibold text-ground shadow-sm transition duration-200 ease-snappy hover:brightness-110 active:scale-[0.97]";
 
 export default function Hero() {
   const reduced = useReducedMotion();
@@ -32,13 +34,13 @@ export default function Hero() {
           {site.tagline}
         </motion.p>
         <motion.div {...rise(0.3)} className="mt-8 flex flex-wrap items-center gap-3">
+          <a href="#contact" className={primary}>
+            <EnvelopeSimple aria-hidden weight="fill" className="size-4" />
+            Get in touch
+          </a>
           <a href={site.linkedin} target="_blank" rel="noopener noreferrer" className={button}>
             <LinkedinLogo aria-hidden weight="fill" className="size-4 text-deep" />
             LinkedIn
-          </a>
-          <a href={socials.find((s) => s.label === "GitHub")?.href} target="_blank" rel="noopener noreferrer" className={button}>
-            <GithubLogo aria-hidden weight="fill" className="size-4 text-deep" />
-            GitHub
           </a>
         </motion.div>
       </div>

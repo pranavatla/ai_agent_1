@@ -7,7 +7,7 @@ import { Cloud, Database, EnvelopeSimple, FlowArrow, GithubLogo, LinkedinLogo, R
 export const site = {
   brand: "Atla",
   name: "Sai Pranav Atla",
-  tagline: "10+ years in enterprise operations. Bringing that experience to cloud automation and applied AI.",
+  tagline: "10+ years in enterprise operations. Bringing that experience to cloud automation and applied AI. Based in Bengaluru.",
   // Rendered as separate items with spacing, not joined by separators.
   handle: ["Cloud operations", "Service delivery", "Applied AI", "Open to opportunities"],
   description:
@@ -78,17 +78,18 @@ export const projects: { title: string; tag: string; href: string; image: string
 
 // Each phrase pairs with a tile naming the real tools behind it (from the résumé).
 // Each phrase has its own colour, shared with its tile on the right.
+// One accent for the whole site: every tile shares --deep rather than its own hue.
 export const services: { phrase: string; color: string; icon: Icon; tools: string }[] = [
   { phrase: "Run cloud ops.", color: "#1d6fd0", icon: Cloud, tools: "SAP CX / I&CX, AWS, Service health" },
-  { phrase: "Automate infra.", color: "#6d3bd4", icon: FlowArrow, tools: "Terraform, Ansible, Jenkins, GitHub Actions" },
-  { phrase: "Lead incidents.", color: "#0f7c8a", icon: Siren, tools: "Major incidents, RCA, ITIL 4" },
-  { phrase: "Build RAG apps.", color: "#a86a12", icon: Database, tools: "Bedrock, ChromaDB, Embeddings" },
-  { phrase: "Build AI tools.", color: "#c2306b", icon: Robot, tools: "Python, FastAPI, AI workflows" },
-  { phrase: "Lead teams.", color: "#157a5a", icon: UsersThree, tools: "16-member team, SLA/KPI governance" },
+  { phrase: "Automate infra.", color: "#1d6fd0", icon: FlowArrow, tools: "Terraform, Ansible, Jenkins, GitHub Actions" },
+  { phrase: "Lead incidents.", color: "#1d6fd0", icon: Siren, tools: "Major incidents, RCA, ITIL 4" },
+  { phrase: "Build RAG apps.", color: "#1d6fd0", icon: Database, tools: "Bedrock, ChromaDB, Embeddings" },
+  { phrase: "Build AI tools.", color: "#1d6fd0", icon: Robot, tools: "Python, FastAPI, AI workflows" },
+  { phrase: "Lead teams.", color: "#1d6fd0", icon: UsersThree, tools: "16-member team, SLA/KPI governance" },
 ];
 
 export const about = {
-  statement: ["systems", "that", "hold."],
+  statement: ["calm", "under", "load."],
   bio: "My work connects technology, teams and the people who rely on a service. Across IBM, TCS and Accenture, I’ve led critical incident response and supported SAP cloud operations. At Accenture, I led a 16-member team across SAP CX and I&CX until April 2026. Outside work, I use AI as a building partner to explore cloud automation, retrieval and observability on my own AWS infrastructure.",
 };
 
@@ -154,7 +155,7 @@ export const resumes = [
 ];
 
 export const contact = {
-  lead: "I’m open to opportunities in cloud operations, service delivery, DevOps and applied AI, as well as project collaborations. Based in Bengaluru. If my experience fits what you’re working on, I’d welcome a conversation: email is the easiest way to reach me.",
+  lead: "Open to roles and collaborations in cloud operations, service delivery, DevOps and applied AI. Based in Bengaluru. Email is the easiest way to reach me.",
 };
 
 export const capabilities = ["Cloud & platform operations", "SAP CX & I&CX operations", "AI automation & RAG", "Incident & service leadership"];
@@ -162,7 +163,7 @@ export const capabilities = ["Cloud & platform operations", "SAP CX & I&CX opera
 export const sections = [
   { id: "home", label: "Home" },
   { id: "work", label: "Work" },
-  { id: "services", label: "Services" },
+  { id: "services", label: "What I do" },
   { id: "about", label: "About" },
   { id: "contact", label: "Contact" },
 ] as const;

@@ -7,7 +7,7 @@
   --ground: #f7f8fc;
   --ink: #0f172a;
   --panel: #f4f5f9;
-  --surface: #ffffff;
+  --surface: #fdfdff;
   --deep: #1d6fd0; /* the single accent, used everywhere */
   --grid-line: rgba(15, 23, 42, 0.07);
   --band: radial-gradient(ellipse 120% 70% at 50% 5%, #f7f8fc 0%, #f7f8fc 44%, #eef3ff 48%, #dce7ff 53%, #cbd7ff 59%, #d8cbf6 62%, #edc9e2 66%, #f8dcc6 74%, #fbece3 83%, #f7f8fc 93%);

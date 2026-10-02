@@ -149,7 +149,7 @@ function Timeline({ reduced }: { reduced: boolean }) {
             <li key={job.org} className={`relative pb-12 pl-12 last:pb-0 lg:w-1/2 lg:pl-0 ${right ? "lg:ml-auto lg:pl-14" : "lg:pr-14"}`}>
               <span
                 aria-hidden
-                className={`absolute top-7 left-4 size-3 -translate-x-1/2 rounded-full bg-deep shadow-[0_0_14px_4px_rgba(29,111,208,0.35)] ${right ? "lg:left-0" : "lg:left-full"}`}
+                className={`absolute top-7 left-4 size-3 -translate-x-1/2 rounded-full bg-deep ring-4 ring-ground ${right ? "lg:left-0" : "lg:left-full"}`}
               />
               <motion.article
                 initial={reduced ? false : { opacity: 0, y: 30 }}
